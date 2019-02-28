@@ -17,7 +17,10 @@
 #define TYPE_SENSOR_LIGHT       3
 #define TYPE_SENSOR_CURRENT     4
 
-
+/**
+ * @brief Structure to hold all data concerning an actuator.
+ * 
+ */
 typedef struct {
     struct Node* parentNode;
     list_element* listPtr;
@@ -26,8 +29,18 @@ typedef struct {
     uint8_t b;
 } Actuator;
 
+/**
+ * @brief "category" of functions used to calculate the value of physical parameters from the raw sensor data.
+ * 
+ * @param value 
+ * @return typedef sensorValueCalculator 
+ */
 typedef float sensorValueCalculator(uint16_t value);
 
+/**
+ * @brief Structure to hold all data concerning a sensor.
+ * 
+ */
 typedef struct {
     struct Node* parentNode;
     list_element* listPtr;
@@ -36,6 +49,10 @@ typedef struct {
     uint16_t value;
 } Sensor;
 
+/**
+ * @brief Structure to hold all data concerning a Node.
+ * 
+ */
 typedef struct {
     uint16_t id;
     struct Room* parentRoom;
@@ -44,6 +61,10 @@ typedef struct {
     list* actuators;
 } Node;
 
+/**
+ * @brief Structure to hold all data concerning a Room.
+ * 
+ */
 typedef struct {
     uint16_t id;
     struct Datastore* parentDatastore;
@@ -52,17 +73,54 @@ typedef struct {
     list* nodes;
 } Room;
 
+/**
+ * @brief Main structure that stores all data concerning a space.
+ * 
+ */
 typedef struct {
     list* rooms;
 } Datastore;
 
 
 
-//TODO: complete docs
+/**
+ * @brief Calculates the voltage a sensor is mesuring from it raw data.
+ * 
+ * @param value Raw 16bit value
+ * @return float result in Volts
+ */
 float voltageSensorValue (uint16_t value);
+
+/**
+ * @brief Calculates the temperature a sensor is mesuring from it raw data.
+ * 
+ * @param value Raw 16bit value
+ * @return float result in degrees Celsius
+ */
 float temperatureSensorValue (uint16_t value);
+
+/**
+ * @brief Calculates the relative humidity a sensor is mesuring from it raw data.
+ * 
+ * @param value Raw 16bit value
+ * @return float result in percentage
+ */
 float humiditySensorValue (uint16_t value);
+
+/**
+ * @brief Calculates the light intensity a sensor is mesuring from it raw data.
+ * 
+ * @param value Raw 16bit value
+ * @return float result in Lux
+ */
 float lightSensorValue (uint16_t value);
+
+/**
+ * @brief Calculates the current a sensor is mesuring from it raw data.
+ * 
+ * @param value Raw 16bit value
+ * @return float result in Ampère
+ */
 float currentSensorValue (uint16_t value);
 
 #define TYPE_SENSOR_VOLTAGE_VALUE_CALCULATOR        (&voltageSensorValue)
