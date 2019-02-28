@@ -1,7 +1,7 @@
 #include "stdlib.h"
 #include "stdio.h"
 
-#include "../lib/DataStructure/DataStructure.h"
+#include "DataStructure.h"
 
 int main(int argc, char const *argv[])
 {

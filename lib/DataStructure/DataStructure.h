@@ -6,7 +6,7 @@
 #include "stdbool.h"
 #include "string.h"
 
-#include "../LinkedList/LinkedList.h"
+#include "LinkedList.h"
 
 #define NAME_MAX_LENGTH 24
 
