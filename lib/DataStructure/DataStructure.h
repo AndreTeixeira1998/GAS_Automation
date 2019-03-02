@@ -17,17 +17,24 @@
 #define TYPE_SENSOR_LIGHT       3
 #define TYPE_SENSOR_CURRENT     4
 
+typedef struct _actuator Actuator;
+typedef struct _sensor Sensor;
+typedef struct _node Node;
+typedef struct _room Room;
+typedef struct _datastore Datastore;
+
+
 /**
  * @brief Structure to hold all data concerning an actuator.
  * 
  */
-typedef struct {
-    struct Node* parentNode;
+struct _actuator {
+    Node* parentNode;
     list_element* listPtr;
     uint8_t r;
     uint8_t g;
     uint8_t b;
-} Actuator;
+};
 
 /**
  * @brief "category" of functions used to calculate the value of physical parameters from the raw sensor data.
@@ -41,45 +48,45 @@ typedef float sensorValueCalculator(uint16_t value);
  * @brief Structure to hold all data concerning a sensor.
  * 
  */
-typedef struct {
-    struct Node* parentNode;
+struct _sensor {
+    Node* parentNode;
     list_element* listPtr;
     uint8_t type;
     sensorValueCalculator* calculator;
     uint16_t value;
-} Sensor;
+};
 
 /**
  * @brief Structure to hold all data concerning a Node.
  * 
  */
-typedef struct {
+struct _node {
     uint16_t id;
-    struct Room* parentRoom;
+    Room* parentRoom;
     list_element* listPtr;
     list* sensors;
     list* actuators;
-} Node;
+};
 
 /**
  * @brief Structure to hold all data concerning a Room.
  * 
  */
-typedef struct {
+struct _room {
     uint16_t id;
-    struct Datastore* parentDatastore;
+    Datastore* parentDatastore;
     list_element* listPtr;
     char* name;
     list* nodes;
-} Room;
+};
 
 /**
  * @brief Main structure that stores all data concerning a space.
  * 
  */
-typedef struct {
+struct _datastore {
     list* rooms;
-} Datastore;
+};
 
 
 

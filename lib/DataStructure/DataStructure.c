@@ -332,6 +332,11 @@ bool setNodeID (Node* node, uint16_t id) {
         return 1;
     }
 
+
+    if (!findNodeByID(node->parentRoom->parentDatastore, id)) {
+        return 1;
+    }
+
     node->id = id;
 
     return 0;
@@ -342,6 +347,10 @@ bool setRoomID (Room* room, uint16_t id) {
         return 1;
     }
 
+    if (!findRoomByID(room->parentDatastore, id)) {
+        return 1;
+    }
+
     room->id = id;
 
     return 0;
@@ -349,6 +358,10 @@ bool setRoomID (Room* room, uint16_t id) {
 
 bool setRoomName (Room* room, char* str) {
     if (str == NULL) {
+        return 1;
+    }
+
+    if (!findRoomByName(room->parentDatastore, str)) {
         return 1;
     }
 
