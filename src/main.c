@@ -24,5 +24,7 @@ int main(int argc, char const *argv[])
     if (room2 == NULL)
         printf("Error: node1");
     
+    printf("Done\n");
+    
     return 0;
 }

@@ -364,3 +364,51 @@ float getSensorValue (Sensor* sensor) {
 
     return (sensor->calculator)(sensor->value);
 }
+
+Node* findNodeByID (Datastore* datastore, uint16_t nodeID) {
+    if (!datastore) {
+        return NULL;
+    }
+
+    for (list_element* room_elem = listStart(datastore->rooms); room_elem != listEnd(datastore->rooms); room_elem = room_elem->next) {
+        Room* room = (Room*)room_elem->ptr;
+        for (list_element* node_elem = listStart(room->nodes); node_elem != listEnd(room->nodes); node_elem = node_elem->next) {
+            Node* node = (Node*)node_elem->ptr;
+            if (node->id == nodeID) {
+                return node;
+            }
+        }
+    }
+
+    return NULL;
+}
+
+Room* findRoomByID (Datastore* datastore, uint16_t roomID) {
+    if (!datastore) {
+        return NULL;
+    }
+
+    for (list_element* room_elem = listStart(datastore->rooms); room_elem != listEnd(datastore->rooms); room_elem = room_elem->next) {
+        Room* room = (Room*)room_elem->ptr;
+        if (room->id == roomID) {
+            return room;
+        }
+    }
+
+    return NULL;
+}
+
+Room* findRoomByName (Datastore* datastore, char* roomName) {
+    if (!datastore) {
+        return NULL;
+    }
+
+    for (list_element* room_elem = listStart(datastore->rooms); room_elem != listEnd(datastore->rooms); room_elem = room_elem->next) {
+        Room* room = (Room*)room_elem->ptr;
+        if (!strcmp(room->name, roomName)) {
+            return room;
+        }
+    }
+
+    return NULL;
+}

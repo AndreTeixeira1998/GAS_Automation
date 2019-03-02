@@ -263,4 +263,31 @@ bool setRoomName(Room* room, char* str);
  */
 float getSensorValue (Sensor* sensor);
 
+/**
+ * @brief Searches the datastore for a Node with the specified nodeID
+ * 
+ * @param datastore Datastore object to search
+ * @param nodeID nodeID to find
+ * @return Node* Node object with 'nodeID' id. NULL if not found.
+ */
+Node* findNodeByID (Datastore* datastore, uint16_t nodeID);
+
+/**
+ * @brief Searches the datastore for a Room with the specified roomID
+ * 
+ * @param datastore Datastore object to search
+ * @param roomID roomID to find
+ * @return Room* Room object with 'roomID' id. NULL if not found.
+ */
+Room* findRoomByID (Datastore* datastore, uint16_t roomID);
+
+/**
+ * @brief Searches the datastore for a Room with the specified roomName
+ * 
+ * @param datastore Datastore object to search
+ * @param roomName roomName to find
+ * @return Room* Room object with 'roomName' name. NULL if not found.
+ */
+Room* findRoomByName (Datastore* datastore, char* roomName);
+
 #endif
