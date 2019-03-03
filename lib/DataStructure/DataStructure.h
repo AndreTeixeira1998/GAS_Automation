@@ -260,7 +260,7 @@ bool setRoomID (Room* room, uint16_t id);
  * @return true Error
  * @return false All good
  */
-bool setRoomName(Room* room, char* str);
+bool setRoomName(Room* room, const char* str);
 
 /**
  * @brief Calculate the value of the Sensor object
@@ -295,6 +295,6 @@ Room* findRoomByID (Datastore* datastore, uint16_t roomID);
  * @param roomName roomName to find
  * @return Room* Room object with 'roomName' name. NULL if not found.
  */
-Room* findRoomByName (Datastore* datastore, char* roomName);
+Room* findRoomByName (Datastore* datastore, const char* roomName);
 
 #endif

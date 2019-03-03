@@ -103,7 +103,7 @@ Room* createRoom (Datastore* datastore) {
     room->id = 0;
     room->parentDatastore = datastore;
     room->listPtr = elem;
-    room->name = NULL; // TODO: allocate memory for room name
+    room->name = NULL;
     room->nodes = nodes;
 
     return room;
@@ -332,8 +332,7 @@ bool setNodeID (Node* node, uint16_t id) {
         return 1;
     }
 
-
-    if (!findNodeByID(node->parentRoom->parentDatastore, id)) {
+    if (findNodeByID(node->parentRoom->parentDatastore, id)) {
         return 1;
     }
 
@@ -347,7 +346,7 @@ bool setRoomID (Room* room, uint16_t id) {
         return 1;
     }
 
-    if (!findRoomByID(room->parentDatastore, id)) {
+    if (findRoomByID(room->parentDatastore, id)) {
         return 1;
     }
 
@@ -356,15 +355,16 @@ bool setRoomID (Room* room, uint16_t id) {
     return 0;
 }
 
-bool setRoomName (Room* room, char* str) {
-    if (str == NULL) {
+bool setRoomName (Room* room, const char* str) {
+    if (room == NULL || str == NULL) {
         return 1;
     }
 
-    if (!findRoomByName(room->parentDatastore, str)) {
+    if (findRoomByName(room->parentDatastore, str)) {
         return 1;
     }
 
+    room->name = (char*)realloc(room->name, strlen(str)+1);
     strcpy(room->name, str);
 
     return 0;
@@ -383,9 +383,9 @@ Node* findNodeByID (Datastore* datastore, uint16_t nodeID) {
         return NULL;
     }
 
-    for (list_element* room_elem = listStart(datastore->rooms); room_elem != listEnd(datastore->rooms); room_elem = room_elem->next) {
+    for (list_element* room_elem = listStart(datastore->rooms); room_elem != NULL; room_elem = room_elem->next) {
         Room* room = (Room*)room_elem->ptr;
-        for (list_element* node_elem = listStart(room->nodes); node_elem != listEnd(room->nodes); node_elem = node_elem->next) {
+        for (list_element* node_elem = listStart(room->nodes); node_elem != NULL; node_elem = node_elem->next) {
             Node* node = (Node*)node_elem->ptr;
             if (node->id == nodeID) {
                 return node;
@@ -401,7 +401,7 @@ Room* findRoomByID (Datastore* datastore, uint16_t roomID) {
         return NULL;
     }
 
-    for (list_element* room_elem = listStart(datastore->rooms); room_elem != listEnd(datastore->rooms); room_elem = room_elem->next) {
+    for (list_element* room_elem = listStart(datastore->rooms); room_elem != NULL; room_elem = room_elem->next) {
         Room* room = (Room*)room_elem->ptr;
         if (room->id == roomID) {
             return room;
@@ -411,13 +411,15 @@ Room* findRoomByID (Datastore* datastore, uint16_t roomID) {
     return NULL;
 }
 
-Room* findRoomByName (Datastore* datastore, char* roomName) {
-    if (!datastore) {
+Room* findRoomByName (Datastore* datastore, const char* roomName) {
+    if (!datastore || !roomName) {
         return NULL;
     }
-
-    for (list_element* room_elem = listStart(datastore->rooms); room_elem != listEnd(datastore->rooms); room_elem = room_elem->next) {
+    for (list_element* room_elem = listStart(datastore->rooms); room_elem != NULL; room_elem = room_elem->next) {
         Room* room = (Room*)room_elem->ptr;
+        if (!room->name) {
+            continue;
+        }
         if (!strcmp(room->name, roomName)) {
             return room;
         }
