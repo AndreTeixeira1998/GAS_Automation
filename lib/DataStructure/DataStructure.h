@@ -280,6 +280,18 @@ bool setSensorValue (Sensor* sensor, uint16_t value);
 float getSensorValue (Sensor* sensor);
 
 /**
+ * @brief Set the values for the RGB colour components that represent the value/state of the Actuator object
+ * 
+ * @param actuator Pointer to the Actuator object
+ * @param red 8-bit value for the Red component of the colour to display
+ * @param green 8-bit value for the Green component of the colour to display
+ * @param blue 8-bit value for the Blue component of the colour to display
+ * @return true Error
+ * @return false All Good
+ */
+bool setActuatorValue (Actuator* actuator, uint8_t red, uint8_t green, uint8_t blue);
+
+/**
  * @brief Searches the datastore for a Node with the specified nodeID
  * 
  * @param datastore Datastore object to search

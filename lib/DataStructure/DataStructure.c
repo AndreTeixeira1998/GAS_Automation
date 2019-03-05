@@ -388,6 +388,18 @@ float getSensorValue (Sensor* sensor) {
     return (sensor->calculator)(sensor->value);
 }
 
+bool setActuatorValue (Actuator* actuator, uint8_t red, uint8_t green, uint8_t blue) {
+    if (!actuator) {
+        return 1;
+    }
+
+    actuator->r = red;
+    actuator->g = green;
+    actuator->b = blue;
+
+    return 0;
+}
+
 Node* findNodeByID (Datastore* datastore, uint16_t nodeID) {
     if (!datastore) {
         return NULL;
