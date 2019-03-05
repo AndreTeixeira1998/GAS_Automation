@@ -1,15 +1,14 @@
 #include "functions.h"
 #include "stdio.h"
-#include <unistd.h>
 
-void skipComments (FILE* file, char* line) {
+/*void skipComments (FILE* file, char* line) {
     
     do {
         line = fgets(line, CONFIGURATION_FILE_MAX_LINE_SIZE, file);
     } while (!strncmp(line, "#", 1));
 
     return;
-}
+}*/
 
 char* filterString (char* str) {
     if (!str) {
@@ -26,7 +25,7 @@ char* filterString (char* str) {
     return str;
 }
 
-Datastore* importConfiguration(const char* filename) {
+char* getMinifiedJSONStringFromFile (const char* filename) {
     if (!filename) {
         return NULL;
     }
@@ -36,70 +35,59 @@ Datastore* importConfiguration(const char* filename) {
         return NULL;
     }
 
-    Datastore* datastore = createDatastore();
-    if (!datastore) {
+    int readChar = 0;
+    unsigned int jsonSize = 0,
+        jsonReserved = 100;
+    bool inString = false;
+    char* json = malloc(jsonReserved);
+    if (!json) {
+        fclose(file);
         return NULL;
     }
-    char line[CONFIGURATION_FILE_MAX_LINE_SIZE];
-    skipComments(file, line);
+    json[0] = '\0';
 
-    // Get the number of rooms to read
-    int nRooms = atoi(filterString(line));
-    if (!nRooms) {
-        deleteDatastore(datastore);
-        return NULL;
-    }
-
-    // Read nRooms rooms
-    for (int i = 0; i < nRooms; i++) {
-        skipComments(file, line);
-
-        // Parse line
-        char* token = filterString(strtok(line, ","));
-        Room* room = createRoom(datastore, atoi(token));
-        if (!room) {
-            deleteDatastore(datastore);
-            return NULL;
+    while ( (readChar = fgetc(file)) != EOF) {
+        // Ignore line endings and spaces (if not in string)
+        if ( (readChar == ' ' && !inString)
+            || readChar == '\n'
+            || readChar == '\r') {
+            continue;
         }
 
-        token = filterString(strtok(NULL, ","));
-        if (setRoomName(room, token)) {
-            deleteDatastore(datastore);
-            return NULL;
-        }
-    }
-
-    skipComments(file, line);
-
-    // Get the number of nodes to read
-    int nNodes = atoi(filterString(line));
-    if (!nNodes) {
-        deleteDatastore(datastore);
-        return NULL;
-    }
-
-    // Read nNodes nodes
-    for (int i = 0; i < nNodes; i++) {
-        skipComments(file, line);
-
-        // Parse line
-        char* token = filterString(strtok(line, ","));
-        uint16_t nodeID = atoi(token);
-        token = strtok(NULL, ",");
-        uint16_t roomID = atoi(token);
-
-        Room* room = findRoomByID(datastore, roomID);
-        if (!room) {
-            deleteDatastore(datastore);
-            return NULL;
+        // Check if string is being read
+        if (readChar == '"' || readChar == '\'') {
+            inString = !inString;
         }
 
-        Node* node = createNode(room, nodeID);
-        if (!node) {
-            deleteDatastore(datastore);
-            return NULL;
+        // Check if there is still space in the allocated string
+        if (jsonSize == jsonReserved-1) {
+            jsonReserved += 100;
+            json = realloc(json, jsonReserved);
+            if (!json) {
+                fclose(file);
+                return NULL;
+            }
         }
+
+        // Concat current JSON string and new char
+        char aux[2] = {readChar, '\0'};
+        strcat(json, aux);
+        jsonSize++;
     }
 
-    return datastore;
+    // Trim string to actual size of JSON's minified string
+    json = realloc(json, jsonSize+1);
+
+    // Close the file
+    fclose(file);
+    
+    return json;
+}
+
+Datastore* importConfiguration(const char* filename) {
+    
+    char* json = getMinifiedJSONStringFromFile(filename);
+
+    printf("%s\n", json);
+    return NULL;
 }

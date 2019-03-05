@@ -6,7 +6,7 @@
 
 int main(int argc, char const *argv[])
 {
-    Datastore* datastore = importConfiguration("GASconfig.conf");
+    Datastore* datastore = importConfiguration("GASconfig.json");
     if (!datastore) {
         printf("Error in config file.\n");
         return 1;

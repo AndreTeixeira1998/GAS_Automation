@@ -2,8 +2,7 @@
 #define __FUNCTIONS_H__
 
 #include "DataStructure.h"
-
-#define CONFIGURATION_FILE_MAX_LINE_SIZE 100
+#include "jsmn.h"
 
 /**
  * @brief Imports the configuration of the nodes and their layout from a file.
