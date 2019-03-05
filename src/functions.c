@@ -56,13 +56,8 @@ Datastore* importConfiguration(const char* filename) {
 
         // Parse line
         char* token = filterString(strtok(line, ","));
-        Room* room = createRoom(datastore);
+        Room* room = createRoom(datastore, atoi(token));
         if (!room) {
-            deleteDatastore(datastore);
-            return NULL;
-        }
-
-        if (setRoomID(room, atoi(token))) {
             deleteDatastore(datastore);
             return NULL;
         }
@@ -99,13 +94,8 @@ Datastore* importConfiguration(const char* filename) {
             return NULL;
         }
 
-        Node* node = createNode(room);
+        Node* node = createNode(room, nodeID);
         if (!node) {
-            deleteDatastore(datastore);
-            return NULL;
-        }
-
-        if (setNodeID(node, nodeID)) {
             deleteDatastore(datastore);
             return NULL;
         }
