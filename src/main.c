@@ -92,7 +92,7 @@ int main(int argc, char const *argv[])
     char str[BUFFER +1];
     char *token; 
     char data[PAYLOAD_SIZE][MAX_DATASIZE];
-    int data_type=0;
+    int data_type=0, k=0;
 
     puts("chateei-me com os channels por isso por agora mandem o path para a file");
     
@@ -112,19 +112,24 @@ int main(int argc, char const *argv[])
             printf("%s\n", str);
             token= strtok(str, " \n");
             while(token !=NULL){
-                //printf("%s\n",token); // debugging
+                //printf("token:%s\n",token); // debugging
                 strcpy(data[data_type], token);
                 //printf("#%s# - %d\n", data[data_type], data_type); //debugging
                 if(data_type==(START +1) || data_type==(DESTINATION_ADDRESS+1) || data_type==(MOTE_ID+1) || data_type==(GROUP_ID+1) || data_type==(RAW_VOLTAGE+1) || data_type==(RAW_VISIBLE_LIGHT+1) || data_type==(RAW_CURRENT+1) || data_type==(RAW_TEMPERATURE+1) || data_type==(RAW_HUMIDITY+1) || data_type==(MESSAGE_HANDLING_INFO+1)) {
                     strcat(data[data_type-1], data[data_type]);
                 }
-                
+                //printf("#%s# - %d\n", data[data_type], data_type); //debugging
+
                 data_type++;
                 token= strtok(NULL, " \n");
                 if(data_type==PAYLOAD_SIZE) data_type=0;
-                
+                //printf("#%s# - %d\n", data[data_type], data_type); //debugging
+
             }
-            for (data_type=0; data_type<23; data_type++) printf("#%s# - %d\n", data[data_type], data_type); //debugging
+
+            //printf("#%s# - %d\n", data[MOTE_ID], MOTE_ID); //debugging
+
+            for (k=0; k<23; k++) printf("#%s# - %d\n", data[k], k); //debugging
             // aqui falta meter um switch para meter os valores
             printf("----------------------------------------------------------------------\n");
 	    }
