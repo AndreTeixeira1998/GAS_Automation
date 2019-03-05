@@ -5,7 +5,11 @@ CC = clang
 BUILD_DIR ?= ./build
 SRC_DIRS ?= ./src ./lib/*
 
+<<<<<<< HEAD
 SRCS := $(shell find $(SRC_DIRS) -maxdepth 1 -name *.cpp -or -name *.c ! -name test.c -or -name *.s)
+=======
+SRCS := $(shell find $(SRC_DIRS) -maxdepth 1 -name *.cpp -or -name *.c -or -name *.s)
+>>>>>>> Read and obtain a minified JSON string from a file
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 

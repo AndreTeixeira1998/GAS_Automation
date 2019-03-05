@@ -1,0 +1,27 @@
+{
+    "rooms": [
+        {
+            "id": 0,
+            "name": "Bedroom of me",
+            "nodes": [
+                {
+                    "id": 0,
+                    "sensors": [
+                        {
+                            "type": 0
+                        },
+                        {
+                            "type": 1
+                        }
+                    ],
+                    "actuators": [
+                        {
+                            "posX": 10,
+                            "posY": 1
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
