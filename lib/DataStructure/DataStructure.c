@@ -79,7 +79,11 @@ Datastore* createDatastore () {
     return datastore;
 }
 
-Room* createRoom (Datastore* datastore) {
+Room* createRoom (Datastore* datastore, uint16_t id) {
+    if (!datastore || findRoomByID(datastore, id)) {
+        return NULL;
+    }
+
     Room* room = (Room*)malloc(sizeof(Room));
     if (room == NULL) {
         // Memory allocation failed
@@ -100,7 +104,7 @@ Room* createRoom (Datastore* datastore) {
         return NULL;
     }
 
-    room->id = 0;
+    room->id = id;
     room->parentDatastore = datastore;
     room->listPtr = elem;
     room->name = NULL;
@@ -109,7 +113,16 @@ Room* createRoom (Datastore* datastore) {
     return room;
 }
 
-Node* createNode (Room* room) {
+Node* createNode (Room* room, uint16_t id) {
+    if (!room) {
+        return NULL;
+    }
+
+    Datastore* datastore = room->parentDatastore;
+    if (findNodeByID(datastore, id)) {
+        return NULL;
+    }
+
     Node* node = (Node*)malloc(sizeof(Node));
     if (node == NULL) {
         // Memory allocation failed
@@ -138,7 +151,7 @@ Node* createNode (Room* room) {
         return NULL;
     }
 
-    node->id = 0;
+    node->id = id;
     node->parentRoom = room;
     node->listPtr = elem;
     node->sensors = sensors;

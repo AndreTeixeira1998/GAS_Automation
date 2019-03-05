@@ -158,17 +158,19 @@ Datastore* createDatastore ();
  * @brief Create a Room object
  * 
  * @param datastore Datastore in which to be inserted.
+ * @param id The ID for the new Room. Must be unique.
  * @return Room* The pointer to the new Room object. NULL if error occurs.
  */
-Room* createRoom (Datastore* datastore);
+Room* createRoom (Datastore* datastore, uint16_t id);
 
 /**
  * @brief Create a Node object
  * 
  * @param room A pointer to the Room this Node will belong to.
+ * @param id The ID of the new Node. Must be unique.
  * @return Node* The pointer to the new Node object. NULL if error occurs.
  */
-Node* createNode (Room* room);
+Node* createNode (Room* room, uint16_t id);
 
 /**
  * @brief Create a Actuator object
