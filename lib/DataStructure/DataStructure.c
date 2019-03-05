@@ -370,6 +370,16 @@ bool setRoomName (Room* room, const char* str) {
     return 0;
 }
 
+bool setSensorValue (Sensor* sensor, uint16_t value) {
+    if (!sensor) {
+        return 1;
+    }
+
+    sensor->value = value;
+    
+    return 0;
+}
+
 float getSensorValue (Sensor* sensor) {
     if (sensor == NULL) {
         return 0;

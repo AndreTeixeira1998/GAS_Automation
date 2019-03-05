@@ -263,6 +263,15 @@ bool setRoomID (Room* room, uint16_t id);
 bool setRoomName(Room* room, const char* str);
 
 /**
+ * @brief Set the raw value of the Sensor object
+ * 
+ * @param sensor Pointer to the Sensor object
+ * @return true Error
+ * @return false All Good
+ */
+bool setSensorValue (Sensor* sensor, uint16_t value);
+
+/**
  * @brief Calculate the value of the Sensor object
  * 
  * @param sensor Pointer to the sendor object
