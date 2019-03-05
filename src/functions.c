@@ -80,14 +80,29 @@ char* getMinifiedJSONStringFromFile (const char* filename) {
 
     // Close the file
     fclose(file);
-    
+
     return json;
 }
 
 Datastore* importConfiguration(const char* filename) {
     
     char* json = getMinifiedJSONStringFromFile(filename);
+    //char* json = "{\"rooms\":[{\"id\":0,\"name\":\"My Bedroom\",\"nodes\":[{\"id\":0,\"sensors\":[{\"type\":0},{\"type\":1}],\"actuators\":[{\"posX\":10,\"posY\":1}]}]}]}";
+
+    jsmn_parser parser;
+    jsmn_init(&parser);
+    int tokensRequired = jsmn_parse(&parser, json, strlen(json), NULL, 0);
+    jsmntok_t tokens[tokensRequired];
+
+    int res = jsmn_parse(&parser, json, strlen(json), tokens, sizeof(tokens)/sizeof(tokens[0]));
+    printf("req: %d | res: %d\n", tokensRequired, res);
+    if (res < 0) {
+        free(json);
+        printf("cenas\n");
+        return NULL;
+    }
 
     printf("%s\n", json);
+    free(json);
     return NULL;
 }
