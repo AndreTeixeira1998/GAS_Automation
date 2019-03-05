@@ -2,9 +2,11 @@
 #include "stdio.h"
 
 #include "DataStructure.h"
+#include "functions.h"
 
 int main(int argc, char const *argv[])
 {
+<<<<<<< HEAD
     Datastore* datastore = createDatastore();
     if (datastore == NULL)
         printf("Error\n");
@@ -36,16 +38,24 @@ int main(int argc, char const *argv[])
 
     if (setRoomName(room1, "Bedroom")) {
         printf("Error: setRoomName(room1, \"Bedroom\")\n");
-    }
-
-    if (findRoomByName(datastore, "Bedroom") != room1) {
-        printf("Error: findRoomByName(datastore, \"Bedroom\") != room1\n");
-    }
-
-    if (deleteDatastore(datastore)) {
-        printf("Error: deleteDatastore(datastore)\n");
+=======
+    Datastore* datastore = importConfiguration("GASconfig.conf");
+    if (!datastore) {
+        printf("Error in config file.\n");
+        return 1;
+>>>>>>> import of rooms and nodes done.
     }
     
+    for (list_element* elem = listStart(datastore->rooms); elem != NULL; elem = elem->next) {
+        Room* room = elem->ptr;
+        printf("%d,%s\n", room->id, room->name);
+
+        for (list_element* elem2 = listStart(room->nodes); elem2 != NULL; elem2 = elem2->next) {
+            Node* node = elem2->ptr;
+            printf("  %d\n", node->id);
+        }
+    }
+
     printf("Done\n");
     
     return 0;
