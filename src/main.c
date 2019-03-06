@@ -90,9 +90,10 @@ int main(int argc, char const *argv[])
     FILE *fp;
     char filename[BUFFER + 1];
     char str[BUFFER +1];
-    char *token; 
+    char *token;
+    char *endptr; 
     char data[PAYLOAD_SIZE][MAX_DATASIZE];
-    int data_type=0, k=0;
+    int data_type=0, k=0, c_vect_index, converted_data[PAYLOAD_SIZE];
 
     puts("chateei-me com os channels por isso por agora mandem o path para a file");
     
@@ -113,6 +114,9 @@ int main(int argc, char const *argv[])
             token= strtok(str, " \n");
             while(token !=NULL){
                 //printf("token:%s\n",token); // debugging
+
+                //printf("#%s# - %d\n", data[data_type], data_type); //debugging
+                
                 strcpy(data[data_type], token);
                 //printf("#%s# - %d\n", data[data_type], data_type); //debugging
                 if(data_type==(START +1) || data_type==(DESTINATION_ADDRESS+1) || data_type==(MOTE_ID+1) || data_type==(GROUP_ID+1) || data_type==(RAW_VOLTAGE+1) || data_type==(RAW_VISIBLE_LIGHT+1) || data_type==(RAW_CURRENT+1) || data_type==(RAW_TEMPERATURE+1) || data_type==(RAW_HUMIDITY+1) || data_type==(MESSAGE_HANDLING_INFO+1)) {
@@ -122,20 +126,33 @@ int main(int argc, char const *argv[])
 
                 data_type++;
                 token= strtok(NULL, " \n");
+                
                 if(data_type==PAYLOAD_SIZE) data_type=0;
                 //printf("#%s# - %d\n", data[data_type], data_type); //debugging
 
             }
 
             //printf("#%s# - %d\n", data[MOTE_ID], MOTE_ID); //debugging
-
-            for (k=0; k<23; k++) printf("#%s# - %d\n", data[k], k); //debugging
+            
+            for (c_vect_index=0; c_vect_index<PAYLOAD_SIZE; c_vect_index++){ 
+                //printf("#%s# - %d\n", data[c_vect_index], c_vect_index);  //DEBUGGING
+                converted_data[c_vect_index]= strtol(data[c_vect_index], &endptr, 16);
+                printf("hex: %s | dec: %d - vect_index: (%d)\n", data[c_vect_index], converted_data[c_vect_index], c_vect_index);  //DEBUGGING
+ 
+            }
+            
+            //for (k=0; k<23; k++){ printf("#%s# - %d\n", data[k], k); }//debugging
+            
             // aqui falta meter um switch para meter os valores
+            
             printf("----------------------------------------------------------------------\n");
 	    }
+
         fclose(fp);
+
     } else {
-    puts("error opening file to read"); 
+
+        puts("error opening file to read"); 
     
     }
     	
