@@ -56,6 +56,11 @@ int main(int argc, char const *argv[])
     setSensorValue(sensor1, 4044);
     printf("val s1: %f\n", getSensorValue(sensor1));
 
+    Sensor* sensor2 = createSensor(node1, TYPE_SENSOR_VOLTAGE);
+    if (sensor2) {
+        printf("Error: sensor2\n");
+    }
+
 
     if (deleteDatastore(datastore)) {
         printf("Error: deleteDatastore(datastore)\n");

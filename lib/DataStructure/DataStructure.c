@@ -227,6 +227,14 @@ Sensor* createSensor (Node* node, uint8_t type) {
         return NULL;
     }
 
+    for (list_element* elem = listStart(node->sensors); elem != NULL; elem = elem->next) {
+        Sensor* sensor = elem->ptr;
+        if (sensor->type == type) {
+            // There's already a sensor of this type registered on to this node
+            return NULL;
+        }
+    }
+
     Sensor* sensor = (Sensor*)malloc(sizeof(Sensor));
     if (sensor == NULL) {
         // Memory allocation failed
