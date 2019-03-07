@@ -2,9 +2,7 @@
 #define __FUNCTIONS_H__
 
 #include "DataStructure.h"
-
-#define JSMN_PARENT_LINKS
-#include "jsmn.h"
+#include "cJSON.h"
 
 /**
  * @brief Imports the configuration of the nodes and their layout from a file.

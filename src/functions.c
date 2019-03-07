@@ -1,15 +1,6 @@
 #include "functions.h"
 #include "stdio.h"
 
-/*void skipComments (FILE* file, char* line) {
-    
-    do {
-        line = fgets(line, CONFIGURATION_FILE_MAX_LINE_SIZE, file);
-    } while (!strncmp(line, "#", 1));
-
-    return;
-}*/
-
 char* filterString (char* str) {
     if (!str) {
         return NULL;
@@ -84,25 +75,195 @@ char* getMinifiedJSONStringFromFile (const char* filename) {
     return json;
 }
 
+bool parseSensor (Node* node, cJSON* json_sensor) {
+    if (!node || !json_sensor) {
+        return 1;
+    }
+
+    // Read the type of the sensor from the parsed json
+    uint16_t type = 0;
+    cJSON* json_type = cJSON_GetObjectItem(json_sensor, "type");
+    if (cJSON_IsNumber(json_type)) {
+        type = (uint16_t)json_type->valueint;
+    }
+    else {
+        return 1;
+    }
+
+    Sensor* sensor = createSensor(node, type);
+    if (!sensor) {
+        return 1;
+    }
+
+    return 0;
+}
+
+bool parseActuator (Node* node, cJSON* json_actuator) {
+    if (!node || !json_actuator) {
+        return 1;
+    }
+
+    // Read the type of the sensor from the parsed json
+    uint16_t posX = 0,
+        posY = 0;
+    cJSON* json_posX = cJSON_GetObjectItem(json_actuator, "posX");
+    cJSON* json_posY = cJSON_GetObjectItem(json_actuator, "posY");
+    if (cJSON_IsNumber(json_posX) && cJSON_IsNumber(json_posY)) {
+        posX = (uint16_t)json_posX->valueint;
+        posY = (uint16_t)json_posY->valueint;
+    }
+    else {
+        return 1;
+    }
+
+    // FIXME : Insert position into actuator instance
+    Actuator* actuator = createActuator(node);
+    if (!actuator) {
+        return 1;
+    }
+
+    return 0;
+}
+
+bool parseNode (Room* room, cJSON* json_node) {
+    if (!room || !json_node) {
+        return 1;
+    }
+
+    // Read the id of the node from the parsed json
+    uint16_t id = 0;
+    cJSON* json_id = cJSON_GetObjectItem(json_node, "id");
+    if (cJSON_IsNumber(json_id)) {
+        id = (uint16_t)json_id->valueint;
+    }
+    else {
+        return 1;
+    }
+
+    // Try to create a node in the room
+    Node* node = createNode(room, id);
+    if (!node) {
+        return 1;
+    }
+
+    // Parse the node's sensors
+    cJSON *sensors = cJSON_GetObjectItem(json_node, "sensors"),
+        *sensor = NULL;
+    if (!cJSON_IsArray(sensors)) {
+        return 1;
+    }
+    cJSON_ArrayForEach(sensor, sensors) {
+        if(parseSensor(node, sensor)) {
+            // Error parsing sensor
+            return 1;
+        }
+    }
+
+    // Parse the node's actuators
+    cJSON *actuators = cJSON_GetObjectItem(json_node, "actuators"),
+        *actuator = NULL;
+    if (!cJSON_IsArray(actuators)) {
+        return 1;
+    }
+    cJSON_ArrayForEach(actuator, actuators) {
+        if(parseActuator(node, actuator)) {
+            // Error parsing actuator
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+bool parseRoom (Datastore* datastore, cJSON* json_room) {
+    if (!datastore || !json_room) {
+        return 1;
+    }
+
+    // Read the id of the room from the parsed json
+    uint16_t id = 0;
+    cJSON* json_id = cJSON_GetObjectItem(json_room, "id");
+    if (cJSON_IsNumber(json_id)) {
+        id = (uint16_t)json_id->valueint;
+    }
+    else {
+        return 1;
+    }
+
+    // Try to create a room in the datastore
+    Room* room = createRoom(datastore, id);
+    if (!room) {
+        return 1;
+    }
+
+    // Read the name of the room from the parsed json
+    char* name;
+    cJSON* json_name = cJSON_GetObjectItem(json_room, "name");
+    if (cJSON_IsString(json_name) && (json_name->valuestring != NULL)) {
+        name = json_name->valuestring;
+    }
+    else {
+        return 1;
+    }
+
+    // Try to set the room name
+    if (setRoomName(room, name)) {
+        return 1;
+    }
+
+    // Parse the room's nodes
+    cJSON *nodes = cJSON_GetObjectItem(json_room, "nodes"),
+        *node = NULL;
+    if (!cJSON_IsArray(nodes)) {
+        return 1;
+    }
+    cJSON_ArrayForEach(node, nodes) {
+        if(parseNode(room, node)) {
+            // Error parsing node
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 Datastore* importConfiguration(const char* filename) {
     
-    char* json = getMinifiedJSONStringFromFile(filename);
-    //char* json = "{\"rooms\":[{\"id\":0,\"name\":\"My Bedroom\",\"nodes\":[{\"id\":0,\"sensors\":[{\"type\":0},{\"type\":1}],\"actuators\":[{\"posX\":10,\"posY\":1}]}]}]}";
-
-    jsmn_parser parser;
-    jsmn_init(&parser);
-    int tokensRequired = jsmn_parse(&parser, json, strlen(json), NULL, 0);
-    jsmntok_t tokens[tokensRequired];
-
-    int res = jsmn_parse(&parser, json, strlen(json), tokens, sizeof(tokens)/sizeof(tokens[0]));
-    printf("req: %d | res: %d\n", tokensRequired, res);
-    if (res < 0) {
-        free(json);
-        printf("cenas\n");
+    char* jsonString = getMinifiedJSONStringFromFile(filename);
+    
+    cJSON* json = cJSON_Parse(jsonString);
+    if (!json) {
+        free(jsonString);
         return NULL;
     }
 
-    printf("%s\n", json);
-    free(json);
-    return NULL;
+    Datastore* datastore = createDatastore();
+    if (!datastore) {
+        free(jsonString);
+        cJSON_Delete(json);
+        return NULL;
+    }
+
+    // Parse the room's data from the configuration file
+    cJSON *rooms = cJSON_GetObjectItem(json, "rooms"),
+        *room = NULL;
+    if (!cJSON_IsArray(rooms)) {
+        deleteDatastore(datastore);
+        cJSON_Delete(json);
+        free(jsonString);
+        return NULL;
+    }
+    cJSON_ArrayForEach(room, rooms) {
+        if(parseRoom(datastore, room)) {
+            // Error parsing room
+            deleteDatastore(datastore);
+            cJSON_Delete(json);
+            free(jsonString);
+            return NULL;
+        }
+    }
+
+    //printf("%s\n", jsonString);
+    free(jsonString);
+    return datastore;
 }
