@@ -20,6 +20,15 @@
                             "posY": 1
                         }
                     ]
+                },
+                {
+                    "id": 1,
+                    "sensors": [
+                        {
+                            "type": 3
+                        }
+                    ],
+                    "actuators": []
                 }
             ]
         }
