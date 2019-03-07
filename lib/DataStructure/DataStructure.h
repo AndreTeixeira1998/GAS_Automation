@@ -17,11 +17,11 @@
 #define TYPE_SENSOR_LIGHT       3
 #define TYPE_SENSOR_CURRENT     4
 
-typedef struct _actuator Actuator;
-typedef struct _sensor Sensor;
-typedef struct _node Node;
-typedef struct _room Room;
 typedef struct _datastore Datastore;
+typedef struct _room Room;
+typedef struct _node Node;
+typedef struct _sensor Sensor;
+typedef struct _actuator Actuator;
 typedef struct _position Position;
 typedef struct _color Color;
 
@@ -35,6 +35,10 @@ struct _position {
     uint16_t y;
 };
 
+/**
+ * @brief Structure to hold a color in RGB format
+ * 
+ */
 struct _color {
     uint8_t r;
     uint8_t g;
@@ -361,5 +365,15 @@ Room* findRoomByName (Datastore* datastore, const char* roomName);
  * @return Actuator* Actuator object with the desired position. NULL if not found.
  */
 Actuator* findActuatorByPos (Datastore* datastore, Position* pos);
+
+/**
+ * @brief Run function through all Actuators in a Datastore. Function should have same return logic.
+ * 
+ * @param datastore Datastore to search for Actuators
+ * @param func Function to run for every Actuator
+ * @return true Error
+ * @return false All good
+ */
+bool iterateActuators (Datastore* datastore, bool (*func)(Actuator*));
 
 #endif

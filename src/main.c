@@ -3,6 +3,11 @@
 
 #include "DataStructure.h"
 
+bool func1(Actuator* actuator) {
+    printf("  %d\n", actuator->pos->x);
+    return 0;
+}
+
 int main(int argc, char const *argv[])
 {
     Datastore* datastore = createDatastore();
@@ -41,6 +46,16 @@ int main(int argc, char const *argv[])
     if (findRoomByName(datastore, "Bedroom") != room1) {
         printf("Error: findRoomByName(datastore, \"Bedroom\") != room1\n");
     }
+
+    Actuator* actuator1 = createActuator(node1, 0,0);
+    Actuator* actuator2 = createActuator(node1, 400,1);
+
+    iterateActuators(datastore, func1);
+
+    Sensor* sensor1 = createSensor(node1, TYPE_SENSOR_VOLTAGE);
+    setSensorValue(sensor1, 4044);
+    printf("val s1: %f\n", getSensorValue(sensor1));
+
 
     if (deleteDatastore(datastore)) {
         printf("Error: deleteDatastore(datastore)\n");

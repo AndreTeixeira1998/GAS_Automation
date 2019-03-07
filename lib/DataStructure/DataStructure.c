@@ -11,24 +11,24 @@ bool isValidType (uint8_t type) {
 
 float voltageSensorValue (uint16_t value) {
     const float VRef = 1.5;
-    return value/4096 * VRef;
+    return (float)value/4096 * VRef;
 }
 
 float temperatureSensorValue (uint16_t value) {
-    return -39.6 + 0.01 * value;
+    return -39.6 + 0.01 * (float)value;
 }
 
 float humiditySensorValue (uint16_t value) {
     // Using (value*value) to avoid import math.h
-    return -2.0468 + 0.0367 * value -0.0000015955 * (value*value);
+    return -2.0468 + 0.0367 * (float)value -0.0000015955 * ((float)value*(float)value);
 }
 
 float lightSensorValue (uint16_t value) {
-    return 6250 * (value/4096) * 1.5;
+    return 6250 * ((float)value/4096) * 1.5;
 }
 
 float currentSensorValue (uint16_t value) {
-    return 769 * (value/4096) * 1.5;
+    return 769 * ((float)value/4096) * 1.5;
 }
 
 sensorValueCalculator* sensorCalculatorFunctionPointer (uint8_t type) {
@@ -196,6 +196,9 @@ Actuator* createActuator (Node* node, uint16_t posX, uint16_t posY) {
         free(actuator);
         return NULL;
     }
+    color->r = 0;
+    color->g = 0;
+    color->b = 0;
 
     list_element* elem = listInsert(node->actuators, actuator, NULL);
     if (elem == NULL) {
@@ -216,6 +219,10 @@ Actuator* createActuator (Node* node, uint16_t posX, uint16_t posY) {
 }
 
 Sensor* createSensor (Node* node, uint8_t type) {
+    if (!node) {
+        return NULL;
+    }
+
     if (!isValidType(type)) {
         return NULL;
     }
@@ -538,4 +545,30 @@ Actuator* findActuatorByPos (Datastore* datastore, Position* pos) {
     }
 
     return NULL;
+}
+
+bool iterateActuators (Datastore* datastore, bool (*func)(Actuator*)) {
+    if (!datastore || !func) {
+        return NULL;
+    }
+
+    // For every Room
+    for (list_element* room_elem = listStart(datastore->rooms); room_elem != NULL; room_elem = room_elem->next) {
+        Room* room = (Room*)room_elem->ptr;
+
+        // For every Node
+        for (list_element* node_elem = listStart(room->nodes); node_elem != NULL; node_elem = node_elem->next) {
+            Node* node = (Node*)node_elem->ptr;
+            
+            // For every Actuator
+            for (list_element* actuator_elem = listStart(node->actuators); actuator_elem != NULL; actuator_elem = actuator_elem->next) {
+                Actuator* actuator = (Actuator*)actuator_elem->ptr;
+                if ((*func)(actuator)) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
 }

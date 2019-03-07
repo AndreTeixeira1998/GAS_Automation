@@ -26,8 +26,7 @@ $(BUILD_DIR)/%.s.o: %.s
 # c source
 $(BUILD_DIR)/%.c.o: %.c
 	$(MKDIR_P) $(dir $@)
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
-	# -g
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@ -Wall -Wextra -g
 
 # c++ source
 $(BUILD_DIR)/%.cpp.o: %.cpp
