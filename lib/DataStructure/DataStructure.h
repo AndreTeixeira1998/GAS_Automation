@@ -34,6 +34,8 @@ struct _actuator {
     uint8_t r;
     uint8_t g;
     uint8_t b;
+    uint16_t posX;
+    uint16_t posY;
 };
 
 /**
@@ -176,9 +178,11 @@ Node* createNode (Room* room, uint16_t id);
  * @brief Create a Actuator object
  * 
  * @param node A pointer to the Node this Actuator will belong to.
+ * @param posX Position in the X axis on the RGB Matrix output
+ * @param posY Position in the Y axis on the RGB Matrix output
  * @return Actuator* The pointer to the new Actuator object. NULL if error occurs.
  */
-Actuator* createActuator (Node* node);
+Actuator* createActuator (Node* node, uint16_t posX, uint16_t posY);
 
 /**
  * @brief Create a Sensor object
@@ -319,5 +323,15 @@ Room* findRoomByID (Datastore* datastore, uint16_t roomID);
  * @return Room* Room object with 'roomName' name. NULL if not found.
  */
 Room* findRoomByName (Datastore* datastore, const char* roomName);
+
+/**
+ * @brief 
+ * 
+ * @param datastore Datastore object to search
+ * @param posX Position in the X axis on the RGB Matrix output
+ * @param posY Position in the Y axis on the RGB Matrix output
+ * @return Actuator* Actuator object with the desired position. NULL if not found.
+ */
+Actuator* findActuatorByPos (Datastore* datastore, uint16_t posX, uint16_t posY);
 
 #endif

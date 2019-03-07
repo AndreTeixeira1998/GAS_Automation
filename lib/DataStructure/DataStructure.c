@@ -160,7 +160,18 @@ Node* createNode (Room* room, uint16_t id) {
     return node;
 }
 
-Actuator* createActuator (Node* node) {
+Actuator* createActuator (Node* node, uint16_t posX, uint16_t posY) {
+    if (!node) {
+        return NULL;
+    }
+
+    Room* room = node->parentRoom;
+    Datastore* datastore = room->parentDatastore;
+    if (findActuatorByPos(datastore, posX, posY)) {
+        // There is already a Actuator assigned to that position
+        return NULL;
+    }
+
     Actuator* actuator = (Actuator*)malloc(sizeof(Actuator));
     if (actuator == NULL) {
         // Memory allocation failed
@@ -179,6 +190,8 @@ Actuator* createActuator (Node* node) {
     actuator->r = 0;
     actuator->g = 0;
     actuator->b = 0;
+    actuator->posX = posX;
+    actuator->posY = posY;
 
     return actuator;
 }
@@ -457,6 +470,32 @@ Room* findRoomByName (Datastore* datastore, const char* roomName) {
         }
         if (!strcmp(room->name, roomName)) {
             return room;
+        }
+    }
+
+    return NULL;
+}
+
+Actuator* findActuatorByPos (Datastore* datastore, uint16_t posX, uint16_t posY) {
+    if (!datastore) {
+        return NULL;
+    }
+
+    // For every Room
+    for (list_element* room_elem = listStart(datastore->rooms); room_elem != NULL; room_elem = room_elem->next) {
+        Room* room = (Room*)room_elem->ptr;
+
+        // For every Node
+        for (list_element* node_elem = listStart(room->nodes); node_elem != NULL; node_elem = node_elem->next) {
+            Node* node = (Node*)node_elem->ptr;
+            
+            // For every Actuator
+            for (list_element* actuator_elem = listStart(node->actuators); actuator_elem != NULL; actuator_elem = actuator_elem->next) {
+                Actuator* actuator = (Actuator*)actuator_elem->ptr;
+                if (actuator->posX == posX && actuator->posY == posY) {
+                    return actuator;
+                }
+            }
         }
     }
 
