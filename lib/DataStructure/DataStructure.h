@@ -22,7 +22,17 @@ typedef struct _sensor Sensor;
 typedef struct _node Node;
 typedef struct _room Room;
 typedef struct _datastore Datastore;
+typedef struct _position Position;
 
+
+/**
+ * @brief Structure to hold a cartesian position
+ * 
+ */
+struct _position {
+    uint16_t x;
+    uint16_t y;
+};
 
 /**
  * @brief Structure to hold all data concerning an actuator.
@@ -34,8 +44,7 @@ struct _actuator {
     uint8_t r;
     uint8_t g;
     uint8_t b;
-    uint16_t posX;
-    uint16_t posY;
+    Position* pos;
 };
 
 /**
@@ -325,13 +334,13 @@ Room* findRoomByID (Datastore* datastore, uint16_t roomID);
 Room* findRoomByName (Datastore* datastore, const char* roomName);
 
 /**
- * @brief 
+ * @brief Searches the datastore for a Actuator with the specified position
  * 
  * @param datastore Datastore object to search
  * @param posX Position in the X axis on the RGB Matrix output
  * @param posY Position in the Y axis on the RGB Matrix output
  * @return Actuator* Actuator object with the desired position. NULL if not found.
  */
-Actuator* findActuatorByPos (Datastore* datastore, uint16_t posX, uint16_t posY);
+Actuator* findActuatorByPos (Datastore* datastore, Position* pos);
 
 #endif

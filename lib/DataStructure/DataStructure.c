@@ -165,22 +165,34 @@ Actuator* createActuator (Node* node, uint16_t posX, uint16_t posY) {
         return NULL;
     }
 
+    Position* pos = (Position*)malloc(sizeof(Position));
+    if (pos == NULL) {
+        // Memory allocation failed
+        return NULL;
+    }
+    pos->x = posX;
+    pos->y = posY;
+
+    // Search for duplicates
     Room* room = node->parentRoom;
     Datastore* datastore = room->parentDatastore;
-    if (findActuatorByPos(datastore, posX, posY)) {
+    if (findActuatorByPos(datastore, pos)) {
         // There is already a Actuator assigned to that position
+        free(pos);
         return NULL;
     }
 
     Actuator* actuator = (Actuator*)malloc(sizeof(Actuator));
     if (actuator == NULL) {
         // Memory allocation failed
+        free(pos);
         return NULL;
     }
 
     list_element* elem = listInsert(node->actuators, actuator, NULL);
     if (elem == NULL) {
         // Insertion failed
+        free(pos);
         free(actuator);
         return NULL;
     }
@@ -190,8 +202,7 @@ Actuator* createActuator (Node* node, uint16_t posX, uint16_t posY) {
     actuator->r = 0;
     actuator->g = 0;
     actuator->b = 0;
-    actuator->posX = posX;
-    actuator->posY = posY;
+    actuator->pos = pos;
 
     return actuator;
 }
@@ -230,6 +241,8 @@ bool deleteActuator (Actuator* actuator) {
 
     list_element* elem = actuator->listPtr;
     Node* node = actuator->parentNode;
+
+    free(actuator->pos);
 
     free(actuator);
     list_element* res = listRemove(node->actuators, elem);
@@ -476,8 +489,8 @@ Room* findRoomByName (Datastore* datastore, const char* roomName) {
     return NULL;
 }
 
-Actuator* findActuatorByPos (Datastore* datastore, uint16_t posX, uint16_t posY) {
-    if (!datastore) {
+Actuator* findActuatorByPos (Datastore* datastore, Position* pos) {
+    if (!datastore || !pos) {
         return NULL;
     }
 
@@ -492,7 +505,7 @@ Actuator* findActuatorByPos (Datastore* datastore, uint16_t posX, uint16_t posY)
             // For every Actuator
             for (list_element* actuator_elem = listStart(node->actuators); actuator_elem != NULL; actuator_elem = actuator_elem->next) {
                 Actuator* actuator = (Actuator*)actuator_elem->ptr;
-                if (actuator->posX == posX && actuator->posY == posY) {
+                if (actuator->pos->x == pos->x && actuator->pos->y == pos->y) {
                     return actuator;
                 }
             }
