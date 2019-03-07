@@ -436,6 +436,22 @@ float getSensorValue (Sensor* sensor) {
     return (sensor->calculator)(sensor->value);
 }
 
+Position* getActuatorPosition (Actuator* actuator) {
+    if (!actuator) {
+        return NULL;
+    }
+
+    return actuator->pos;
+}
+
+Color* getActuatorColor (Actuator* actuator) {
+    if (!actuator) {
+        return NULL;
+    }
+
+    return actuator->color;
+}
+
 bool setActuatorValue (Actuator* actuator, Color* color) {
     if (!actuator || !color) {
         return 1;

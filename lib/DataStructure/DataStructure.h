@@ -294,10 +294,26 @@ bool setSensorValue (Sensor* sensor, uint16_t value);
 /**
  * @brief Calculate the value of the Sensor object
  * 
- * @param sensor Pointer to the sendor object
+ * @param sensor Pointer to the Sensor object
  * @return float Value of the sensor. 0 in case of error
  */
 float getSensorValue (Sensor* sensor);
+
+/**
+ * @brief Get the Actuator Position object
+ * 
+ * @param actuator Pointer to the Actuator object
+ * @return Position* Pointer to the Position of the Actuator. NULL if error.
+ */
+Position* getActuatorPosition (Actuator* actuator);
+
+/**
+ * @brief Get the Actuator Color object
+ * 
+ * @param actuator Pointer to the Actuator object
+ * @return Color* Pointer to the Color of the Actuator. NULL if error.
+ */
+Color* getActuatorColor (Actuator* actuator);
 
 /**
  * @brief Set the values for the RGB colour components that represent the value/state of the Actuator object
