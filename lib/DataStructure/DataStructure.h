@@ -23,6 +23,7 @@ typedef struct _node Node;
 typedef struct _room Room;
 typedef struct _datastore Datastore;
 typedef struct _position Position;
+typedef struct _color Color;
 
 
 /**
@@ -34,6 +35,12 @@ struct _position {
     uint16_t y;
 };
 
+struct _color {
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+};
+
 /**
  * @brief Structure to hold all data concerning an actuator.
  * 
@@ -41,9 +48,7 @@ struct _position {
 struct _actuator {
     Node* parentNode;
     list_element* listPtr;
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
+    Color* color;
     Position* pos;
 };
 
@@ -298,13 +303,11 @@ float getSensorValue (Sensor* sensor);
  * @brief Set the values for the RGB colour components that represent the value/state of the Actuator object
  * 
  * @param actuator Pointer to the Actuator object
- * @param red 8-bit value for the Red component of the colour to display
- * @param green 8-bit value for the Green component of the colour to display
- * @param blue 8-bit value for the Blue component of the colour to display
+ * @param color Pointer to color object to import
  * @return true Error
  * @return false All Good
  */
-bool setActuatorValue (Actuator* actuator, uint8_t red, uint8_t green, uint8_t blue);
+bool setActuatorValue (Actuator* actuator, Color* color);
 
 /**
  * @brief Searches the datastore for a Node with the specified nodeID

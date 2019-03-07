@@ -189,19 +189,27 @@ Actuator* createActuator (Node* node, uint16_t posX, uint16_t posY) {
         return NULL;
     }
 
-    list_element* elem = listInsert(node->actuators, actuator, NULL);
-    if (elem == NULL) {
-        // Insertion failed
+    Color* color = (Color*)malloc(sizeof(Color));
+    if (color == NULL) {
+        // Memory allocation failed
         free(pos);
         free(actuator);
         return NULL;
     }
 
+    list_element* elem = listInsert(node->actuators, actuator, NULL);
+    if (elem == NULL) {
+        // Insertion failed
+        free(pos);
+        free(color);
+        free(actuator);
+        return NULL;
+    }
+
+
     actuator->parentNode = node;
     actuator->listPtr = elem;
-    actuator->r = 0;
-    actuator->g = 0;
-    actuator->b = 0;
+    actuator->color = color;
     actuator->pos = pos;
 
     return actuator;
@@ -242,6 +250,7 @@ bool deleteActuator (Actuator* actuator) {
     list_element* elem = actuator->listPtr;
     Node* node = actuator->parentNode;
 
+    free(actuator->color);
     free(actuator->pos);
 
     free(actuator);
@@ -427,14 +436,14 @@ float getSensorValue (Sensor* sensor) {
     return (sensor->calculator)(sensor->value);
 }
 
-bool setActuatorValue (Actuator* actuator, uint8_t red, uint8_t green, uint8_t blue) {
-    if (!actuator) {
+bool setActuatorValue (Actuator* actuator, Color* color) {
+    if (!actuator || !color) {
         return 1;
     }
 
-    actuator->r = red;
-    actuator->g = green;
-    actuator->b = blue;
+    actuator->color->r = color->r;
+    actuator->color->g = color->g;
+    actuator->color->b = color->b;
 
     return 0;
 }
