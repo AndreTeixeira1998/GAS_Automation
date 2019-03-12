@@ -227,12 +227,9 @@ Sensor* createSensor (Node* node, uint8_t type) {
         return NULL;
     }
 
-    for (list_element* elem = listStart(node->sensors); elem != NULL; elem = elem->next) {
-        Sensor* sensor = elem->ptr;
-        if (sensor->type == type) {
-            // There's already a sensor of this type registered on to this node
-            return NULL;
-        }
+    if (findSensorByType(node, type)) {
+        // There's alreay a sensor with the specified type associated with this node.
+        return NULL;
     }
 
     Sensor* sensor = (Sensor*)malloc(sizeof(Sensor));
@@ -549,6 +546,22 @@ Actuator* findActuatorByPos (Datastore* datastore, Position* pos) {
                     return actuator;
                 }
             }
+        }
+    }
+
+    return NULL;
+}
+
+Sensor* findSensorByType (Node* node, uint8_t type) {
+    if (!node) {
+        return NULL;
+    }
+
+    for (list_element* elem = listStart(node->sensors); elem != NULL; elem = elem->next) {
+        Sensor* sensor = elem->ptr;
+        if (sensor->type == type) {
+            // There's already a sensor of this type registered on to this node
+            return sensor;
         }
     }
 
