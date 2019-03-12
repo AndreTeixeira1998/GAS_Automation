@@ -1,0 +1,36 @@
+{
+    "rooms": [
+        {
+            "id": 0,
+            "name": "My Bedroom",
+            "nodes": [
+                {
+                    "id": 0,
+                    "sensors": [
+                        {
+                            "type": 0
+                        },
+                        {
+                            "type": 1
+                        }
+                    ],
+                    "actuators": [
+                        {
+                            "posX": 10,
+                            "posY": 1
+                        }
+                    ]
+                },
+                {
+                    "id": 1,
+                    "sensors": [
+                        {
+                            "type": 3
+                        }
+                    ],
+                    "actuators": []
+                }
+            ]
+        }
+    ]
+}
