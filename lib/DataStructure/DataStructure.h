@@ -17,12 +17,33 @@
 #define TYPE_SENSOR_LIGHT       3
 #define TYPE_SENSOR_CURRENT     4
 
-typedef struct _actuator Actuator;
-typedef struct _sensor Sensor;
-typedef struct _node Node;
-typedef struct _room Room;
 typedef struct _datastore Datastore;
+typedef struct _room Room;
+typedef struct _node Node;
+typedef struct _sensor Sensor;
+typedef struct _actuator Actuator;
+typedef struct _position Position;
+typedef struct _color Color;
 
+
+/**
+ * @brief Structure to hold a cartesian position
+ * 
+ */
+struct _position {
+    uint16_t x;
+    uint16_t y;
+};
+
+/**
+ * @brief Structure to hold a color in RGB format
+ * 
+ */
+struct _color {
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+};
 
 /**
  * @brief Structure to hold all data concerning an actuator.
@@ -31,9 +52,8 @@ typedef struct _datastore Datastore;
 struct _actuator {
     Node* parentNode;
     list_element* listPtr;
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
+    Color* color;
+    Position* pos;
 };
 
 /**
@@ -174,9 +194,11 @@ Node* createNode (Room* room);
  * @brief Create a Actuator object
  * 
  * @param node A pointer to the Node this Actuator will belong to.
+ * @param posX Position in the X axis on the RGB Matrix output
+ * @param posY Position in the Y axis on the RGB Matrix output
  * @return Actuator* The pointer to the new Actuator object. NULL if error occurs.
  */
-Actuator* createActuator (Node* node);
+Actuator* createActuator (Node* node, uint16_t posX, uint16_t posY);
 
 /**
  * @brief Create a Sensor object
@@ -274,22 +296,36 @@ bool setSensorValue (Sensor* sensor, uint16_t value);
 /**
  * @brief Calculate the value of the Sensor object
  * 
- * @param sensor Pointer to the sendor object
+ * @param sensor Pointer to the Sensor object
  * @return float Value of the sensor. 0 in case of error
  */
 float getSensorValue (Sensor* sensor);
 
 /**
+ * @brief Get the Actuator Position object
+ * 
+ * @param actuator Pointer to the Actuator object
+ * @return Position* Pointer to the Position of the Actuator. NULL if error.
+ */
+Position* getActuatorPosition (Actuator* actuator);
+
+/**
+ * @brief Get the Actuator Color object
+ * 
+ * @param actuator Pointer to the Actuator object
+ * @return Color* Pointer to the Color of the Actuator. NULL if error.
+ */
+Color* getActuatorColor (Actuator* actuator);
+
+/**
  * @brief Set the values for the RGB colour components that represent the value/state of the Actuator object
  * 
  * @param actuator Pointer to the Actuator object
- * @param red 8-bit value for the Red component of the colour to display
- * @param green 8-bit value for the Green component of the colour to display
- * @param blue 8-bit value for the Blue component of the colour to display
+ * @param color Pointer to color object to import
  * @return true Error
  * @return false All Good
  */
-bool setActuatorValue (Actuator* actuator, uint8_t red, uint8_t green, uint8_t blue);
+bool setActuatorValue (Actuator* actuator, Color* color);
 
 /**
  * @brief Searches the datastore for a Node with the specified nodeID
@@ -317,5 +353,34 @@ Room* findRoomByID (Datastore* datastore, uint16_t roomID);
  * @return Room* Room object with 'roomName' name. NULL if not found.
  */
 Room* findRoomByName (Datastore* datastore, const char* roomName);
+
+/**
+ * @brief Searches the datastore for a Actuator with the specified position
+ * 
+ * @param datastore Datastore object to search
+ * @param posX Position in the X axis on the RGB Matrix output
+ * @param posY Position in the Y axis on the RGB Matrix output
+ * @return Actuator* Actuator object with the desired position. NULL if not found.
+ */
+Actuator* findActuatorByPos (Datastore* datastore, Position* pos);
+
+/**
+ * @brief Searches a node's sensors for the one with a specific type.
+ * 
+ * @param node Node to search
+ * @param type type of sensor to find
+ * @return Sensor* sensor object with specified type. NULL if error or not found.
+ */
+Sensor* findSensorByType (Node* node, uint8_t type);
+
+/**
+ * @brief Run function through all Actuators in a Datastore. Function should have same return logic.
+ * 
+ * @param datastore Datastore to search for Actuators
+ * @param func Function to run for every Actuator
+ * @return true Error
+ * @return false All good
+ */
+bool iterateActuators (Datastore* datastore, bool (*func)(Actuator*));
 
 #endif
