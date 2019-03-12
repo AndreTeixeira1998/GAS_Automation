@@ -1,3 +1,7 @@
+# User Added
+.vscode
+build/
+
 # Prerequisites
 *.d
 
