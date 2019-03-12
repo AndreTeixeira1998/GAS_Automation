@@ -1,15 +1,12 @@
 #ifndef __FUNCTIONS_H__
 #define __FUNCTIONS_H__
 
-#include "DataStructure.h"
-#include "cJSON.h"
-
 /**
- * @brief Imports the configuration of the nodes and their layout from a file.
+ * @brief remove line ending caracters
  * 
- * @param filename Filename and directory of the file to be read
- * @return Datastore* Datastore object with all the information already inserted. NULL if error.
+ * @param str String to filter
+ * @return char* result
  */
-Datastore* importConfiguration(const char* filename);
+char* filterLineEndings (char* str);
 
 #endif
