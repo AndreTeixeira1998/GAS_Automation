@@ -2,6 +2,7 @@
 #include "stdio.h"
 
 #include "DataStructure.h"
+#include "ImportConfiguration.h"
 #include "functions.h"
 
 int main(int argc, char const *argv[])
