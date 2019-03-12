@@ -367,6 +367,15 @@ Room* findRoomByName (Datastore* datastore, const char* roomName);
 Actuator* findActuatorByPos (Datastore* datastore, Position* pos);
 
 /**
+ * @brief Searches a node's sensors for the one with a specific type.
+ * 
+ * @param node Node to search
+ * @param type type of sensor to find
+ * @return Sensor* sensor object with specified type. NULL if error or not found.
+ */
+Sensor* findSensorByType (Node* node, uint8_t type);
+
+/**
  * @brief Run function through all Actuators in a Datastore. Function should have same return logic.
  * 
  * @param datastore Datastore to search for Actuators
