@@ -4,11 +4,6 @@
 #include "DataStructure.h"
 #include "functions.h"
 
-bool func1(Actuator* actuator) {
-    printf("  %d\n", actuator->pos->x);
-    return 0;
-}
-
 int main(int argc, char const *argv[])
 {
     Datastore* datastore = importConfiguration("GASconfig.json");

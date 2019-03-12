@@ -5,15 +5,7 @@ CC = clang
 BUILD_DIR ?= ./build
 SRC_DIRS ?= ./src ./lib/*
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 SRCS := $(shell find $(SRC_DIRS) -maxdepth 1 -name *.cpp -or -name *.c ! -name test.c -or -name *.s)
-=======
-SRCS := $(shell find $(SRC_DIRS) -maxdepth 1 -name *.cpp -or -name *.c -or -name *.s)
->>>>>>> Read and obtain a minified JSON string from a file
-=======
-SRCS := $(shell find $(SRC_DIRS) -maxdepth 1 -name *.cpp -or -name *.c ! -name test.c -or -name *.s)
->>>>>>> Import configuration from JSON file
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
@@ -34,12 +26,7 @@ $(BUILD_DIR)/%.s.o: %.s
 # c source
 $(BUILD_DIR)/%.c.o: %.c
 	$(MKDIR_P) $(dir $@)
-<<<<<<< HEAD
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@ -Wall -Wextra -g
-=======
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
-	# -g
->>>>>>> Import configuration from JSON file
 
 # c++ source
 $(BUILD_DIR)/%.cpp.o: %.cpp
