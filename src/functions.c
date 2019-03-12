@@ -6,7 +6,7 @@ char* filterString (char* str) {
         return NULL;
     }
 
-    for (int i = 0; i < strlen(str); i++) {
+    for (unsigned int i = 0; i < strlen(str); i++) {
         if (str[i] == '\r' || str[i] == '\n' || str[i] == '#') {
             str[i] = '\0';
             return str;
@@ -116,8 +116,8 @@ bool parseActuator (Node* node, cJSON* json_actuator) {
         return 1;
     }
 
-    // FIXME : Insert position into actuator instance
-    Actuator* actuator = createActuator(node);
+    // Create actuator instance
+    Actuator* actuator = createActuator(node, posX, posY);
     if (!actuator) {
         return 1;
     }

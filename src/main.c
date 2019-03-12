@@ -23,7 +23,13 @@ int main(int argc, char const *argv[])
 
             for (list_element* elem3 = listStart(node->sensors); elem3 != NULL; elem3 = elem3->next) {
                 Sensor* sensor = elem3->ptr;
-                printf("    t: %d\n", sensor->type);
+                printf("    s_t: %d\n", sensor->type);
+            }
+
+            for (list_element* elem3 = listStart(node->actuators); elem3 != NULL; elem3 = elem3->next) {
+                Actuator* actuator = elem3->ptr;
+                Position* pos = getActuatorPosition(actuator);
+                printf("    a_x: %d | a_y: %d\n", pos->x, pos->y);
             }
         }
     }
