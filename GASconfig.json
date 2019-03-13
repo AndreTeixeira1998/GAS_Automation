@@ -16,6 +16,8 @@
                     ],
                     "actuators": [
                         {
+                            "id": 0,
+                            "type": 0,
                             "posX": 10,
                             "posY": 1
                         }

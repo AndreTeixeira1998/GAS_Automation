@@ -1,7 +1,7 @@
 #include "DataStructure.h"
 
 
-bool isValidType (uint8_t type) {
+bool isValidSensorType (uint8_t type) {
     if (type <= N_TYPE_SENSOR) {
         return true;
     }
@@ -32,7 +32,7 @@ float currentSensorValue (uint16_t value) {
 }
 
 sensorValueCalculator* sensorCalculatorFunctionPointer (uint8_t type) {
-    if (!isValidType(type)) {
+    if (!isValidSensorType(type)) {
         return NULL;
     }
 
@@ -160,7 +160,7 @@ Node* createNode (Room* room, uint16_t id) {
     return node;
 }
 
-Actuator* createActuator (Node* node, uint16_t posX, uint16_t posY) {
+Actuator* createActuator (Node* node, uint16_t id, uint8_t type, uint16_t posX, uint16_t posY) {
     if (!node) {
         return NULL;
     }
@@ -178,6 +178,12 @@ Actuator* createActuator (Node* node, uint16_t posX, uint16_t posY) {
     Datastore* datastore = room->parentDatastore;
     if (findActuatorByPos(datastore, pos)) {
         // There is already a Actuator assigned to that position
+        free(pos);
+        return NULL;
+    }
+
+    if (findActuatorByID(node, id)) {
+        // There is already a Actuator with this ID assigned to this node
         free(pos);
         return NULL;
     }
@@ -209,7 +215,7 @@ Actuator* createActuator (Node* node, uint16_t posX, uint16_t posY) {
         return NULL;
     }
 
-
+    actuator->type = type;
     actuator->parentNode = node;
     actuator->listPtr = elem;
     actuator->color = color;
@@ -223,7 +229,7 @@ Sensor* createSensor (Node* node, uint8_t type) {
         return NULL;
     }
 
-    if (!isValidType(type)) {
+    if (!isValidSensorType(type)) {
         return NULL;
     }
 
@@ -503,6 +509,21 @@ Room* findRoomByID (Datastore* datastore, uint16_t roomID) {
         Room* room = (Room*)room_elem->ptr;
         if (room->id == roomID) {
             return room;
+        }
+    }
+
+    return NULL;
+}
+
+Actuator* findActuatorByID (Node* node, uint16_t actuatorID) {
+    if (!node) {
+        return NULL;
+    }
+
+    for (list_element* actuator_elem = listStart(node->actuators); actuator_elem != NULL; actuator_elem = actuator_elem->next) {
+        Actuator* actuator = (Actuator*)actuator_elem->ptr;
+        if (actuator->id == actuatorID) {
+            return actuator;
         }
     }
 
