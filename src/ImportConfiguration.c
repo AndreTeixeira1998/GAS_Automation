@@ -225,6 +225,9 @@ bool parseRoom (Datastore* datastore, cJSON* json_room) {
 Datastore* importConfiguration(const char* filename) {
     
     char* jsonString = getMinifiedJSONStringFromFile(filename);
+    if (!jsonString) {
+        return NULL;
+    }
     
     cJSON* json = cJSON_Parse(jsonString);
     if (!json) {
