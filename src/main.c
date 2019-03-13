@@ -60,7 +60,12 @@ int main(int argc, char const *argv[])
     printf("%d\n", *(int*)thread_retValues[THREAD_EXECUTERULES]);
     printf("%d\n", *(int*)thread_retValues[THREAD_WRITEOUTPUT]);
 
+    uint8_t nThreads = sizeof(thread_retValues)/sizeof(thread_retValues[0]);
+    for (int i = 0; i < nThreads; i++) {
+        free(thread_retValues[i]);
+    }
 
+    deleteDatastore(datastore);
     printf("Done\n");
     
     return 0;
