@@ -1,6 +1,7 @@
 # User Added
 .vscode
 build/
+sims/
 
 # Prerequisites
 *.d
