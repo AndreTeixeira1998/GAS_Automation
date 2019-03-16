@@ -3,8 +3,10 @@
 #include <string.h>
 
 #include "DataStructure.h"
-#include "ImportConfiguration.h"
 #include "functions.h"
+//#include "ImportConfiguration.h"
+
+
 
 #define BUFFER 256 
 #define MAX_DATASIZE 5 
@@ -24,29 +26,13 @@
 #define MESSAGE_HANDLING_INFO 20
 #define END 22
 
-char* filterString (char* str) {
-    if (!str) {
-        return NULL;
-    }
 
-    for (int i = 0; i < strlen(str); i++) {
-        if (str[i] == '\r' || str[i] == '\n' || str[i] == '#') {
-            str[i] = '\0';
-            return str;
-        }
-    }
-
-    return str;
-}
-
-
-int main(int argc, char const *argv[])
-{
-    Datastore* datastore = importConfiguration("GASconfig.json");
-    if (!datastore) {
-        printf("Error in config file.\n");
-        return 1;
-    }
+void readInput () {
+    
+    Datastore* datastore = createDatastore();
+    if (datastore == NULL)
+        printf("Error\n");
+    //printf("%x\n", datastore);
 
     FILE *fp;
     char filename[BUFFER + 1];
@@ -60,9 +46,9 @@ int main(int argc, char const *argv[])
     
     fgets( filename, BUFFER, stdin);
     //gets(filename);
-    filterString (filename);
+    filterLineEndings (filename);
     
-    printf("\n\n\nOpening #%s#\n\n", filename );
+    //printf("\n\n\nOpening #%s#\n\n", filename );
     
     fp=fopen(filename, "r");
     
@@ -98,14 +84,17 @@ int main(int argc, char const *argv[])
             for (c_vect_index=0; c_vect_index<PAYLOAD_SIZE; c_vect_index++){ 
                 //printf("#%s# - %d\n", data[c_vect_index], c_vect_index);  //DEBUGGING
                 converted_data[c_vect_index]= strtol(data[c_vect_index], &endptr, 16);
-                printf("hex: %s | dec: %d - vect_index: (%d)\n", data[c_vect_index], converted_data[c_vect_index], c_vect_index);  //DEBUGGING
+                //printf("hex: %s | dec: %d - vect_index: (%d)\n", data[c_vect_index], converted_data[c_vect_index], c_vect_index);  //DEBUGGING
  
             }
             
-            //for (k=0; k<23; k++){ printf("#%s# - %d\n", data[k], k); }//debugging
-            
-            // aqui falta meter um switch para meter os valores
-            
+            setSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_VOLTAGE), converted_data[RAW_VOLTAGE]);
+            setSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_TEMPERATURE), converted_data[RAW_TEMPERATURE]);
+            setSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_HUMIDITY), converted_data[RAW_HUMIDITY]);
+            setSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_LIGHT), converted_data[RAW_VISIBLE_LIGHT]);
+            setSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_CURRENT), converted_data[RAW_CURRENT]);
+            //printf("Valor no sensor: #%d# T= %f\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_TEMPERATURE)));
+            //printf("Valor no vetor: #%d# T= %f\n", converted_data[MOTE_ID], (float)converted_data[RAW_TEMPERATURE]); 
             printf("----------------------------------------------------------------------\n");
 	    }
 
@@ -118,5 +107,14 @@ int main(int argc, char const *argv[])
     }
     	
     printf("\n\nDone\n");
+
+    //pthread_exit(ret);
+}
+
+int main()
+{
+     
+    readInput ();
+    
     return 0;
 }
