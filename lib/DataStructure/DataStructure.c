@@ -206,9 +206,18 @@ Actuator* createActuator (Node* node, uint16_t id, uint8_t type, uint16_t posX, 
     color->g = 0;
     color->b = 0;
 
+    if(!pthread_mutex_init(actuator->mutex, NULL)) {
+        // Mutex init failed
+        free(pos);
+        free(color);
+        free(actuator);
+        return NULL;
+    }
+
     list_element* elem = listInsert(node->actuators, actuator, NULL);
     if (elem == NULL) {
         // Insertion failed
+        pthread_mutex_destroy(actuator->mutex);
         free(pos);
         free(color);
         free(actuator);
@@ -244,9 +253,15 @@ Sensor* createSensor (Node* node, uint8_t type) {
         return NULL;
     }
 
+    if(!pthread_mutex_init(sensor->mutex, NULL)) {
+        // Mutex init failed
+        return NULL;
+    }
+
     list_element* elem = listInsert(node->sensors, sensor, NULL);
     if (elem == NULL) {
         // Insertion failed
+        pthread_mutex_destroy(sensor->mutex);
         free(sensor);
         return NULL;
     }
@@ -270,6 +285,7 @@ bool deleteActuator (Actuator* actuator) {
 
     free(actuator->color);
     free(actuator->pos);
+    pthread_mutex_destroy(actuator->mutex);
 
     free(actuator);
     list_element* res = listRemove(node->actuators, elem);
@@ -287,6 +303,7 @@ bool deleteSensor (Sensor* sensor) {
 
     list_element* elem = sensor->listPtr;
     Node* node = sensor->parentNode;
+    pthread_mutex_destroy(sensor->mutex);
 
     free(sensor);
     list_element* res = listRemove(node->sensors, elem);
@@ -441,7 +458,9 @@ bool setSensorValue (Sensor* sensor, uint16_t value) {
         return 1;
     }
 
+    pthread_mutex_lock(sensor->mutex);
     sensor->value = value;
+    pthread_mutex_unlock(sensor->mutex);
     
     return 0;
 }
@@ -451,7 +470,11 @@ float getSensorValue (Sensor* sensor) {
         return 0;
     }
 
-    return (sensor->calculator)(sensor->value);
+    pthread_mutex_lock(sensor->mutex);
+    float res = (sensor->calculator)(sensor->value);
+    pthread_mutex_unlock(sensor->mutex);
+
+    return res;
 }
 
 Position* getActuatorPosition (Actuator* actuator) {
@@ -475,9 +498,11 @@ bool setActuatorValue (Actuator* actuator, Color* color) {
         return 1;
     }
 
+    pthread_mutex_lock(actuator->mutex);
     actuator->color->r = color->r;
     actuator->color->g = color->g;
     actuator->color->b = color->b;
+    pthread_mutex_unlock(actuator->mutex);
 
     return 0;
 }

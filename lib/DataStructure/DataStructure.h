@@ -57,6 +57,7 @@ struct _actuator {
     uint8_t type;
     Color* color;
     Position* pos;
+    pthread_mutex_t* mutex;
 };
 
 /**
@@ -77,6 +78,7 @@ struct _sensor {
     uint8_t type;
     sensorValueCalculator* calculator;
     uint16_t value;
+    pthread_mutex_t* mutex;
 };
 
 /**
