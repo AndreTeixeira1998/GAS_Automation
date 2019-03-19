@@ -4,9 +4,7 @@
 
 #include "DataStructure.h"
 #include "functions.h"
-//#include "ImportConfiguration.h"
-
-
+#include "ImportConfiguration.h"
 
 #define BUFFER 256 
 #define MAX_DATASIZE 5 
@@ -27,14 +25,8 @@
 #define END 22
 
 
-void readInput () {
+void readInput (Datastore* datastore, FILE* fp) {
     
-    Datastore* datastore = createDatastore();
-    if (datastore == NULL)
-        printf("Error\n");
-    //printf("%x\n", datastore);
-
-    FILE *fp;
     char filename[BUFFER + 1];
     char str[BUFFER +1];
     char *token;
@@ -42,20 +34,9 @@ void readInput () {
     char data[PAYLOAD_SIZE][MAX_DATASIZE];
     int data_type=0, k=0, c_vect_index, converted_data[PAYLOAD_SIZE];
 
-    puts("chateei-me com os channels por isso por agora mandem o path para a file");
-    
-    fgets( filename, BUFFER, stdin);
-    //gets(filename);
-    filterLineEndings (filename);
-    
-    //printf("\n\n\nOpening #%s#\n\n", filename );
-    
-    fp=fopen(filename, "r");
     
     if(fp){
-        
-        printf("\n\n\nOpening #%s#\n\n", filename );
-        
+            
         while(fgets(str, BUFFER , fp)){
             printf("%s\n", str);
             token= strtok(str, " \n");
@@ -111,10 +92,34 @@ void readInput () {
     //pthread_exit(ret);
 }
 
-int main()
+int main(int argc, char const *argv[])
 {
-     
-    readInput ();
+    if (argc < 4) {
+        printf("Not enough arguments. Expecting:\n\t%s <configuration-file> <input-stream> <output-stream>\n\n", argv[0]);
+        return 1;
+    }
+
+    Datastore* datastore = importConfiguration(argv[1]);
+    if (!datastore) {
+        printf("Error in config file.\n");
+        return 1;
+    }
     
+    FILE* inputStream = fopen(argv[2], "r");
+    FILE* outputStream = fopen(argv[3], "w");
+    if (!inputStream || !outputStream) {
+        printf("Error reading streams. Please verify.\n");
+        return 1;
+    }
+
+    
+    readInput (datastore, inputStream);
+
+    
+    printf("Done\n");
+
+    fclose(inputStream);
+    fclose(outputStream);
+    deleteDatastore(datastore);
     return 0;
 }

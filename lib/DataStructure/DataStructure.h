@@ -52,6 +52,8 @@ struct _color {
 struct _actuator {
     Node* parentNode;
     list_element* listPtr;
+    uint16_t id;
+    uint8_t type;
     Color* color;
     Position* pos;
 };
@@ -165,7 +167,7 @@ float currentSensorValue (uint16_t value);
  * @return true Valid type
  * @return false Invalid type
  */
-bool isValidType (uint8_t type);
+bool isValidSensorType (uint8_t type);
 
 /**
  * @brief Create a Datastore object
@@ -178,27 +180,31 @@ Datastore* createDatastore ();
  * @brief Create a Room object
  * 
  * @param datastore Datastore in which to be inserted.
+ * @param id The ID for the new Room. Must be unique.
  * @return Room* The pointer to the new Room object. NULL if error occurs.
  */
-Room* createRoom (Datastore* datastore);
+Room* createRoom (Datastore* datastore, uint16_t id);
 
 /**
  * @brief Create a Node object
  * 
  * @param room A pointer to the Room this Node will belong to.
+ * @param id The ID of the new Node. Must be unique.
  * @return Node* The pointer to the new Node object. NULL if error occurs.
  */
-Node* createNode (Room* room);
+Node* createNode (Room* room, uint16_t id);
 
 /**
  * @brief Create a Actuator object
  * 
  * @param node A pointer to the Node this Actuator will belong to.
+ * @param id The ID of the new Actuator. Must be unique inside the Node.
+ * @param type Type of the Actuator
  * @param posX Position in the X axis on the RGB Matrix output
  * @param posY Position in the Y axis on the RGB Matrix output
  * @return Actuator* The pointer to the new Actuator object. NULL if error occurs.
  */
-Actuator* createActuator (Node* node, uint16_t posX, uint16_t posY);
+Actuator* createActuator (Node* node, uint16_t id, uint8_t type, uint16_t posX, uint16_t posY);
 
 /**
  * @brief Create a Sensor object
@@ -344,6 +350,15 @@ Node* findNodeByID (Datastore* datastore, uint16_t nodeID);
  * @return Room* Room object with 'roomID' id. NULL if not found.
  */
 Room* findRoomByID (Datastore* datastore, uint16_t roomID);
+
+/**
+ * @brief Searches the node for a Actuator with the specified actuatorID
+ * 
+ * @param node Node object to search
+ * @param actuatorID ID of the actuator to find
+ * @return Actuator* Actuator object with 'actuatorID' id. NULL if not found.
+ */
+Actuator* findActuatorByID (Node* node, uint16_t actuatorID);
 
 /**
  * @brief Searches the datastore for a Room with the specified roomName

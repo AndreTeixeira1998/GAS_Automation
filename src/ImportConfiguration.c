@@ -88,12 +88,22 @@ bool parseActuator (Node* node, cJSON* json_actuator) {
         return 1;
     }
 
-    // Read the type of the sensor from the parsed json
-    uint16_t posX = 0,
+    // Read the atributes of the actuator from the parsed json
+    uint8_t type = 0;
+    uint16_t id = 0,
+        posX = 0,
         posY = 0;
+    cJSON* json_id = cJSON_GetObjectItem(json_actuator, "id");
+    cJSON* json_type = cJSON_GetObjectItem(json_actuator, "type");
     cJSON* json_posX = cJSON_GetObjectItem(json_actuator, "posX");
     cJSON* json_posY = cJSON_GetObjectItem(json_actuator, "posY");
-    if (cJSON_IsNumber(json_posX) && cJSON_IsNumber(json_posY)) {
+    if (cJSON_IsNumber(json_id) &&
+        cJSON_IsNumber(json_type) &&
+        cJSON_IsNumber(json_posX) &&
+        cJSON_IsNumber(json_posY)) {
+        
+        id = (uint16_t)json_id->valueint;
+        type = (uint8_t)json_type->valueint;
         posX = (uint16_t)json_posX->valueint;
         posY = (uint16_t)json_posY->valueint;
     }
@@ -102,7 +112,7 @@ bool parseActuator (Node* node, cJSON* json_actuator) {
     }
 
     // Create actuator instance
-    Actuator* actuator = createActuator(node, posX, posY);
+    Actuator* actuator = createActuator(node, id, type, posX, posY);
     if (!actuator) {
         return 1;
     }
@@ -215,6 +225,9 @@ bool parseRoom (Datastore* datastore, cJSON* json_room) {
 Datastore* importConfiguration(const char* filename) {
     
     char* jsonString = getMinifiedJSONStringFromFile(filename);
+    if (!jsonString) {
+        return NULL;
+    }
     
     cJSON* json = cJSON_Parse(jsonString);
     if (!json) {
