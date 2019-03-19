@@ -6,10 +6,12 @@
 #include "functions.h"
 #include "ImportConfiguration.h"
 
+//Here some definitions for stings and data sizes
 #define BUFFER 256 
 #define MAX_DATASIZE 5 
 #define PAYLOAD_SIZE 23 
 
+//Denomination and respective positions of the arrays
 #define START 0 
 #define AM_MESSAGE 2
 #define DESTINATION_ADDRESS 3
@@ -27,57 +29,70 @@
 
 void readInput (Datastore* datastore, FILE* fp) {
     
-    char filename[BUFFER + 1];
+    //char filename[BUFFER + 1];
     char str[BUFFER +1];
     char *token;
     char *endptr; 
     char data[PAYLOAD_SIZE][MAX_DATASIZE];
-    int data_type=0, k=0, c_vect_index, converted_data[PAYLOAD_SIZE];
+    int data_type=0, c_vect_index, converted_data[PAYLOAD_SIZE];
 
     
     if(fp){
             
-        while(fgets(str, BUFFER , fp)){
+        while(fgets(str, BUFFER , fp)){ 
+            
             printf("%s\n", str);
-            token= strtok(str, " \n");
-            while(token !=NULL){
-                //printf("token:%s\n",token); // debugging
+            
+            token= strtok(str, " \n"); //here starts a loop to separate data into respective positions
+            
+            while(token !=NULL){ // Loop until no character is found
+            
+                //printf("token:%s\n",token); //DEBUGGING
 
-                //printf("#%s# - %d\n", data[data_type], data_type); //debugging
+                //printf("#%s# - %d\n", data[data_type], data_type); //DEBUGGING
                 
                 strcpy(data[data_type], token);
-                //printf("#%s# - %d\n", data[data_type], data_type); //debugging
+                //printf("#%s# - %d\n", data[data_type], data_type); //DEBUGGING
                 if(data_type==(START +1) || data_type==(DESTINATION_ADDRESS+1) || data_type==(MOTE_ID+1) || data_type==(GROUP_ID+1) || data_type==(RAW_VOLTAGE+1) || data_type==(RAW_VISIBLE_LIGHT+1) || data_type==(RAW_CURRENT+1) || data_type==(RAW_TEMPERATURE+1) || data_type==(RAW_HUMIDITY+1) || data_type==(MESSAGE_HANDLING_INFO+1)) {
-                    strcat(data[data_type-1], data[data_type]);
+                    strcat(data[data_type-1], data[data_type]); //if the attribute needs 4 hex digits we concatenate the next value into the last position
                 }
-                //printf("#%s# - %d\n", data[data_type], data_type); //debugging
+                //printf("#%s# - %d\n", data[data_type], data_type); //DEBUGGING
 
                 data_type++;
+
                 token= strtok(NULL, " \n");
                 
-                if(data_type==PAYLOAD_SIZE) data_type=0;
-                //printf("#%s# - %d\n", data[data_type], data_type); //debugging
+                if(data_type==PAYLOAD_SIZE) data_type=0; //restart postitions
+                //printf("#%s# - %d\n", data[data_type], data_type); //DEBUGGING
 
             }
 
-            //printf("#%s# - %d\n", data[MOTE_ID], MOTE_ID); //debugging
+            //printf("#%s# - %d\n", data[MOTE_ID], MOTE_ID); //DEBUGGING
             
-            for (c_vect_index=0; c_vect_index<PAYLOAD_SIZE; c_vect_index++){ 
+            for (c_vect_index=0; c_vect_index<PAYLOAD_SIZE; c_vect_index++){ //converts hex data to dec
                 //printf("#%s# - %d\n", data[c_vect_index], c_vect_index);  //DEBUGGING
                 converted_data[c_vect_index]= strtol(data[c_vect_index], &endptr, 16);
                 //printf("hex: %s | dec: %d - vect_index: (%d)\n", data[c_vect_index], converted_data[c_vect_index], c_vect_index);  //DEBUGGING
  
             }
             
+            //here we set the sensor values with converted data in its respective Mote IDs and Sensor Type
             setSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_VOLTAGE), converted_data[RAW_VOLTAGE]);
             setSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_TEMPERATURE), converted_data[RAW_TEMPERATURE]);
             setSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_HUMIDITY), converted_data[RAW_HUMIDITY]);
             setSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_LIGHT), converted_data[RAW_VISIBLE_LIGHT]);
             setSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_CURRENT), converted_data[RAW_CURRENT]);
-            if(findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_HUMIDITY)==NULL) puts("sensor em falta");
+            
+            /*
+            // some printfs for debugging
+            if(findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_HUMIDITY)==NULL) 
+                puts("sensor em falta");
+            
             printf("Valor no sensor: #%d# T= %f\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_TEMPERATURE)));
             printf("Valor no vetor: #%d# T= %f\n", converted_data[MOTE_ID], (float)converted_data[RAW_TEMPERATURE]); 
+            
             printf("----------------------------------------------------------------------\n");
+            */
 	    }
 
         fclose(fp);

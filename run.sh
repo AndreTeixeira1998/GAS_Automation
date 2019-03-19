@@ -11,16 +11,16 @@ read -p "Enter second socat out: " secondout
 
 #Start Simulators
 echo $PWD &
-python $PWD/sims/MsgCreator.py > /dev/pts/$firstin &
+python3 $PWD/sims/MsgCreator.py > /dev/pts/$firstin &
 P3=$!
 
-python $PWD/sims/RGBMatrix.py < /dev/pts/$secondout &
+python3 $PWD/sims/RGBMatrix.py < /dev/pts/$secondout &
 P4=$!
 
 sleep 3
 
 bash -c "./GAS.out GASconfig.json /dev/pts/$firstout /dev/pts/$secondin"
-#python sims/write_matrix.py > /dev/pts/$secondin
+#python3 sims/write_matrix.py > /dev/pts/$secondin
 P5=$!
 
 wait $P1 $P2 $P3 $P4 $P5
