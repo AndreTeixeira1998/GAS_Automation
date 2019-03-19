@@ -12,6 +12,15 @@
                         },
                         {
                             "type": 1
+                        },
+                        {
+                            "type": 2
+                        },
+                        {
+                            "type": 3
+                        },
+                        {
+                            "type": 4
                         }
                     ],
                     "actuators": [
@@ -27,7 +36,61 @@
                     "id": 1,
                     "sensors": [
                         {
+                            "type": 0
+                        },
+                        {
+                            "type": 1
+                        },
+                        {
+                            "type": 2
+                        },
+                        {
                             "type": 3
+                        },
+                        {
+                            "type": 4
+                        }
+                    ],
+                    "actuators": []
+                },
+                {
+                    "id": 2,
+                    "sensors": [
+                        {
+                            "type": 0
+                        },
+                        {
+                            "type": 1
+                        },
+                        {
+                            "type": 2
+                        },
+                        {
+                            "type": 3
+                        },
+                        {
+                            "type": 4
+                        }
+                    ],
+                    "actuators": []
+                },
+                {
+                    "id": 3,
+                    "sensors": [
+                        {
+                            "type": 0
+                        },
+                        {
+                            "type": 1
+                        },
+                        {
+                            "type": 2
+                        },
+                        {
+                            "type": 3
+                        },
+                        {
+                            "type": 4
                         }
                     ],
                     "actuators": []
