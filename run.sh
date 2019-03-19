@@ -17,7 +17,9 @@ P3=$!
 python $PWD/sims/RGBMatrix.py < /dev/pts/$secondout &
 P4=$!
 
-bash -c "./GAS.out /dev/pts/$firstout /dev/pts/$secondin"
+sleep 3
+
+bash -c "./GAS.out GASconfig.json /dev/pts/$firstout /dev/pts/$secondin"
 #python sims/write_matrix.py > /dev/pts/$secondin
 P5=$!
 
