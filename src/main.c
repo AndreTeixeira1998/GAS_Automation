@@ -45,7 +45,7 @@ void readInput (Datastore* datastore, FILE* fp) {
             
             token= strtok(str, " \n"); //here starts a loop to separate data into respective positions
             
-            while(token !=NULL){ // Loop until no character is found
+            while(token !=NULL){ // Loop until no character is found on the string
             
                 //printf("token:%s\n",token); //DEBUGGING
 
@@ -54,7 +54,7 @@ void readInput (Datastore* datastore, FILE* fp) {
                 strcpy(data[data_type], token);
                 //printf("#%s# - %d\n", data[data_type], data_type); //DEBUGGING
                 if(data_type==(START +1) || data_type==(DESTINATION_ADDRESS+1) || data_type==(MOTE_ID+1) || data_type==(GROUP_ID+1) || data_type==(RAW_VOLTAGE+1) || data_type==(RAW_VISIBLE_LIGHT+1) || data_type==(RAW_CURRENT+1) || data_type==(RAW_TEMPERATURE+1) || data_type==(RAW_HUMIDITY+1) || data_type==(MESSAGE_HANDLING_INFO+1)) {
-                    strcat(data[data_type-1], data[data_type]); //if the attribute needs 4 hex digits we concatenate the next value into the last position
+                    strcat(data[data_type-1], data[data_type]); //if the attribute needs 4 hex digits we concatenate the next value into the correct position
                 }
                 //printf("#%s# - %d\n", data[data_type], data_type); //DEBUGGING
 
@@ -63,6 +63,7 @@ void readInput (Datastore* datastore, FILE* fp) {
                 token= strtok(NULL, " \n");
                 
                 if(data_type==PAYLOAD_SIZE) data_type=0; //restart postitions
+                
                 //printf("#%s# - %d\n", data[data_type], data_type); //DEBUGGING
 
             }
@@ -86,7 +87,7 @@ void readInput (Datastore* datastore, FILE* fp) {
             
             // some printfs for debugging
             if(findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_HUMIDITY)==NULL) 
-                puts("sensor em falta");
+                puts("Humidity sensor missing");
             
             printf("Sensor ID: #%d# T= %f ºC\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_TEMPERATURE)));
             printf("Sensor ID: #%d# I= %f A\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_CURRENT)));
@@ -94,7 +95,7 @@ void readInput (Datastore* datastore, FILE* fp) {
             printf("Sensor ID: #%d# V= %f V\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_VOLTAGE)));
             printf("Sensor ID: #%d# L= %f lx\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_LIGHT)));
 
-            //printf("Valor no vetor: #%d# T= %f\n", converted_data[MOTE_ID], (float)converted_data[RAW_TEMPERATURE]); 
+            //printf("Array Value: #%d# T= %f\n", converted_data[MOTE_ID], (float)converted_data[RAW_TEMPERATURE]); 
             
             printf("----------------------------------------------------------------------\n");
             
@@ -104,7 +105,7 @@ void readInput (Datastore* datastore, FILE* fp) {
 
     } else {
 
-        puts("error opening file to read"); 
+        puts("Error opening file (Read_Data_From_Sensors)"); 
     
     }
     	
