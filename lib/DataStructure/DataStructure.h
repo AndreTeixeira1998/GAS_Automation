@@ -429,6 +429,26 @@ Actuator* findActuatorByPos (Datastore* datastore, Position* pos);
 Sensor* findSensorByType (Node* node, uint8_t type);
 
 /**
+ * @brief Adds a Sensor as a condition to a rule
+ * 
+ * @param rule 
+ * @param sensor 
+ * @return true Error
+ * @return false All Good
+ */
+bool addSensorToRule (Rule* rule, Sensor* sensor);
+
+/**
+ * @brief Adds a Actuator as a condition to a rule
+ * 
+ * @param rule 
+ * @param actuator 
+ * @return true Error
+ * @return false All Good
+ */
+bool addActuatorToRule (Rule* rule, Actuator* actuator);
+
+/**
  * @brief Execute the control rules
  * 
  * @param datastore 

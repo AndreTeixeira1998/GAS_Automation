@@ -321,7 +321,7 @@ Rule* createRule (Room* room, Rule* parent, uint16_t type, uint16_t value) {
 
     rule->listPtr = elem;
 
-    return room;
+    return rule;
 }
 
 bool deleteRule (Rule* rule) {
@@ -345,14 +345,14 @@ bool deleteRule (Rule* rule) {
         *res;
     
     if (rule->parentRoom) {
-        res = listRemove(rule->parentRoom, elem);
-        if (res == NULL && listSize(rule->parentRoom)) {
+        res = listRemove(rule->parentRoom->rules, elem);
+        if (res == NULL && listSize(rule->parentRoom->rules)) {
             retVal++;
         }
     }
     else if (rule->parentRule) {
-        res = listRemove(rule->parentRule, elem);
-        if (res == NULL && listSize(rule->parentRule)) {
+        res = listRemove(rule->parentRule->childs, elem);
+        if (res == NULL && listSize(rule->parentRule->childs)) {
             retVal++;
         }
     }
@@ -691,6 +691,34 @@ Sensor* findSensorByType (Node* node, uint8_t type) {
     return NULL;
 }
 
+bool addSensorToRule (Rule* rule, Sensor* sensor) {
+    if (!rule || !sensor) {
+        return true;
+    }
+
+    list_element* elem = listInsert(rule->sensors, sensor, NULL);
+    if (elem == NULL) {
+        // Insertion failed
+        return true;
+    }
+
+    return false;
+}
+
+bool addActuatorToRule (Rule* rule, Actuator* actuator) {
+    if (!rule || !actuator) {
+        return true;
+    }
+
+    list_element* elem = listInsert(rule->actuators, actuator, NULL);
+    if (elem == NULL) {
+        // Insertion failed
+        return true;
+    }
+
+    return false;
+}
+
 bool evaluateRule (Rule* rule) {
     if (!rule) {
         return false;
@@ -708,6 +736,7 @@ bool evaluateRule (Rule* rule) {
     // Test sensor values against rule value given the rule operation
     LL_iterator(rule->sensors, sensor_elem) {
         Sensor* sensor = sensor_elem->ptr;
+        float val = 0;
         
         switch(rule->operation) {
             case TYPE_RULE_LESS_THEN:
@@ -729,7 +758,7 @@ bool evaluateRule (Rule* rule) {
                 break;
 
             case TYPE_RULE_WITHIN_MARGIN:
-                float val = getSensorValue(sensor);
+                val = getSensorValue(sensor);
                 if ( !((val > ((float)(rule->value))*(0.95)) &&
                     (val < ((float)(rule->value))*(1.05)) )) {
                     return false;
