@@ -1,11 +1,13 @@
 #Setup sockets
 socat -d -d pty,raw,echo=0 pty,raw,echo=0 &
 P1=$!
+sleep 0.5
 read -p "Enter first socat in: " firstin
 read -p "Enter first socat out: " firstout
 
 socat -d -d pty,raw,echo=0 pty,raw,echo=0 &
 P2=$!
+sleep 0.5
 read -p "Enter second socat in: " secondin
 read -p "Enter second socat out: " secondout
 
