@@ -334,9 +334,14 @@ bool deleteRule (Rule* rule) {
     deleteList(rule->sensors);
     deleteList(rule->actuators);
 
-    LL_iterator(rule->childs, child_elem) {
-        Rule* child = child_elem->ptr;
-        retVal += deleteRule(child);
+    // Delete all childs
+    list_element* aux = listStart(rule->childs);
+    while (aux != NULL) {
+        if (deleteRule(aux->ptr)) {
+            // Error
+            return 1;
+        }
+        aux = listStart(rule->childs);
     }
     deleteList(rule->childs);
 
