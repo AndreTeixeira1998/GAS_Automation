@@ -690,3 +690,105 @@ Sensor* findSensorByType (Node* node, uint8_t type) {
 
     return NULL;
 }
+
+bool evaluateRule (Rule* rule) {
+    if (!rule) {
+        return false;
+    }
+
+    // Test all childs
+    LL_iterator(rule->childs, child_elem) {
+        Rule* child = child_elem->ptr;
+        if (!evaluateRule(child)) {
+            // Child is not verified
+            return false;
+        }
+    }
+
+    // Test sensor values against rule value given the rule operation
+    LL_iterator(rule->sensors, sensor_elem) {
+        Sensor* sensor = sensor_elem->ptr;
+        
+        switch(rule->operation) {
+            case TYPE_RULE_LESS_THEN:
+                if ( !(getSensorValue(sensor) < rule->value) ) {
+                    return false;
+                }
+                break;
+
+            case TYPE_RULE_GREATER_THEN:
+                if ( !(getSensorValue(sensor) > rule->value) ) {
+                    return false;
+                }
+                break;
+
+            case TYPE_RULE_EQUAL_TO:
+                if ( !(getSensorValue(sensor) == rule->value) ) {
+                    return false;
+                }
+                break;
+
+            case TYPE_RULE_WITHIN_MARGIN:
+                float val = getSensorValue(sensor);
+                if ( !((val > ((float)(rule->value))*(0.95)) &&
+                    (val < ((float)(rule->value))*(1.05)) )) {
+                    return false;
+                }
+                break;
+                
+            default:
+                return false;
+                break;
+        }
+    }
+
+
+    return true;
+}
+
+bool executeRules (Datastore* datastore) {
+    if (!datastore) {
+        return true;
+    }
+
+    Color colorActive,
+        colorInactive;
+    
+    // Green
+    colorActive.r = 0;
+    colorActive.g = 255;
+    colorActive.b = 0;
+
+    // Red
+    colorInactive.r = 255;
+    colorInactive.g = 0;
+    colorInactive.b = 0;
+
+    LL_iterator(datastore->rooms, room_elem) {
+        Room* room = room_elem->ptr;
+        LL_iterator(room->rules, rule_elem) {
+            Rule* rule = rule_elem->ptr;
+            
+            LL_iterator(rule->actuators, actuator_elem) {
+                // Clear actuator status
+                // FIXME May create a flicker if using threads
+                Actuator* actuator = actuator_elem->ptr;
+                if (setActuatorValue(actuator, &colorInactive)) {
+                    return true;
+                }
+            }
+
+            if (evaluateRule(rule)) {
+                // Rule is active
+                LL_iterator(rule->actuators, actuator_elem) {
+                    Actuator* actuator = actuator_elem->ptr;
+                    if (setActuatorValue(actuator, &colorActive)) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
+}

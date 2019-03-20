@@ -18,8 +18,8 @@
 #define TYPE_SENSOR_CURRENT     4
 
 #define TYPE_RULE_LESS_THEN     0
-#define TYPE_RULE_MORE_THEN     1
-#define TYPE_RULE_EQUAL_THEN    2
+#define TYPE_RULE_GREATER_THEN  1
+#define TYPE_RULE_EQUAL_TO      2
 #define TYPE_RULE_WITHIN_MARGIN 3
 
 typedef struct _datastore Datastore;
@@ -427,5 +427,14 @@ Actuator* findActuatorByPos (Datastore* datastore, Position* pos);
  * @return Sensor* sensor object with specified type. NULL if error or not found.
  */
 Sensor* findSensorByType (Node* node, uint8_t type);
+
+/**
+ * @brief Execute the control rules
+ * 
+ * @param datastore 
+ * @return true Error
+ * @return false All Good
+ */
+bool executeRules (Datastore* datastore);
 
 #endif
