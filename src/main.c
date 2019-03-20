@@ -83,16 +83,21 @@ void readInput (Datastore* datastore, FILE* fp) {
             setSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_LIGHT), converted_data[RAW_VISIBLE_LIGHT]);
             setSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_CURRENT), converted_data[RAW_CURRENT]);
             
-            /*
+            
             // some printfs for debugging
             if(findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_HUMIDITY)==NULL) 
                 puts("sensor em falta");
             
-            printf("Valor no sensor: #%d# T= %f\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_TEMPERATURE)));
-            printf("Valor no vetor: #%d# T= %f\n", converted_data[MOTE_ID], (float)converted_data[RAW_TEMPERATURE]); 
+            printf("Sensor ID: #%d# T= %f ºC\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_TEMPERATURE)));
+            printf("Sensor ID: #%d# I= %f A\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_CURRENT)));
+            printf("Sensor ID: #%d# H= %f Kg/m3\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_HUMIDITY)));
+            printf("Sensor ID: #%d# V= %f V\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_VOLTAGE)));
+            printf("Sensor ID: #%d# L= %f lx\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_LIGHT)));
+
+            //printf("Valor no vetor: #%d# T= %f\n", converted_data[MOTE_ID], (float)converted_data[RAW_TEMPERATURE]); 
             
             printf("----------------------------------------------------------------------\n");
-            */
+            
 	    }
 
         fclose(fp);
