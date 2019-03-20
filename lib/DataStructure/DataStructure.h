@@ -428,14 +428,4 @@ Actuator* findActuatorByPos (Datastore* datastore, Position* pos);
  */
 Sensor* findSensorByType (Node* node, uint8_t type);
 
-/**
- * @brief Run function through all Actuators in a Datastore. Function should have same return logic.
- * 
- * @param datastore Datastore to search for Actuators
- * @param func Function to run for every Actuator
- * @return true Error
- * @return false All good
- */
-bool iterateActuators (Datastore* datastore, bool (*func)(Actuator*));
-
 #endif

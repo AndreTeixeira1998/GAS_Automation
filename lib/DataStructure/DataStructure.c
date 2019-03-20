@@ -690,29 +690,3 @@ Sensor* findSensorByType (Node* node, uint8_t type) {
 
     return NULL;
 }
-
-bool iterateActuators (Datastore* datastore, bool (*func)(Actuator*)) {
-    if (!datastore || !func) {
-        return NULL;
-    }
-
-    // For every Room
-    for (list_element* room_elem = listStart(datastore->rooms); room_elem != NULL; room_elem = room_elem->next) {
-        Room* room = (Room*)room_elem->ptr;
-
-        // For every Node
-        for (list_element* node_elem = listStart(room->nodes); node_elem != NULL; node_elem = node_elem->next) {
-            Node* node = (Node*)node_elem->ptr;
-            
-            // For every Actuator
-            for (list_element* actuator_elem = listStart(node->actuators); actuator_elem != NULL; actuator_elem = actuator_elem->next) {
-                Actuator* actuator = (Actuator*)actuator_elem->ptr;
-                if ((*func)(actuator)) {
-                    return true;
-                }
-            }
-        }
-    }
-
-    return false;
-}
