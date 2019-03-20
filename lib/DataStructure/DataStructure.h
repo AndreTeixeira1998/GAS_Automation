@@ -17,6 +17,11 @@
 #define TYPE_SENSOR_LIGHT       3
 #define TYPE_SENSOR_CURRENT     4
 
+#define TYPE_RULE_LESS_THEN     0
+#define TYPE_RULE_MORE_THEN     1
+#define TYPE_RULE_EQUAL_THEN    2
+#define TYPE_RULE_WITHIN_MARGIN 3
+
 typedef struct _datastore Datastore;
 typedef struct _room Room;
 typedef struct _node Node;
@@ -24,7 +29,22 @@ typedef struct _sensor Sensor;
 typedef struct _actuator Actuator;
 typedef struct _position Position;
 typedef struct _color Color;
+typedef struct _rule Rule;
 
+/**
+ * @brief Structure to hold a rule for actuator control
+ * 
+ */
+struct _rule {
+    Room* parentRoom;
+    Rule* parentRule;
+    list_element* listPtr;
+    list* sensors;
+    list* actuators;
+    uint16_t operation;
+    uint16_t value;
+    list* childs;
+};
 
 /**
  * @brief Structure to hold a cartesian position
@@ -100,6 +120,7 @@ struct _room {
     list_element* listPtr;
     char* name;
     list* nodes;
+    list* rules;
 };
 
 /**
@@ -214,6 +235,25 @@ Actuator* createActuator (Node* node, uint16_t id, uint8_t type, uint16_t posX, 
  */
 Sensor* createSensor (Node* node, uint8_t type);
 
+/**
+ * @brief Create a Rule object
+ * 
+ * @param room Room associated with the rule
+ * @param parent Parent Rule
+ * @param type operation to be made to the value of associated sensors and the rule value
+ * @param value 
+ * @return Rule* Pointer to the new Rule object
+ */
+Rule* createRule (Room* room, Rule* parent, uint16_t type, uint16_t value);
+
+/**
+ * @brief Delete a Rule object
+ * 
+ * @param rule The pointer to the Rule object to be deleted.
+ * @return true Error
+ * @return false All good
+ */
+bool deleteRule (Rule* rule);
 
 /**
  * @brief Delete a Actuator object

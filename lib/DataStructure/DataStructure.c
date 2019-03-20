@@ -260,6 +260,108 @@ Sensor* createSensor (Node* node, uint8_t type) {
     return sensor;
 }
 
+Rule* createRule (Room* room, Rule* parent, uint16_t type, uint16_t value) {
+    if ((!room && !parent) || 
+        (room && parent)) {
+        return NULL;
+    }
+
+    // Alocate memory for this rule
+    Rule* rule = (Rule*)malloc(sizeof(Rule));
+    if (!rule) {
+        return NULL;
+    }
+
+    list* sensors = newList();
+    if (sensors == NULL) {
+        free(rule);
+        return NULL;
+    }
+
+    list* actuators = newList();
+    if (actuators == NULL) {
+        deleteList(sensors);
+        free(rule);
+        return NULL;
+    }
+
+    list* childs = newList();
+    if (childs == NULL) {
+        deleteList(sensors);
+        deleteList(actuators);
+        free(rule);
+        return NULL;
+    }
+
+    rule->parentRoom = room;
+    rule->parentRule = parent;
+    rule->sensors = sensors;
+    rule->actuators = actuators;
+    rule->operation = type;
+    rule->value = value;
+    rule->childs = childs;
+
+    list_element* elem = NULL;
+
+    if (room) { // Insert rule in room
+        elem = listInsert(room->rules, rule, NULL);
+    }
+    else if (parent) { // Insert rule in parent rule
+        elem = listInsert(parent->childs, rule, NULL);
+    }
+    
+    if (elem == NULL) {
+        // Insertion failed
+        deleteList(sensors);
+        deleteList(actuators);
+        deleteList(childs);
+        free(rule);
+        return NULL;
+    }
+
+    rule->listPtr = elem;
+
+    return room;
+}
+
+bool deleteRule (Rule* rule) {
+    if (!rule) {
+        return true;
+    }
+
+    uint16_t retVal = 0;
+
+    deleteList(rule->sensors);
+    deleteList(rule->actuators);
+
+    LL_iterator(rule->childs, child_elem) {
+        Rule* child = child_elem->ptr;
+        retVal += deleteRule(child);
+    }
+    deleteList(rule->childs);
+
+
+    list_element *elem = rule->listPtr,
+        *res;
+    
+    if (rule->parentRoom) {
+        res = listRemove(rule->parentRoom, elem);
+        if (res == NULL && listSize(rule->parentRoom)) {
+            retVal++;
+        }
+    }
+    else if (rule->parentRule) {
+        res = listRemove(rule->parentRule, elem);
+        if (res == NULL && listSize(rule->parentRule)) {
+            retVal++;
+        }
+    }
+    
+    free(rule);
+
+    return retVal > 0 ? true : false;
+}
+
 bool deleteActuator (Actuator* actuator) {
     if (actuator == NULL) {
         return 1;
