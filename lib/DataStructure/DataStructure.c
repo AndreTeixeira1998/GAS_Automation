@@ -372,6 +372,24 @@ bool deleteActuator (Actuator* actuator) {
         return 1;
     }
 
+    // Remove Actuator from existing rules
+    Datastore* datastore = actuator->parentNode->parentRoom->parentDatastore;
+    LL_iterator(datastore->rooms, room_elem) {
+        Room* room = room_elem->ptr;
+        LL_iterator(room->rules, rule_elem) {
+            Rule* rule = rule_elem->ptr;
+            LL_iterator(rule->actuators, ruleActuator_elem) {
+                if (actuator == (ruleActuator_elem->ptr)) {
+                    list_element* rule_remover = listRemove(rule->actuators, ruleActuator_elem);
+                    if (rule_remover == NULL && listSize(rule->actuators)) {
+                        return 1;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
     list_element* elem = actuator->listPtr;
     Node* node = actuator->parentNode;
 
@@ -390,6 +408,24 @@ bool deleteActuator (Actuator* actuator) {
 bool deleteSensor (Sensor* sensor) {
     if (sensor == NULL) {
         return 1;
+    }
+
+    // Remove Sensor from existing rules
+    Datastore* datastore = sensor->parentNode->parentRoom->parentDatastore;
+    LL_iterator(datastore->rooms, room_elem) {
+        Room* room = room_elem->ptr;
+        LL_iterator(room->rules, rule_elem) {
+            Rule* rule = rule_elem->ptr;
+            LL_iterator(rule->sensors, ruleSensor_elem) {
+                if (sensor == (ruleSensor_elem->ptr)) {
+                    list_element* rule_remover = listRemove(rule->sensors, ruleSensor_elem);
+                    if (rule_remover == NULL && listSize(rule->sensors)) {
+                        return 1;
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     list_element* elem = sensor->listPtr;
