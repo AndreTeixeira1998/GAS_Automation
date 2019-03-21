@@ -32,6 +32,38 @@
                     ],
                     "actuators": []
                 }
+            ],
+            "rules": [
+                {
+                    "type": 0,
+                    "value": 10,
+                    "sensors": ["0.0"],
+                    "actuators": [0],
+                    "childs": [
+                        {
+                            "type": 1,
+                            "value": 40,
+                            "sensors": ["0.1"],
+                            "actuators": [0],
+                            "childs": []
+                        }
+                    ]
+                },
+                {
+                    "type": 0,
+                    "value": 5,
+                    "sensors": ["1.3"],
+                    "actuators": [0],
+                    "childs": [
+                        {
+                            "type": 1,
+                            "value": 20,
+                            "sensors": ["1.3"],
+                            "actuators": [0],
+                            "childs": []
+                        }
+                    ]
+                }
             ]
         }
     ]
