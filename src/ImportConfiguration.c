@@ -66,16 +66,28 @@ bool parseSensor (Node* node, cJSON* json_sensor) {
     }
 
     // Read the type of the sensor from the parsed json
-    uint16_t type = 0;
+    uint16_t type = 0,
+        posX = 0,
+        posY = 0;
     cJSON* json_type = cJSON_GetObjectItem(json_sensor, "type");
-    if (cJSON_IsNumber(json_type)) {
+    cJSON* json_posX = cJSON_GetObjectItem(json_sensor, "posX");
+    cJSON* json_posY = cJSON_GetObjectItem(json_sensor, "posY");
+    if (cJSON_IsNumber(json_type) &&
+        cJSON_IsNumber(json_posX) &&
+        cJSON_IsNumber(json_posY)) {
         type = (uint16_t)json_type->valueint;
+        posX = (uint16_t)json_posX->valueint;
+        posY = (uint16_t)json_posY->valueint;
     }
     else {
         return 1;
     }
 
-    Sensor* sensor = createSensor(node, type);
+    Position position;
+    position.x = posX;
+    position.y = posY;
+
+    Sensor* sensor = createSensor(node, type, &position);
     if (!sensor) {
         return 1;
     }
@@ -111,8 +123,12 @@ bool parseActuator (Node* node, cJSON* json_actuator) {
         return 1;
     }
 
+    Position position;
+    position.x = posX;
+    position.y = posY;
+
     // Create actuator instance
-    Actuator* actuator = createActuator(node, id, type, posX, posY);
+    Actuator* actuator = createActuator(node, id, type, &position);
     if (!actuator) {
         return 1;
     }
