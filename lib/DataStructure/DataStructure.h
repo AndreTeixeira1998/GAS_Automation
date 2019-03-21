@@ -341,30 +341,36 @@ bool setSensorValue (Sensor* sensor, uint16_t value);
 float getSensorValue (Sensor* sensor);
 
 /**
- * @brief Get the Actuator Position object
+ * @brief Get the Actuator Pixel object
  * 
  * @param actuator Pointer to the Actuator object
- * @return Position* Pointer to the Position of the Actuator. NULL if error.
+ * @return Pixel* Pointer to the Pixel object. NULL if error.
  */
-Position* getActuatorPosition (Actuator* actuator);
+Pixel* getActuatorPixel (Actuator* actuator);
 
 /**
- * @brief Get the Actuator Color object
+ * @brief Get the Sensor Pixel object
  * 
- * @param actuator Pointer to the Actuator object
- * @return Color* Pointer to the Color of the Actuator. NULL if error.
+ * @param actuator Pointer to the Sensor object
+ * @return Pixel* Pointer to the Pixel object. NULL if error.
  */
-Color* getActuatorColor (Actuator* actuator);
+Pixel* getSensorPixel (Sensor* sensor);
 
 /**
- * @brief Set the values for the RGB colour components that represent the value/state of the Actuator object
+ * @brief Get the Pixel Position object
  * 
- * @param actuator Pointer to the Actuator object
- * @param color Pointer to color object to import
- * @return true Error
- * @return false All Good
+ * @param pixel Pointer to the Pixel object
+ * @return Position* Pointer to the Position of the Pixel. NULL if error.
  */
-bool setActuatorValue (Actuator* actuator, Color* color);
+Position* getPixelPosition (Pixel* pixel);
+
+/**
+ * @brief Get the Pixel Color object
+ * 
+ * @param actuator Pointer to the Pixel object
+ * @return Color* Pointer to the Color of the Pixel. NULL if error.
+ */
+Color* getPixelColor (Pixel* pixel);
 
 /**
  * @brief Searches the datastore for a Node with the specified nodeID

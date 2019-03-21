@@ -539,32 +539,36 @@ float getSensorValue (Sensor* sensor) {
     return (sensor->calculator)(sensor->value);
 }
 
-Position* getActuatorPosition (Actuator* actuator) {
+Pixel* getActuatorPixel (Actuator* actuator) {
     if (!actuator) {
         return NULL;
     }
 
-    return actuator->pos;
+    return actuator->pixel;
 }
 
-Color* getActuatorColor (Actuator* actuator) {
-    if (!actuator) {
+Pixel* getSensorPixel (Sensor* sensor) {
+    if (!sensor) {
         return NULL;
     }
 
-    return actuator->color;
+    return sensor->pixel;
 }
 
-bool setActuatorValue (Actuator* actuator, Color* color) {
-    if (!actuator || !color) {
-        return 1;
+Position* getPixelPosition (Pixel* pixel) {
+    if (!pixel) {
+        return NULL;
     }
 
-    actuator->color->r = color->r;
-    actuator->color->g = color->g;
-    actuator->color->b = color->b;
+    return pixel->pos;
+}
 
-    return 0;
+Color* getPixelColor (Pixel* pixel) {
+    if (!pixel) {
+        return NULL;
+    }
+
+    return pixel->color;
 }
 
 Node* findNodeByID (Datastore* datastore, uint16_t nodeID) {
