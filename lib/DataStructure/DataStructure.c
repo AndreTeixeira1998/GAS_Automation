@@ -503,6 +503,17 @@ bool deleteRoom (Room* room) {
     }
     deleteList(room->nodes);
 
+    // Delete all room's rules
+    aux = listStart(room->rules);
+    while (aux != NULL) {
+        if (deleteRule(aux->ptr)) {
+            // Error
+            return 1;
+        }
+        aux = listStart(room->nodes);
+    }
+    deleteList(room->nodes);
+
     free(room->name);
     free(room);
     list_element* res = listRemove(datastore->rooms, elem);
