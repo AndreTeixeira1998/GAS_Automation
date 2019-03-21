@@ -74,7 +74,16 @@ Datastore* createDatastore () {
         return NULL;
     }
 
+    list* pixels = newList();
+    if (pixels == NULL) {
+        // Error creating list
+        deleteList(rooms);
+        free(datastore);
+        return NULL;
+    }
+
     datastore->rooms = rooms;
+    datastore->pixels = pixels;
 
     return datastore;
 }
@@ -160,71 +169,46 @@ Node* createNode (Room* room, uint16_t id) {
     return node;
 }
 
-Actuator* createActuator (Node* node, uint16_t id, uint8_t type, uint16_t posX, uint16_t posY) {
+Actuator* createActuator (Node* node, uint16_t id, uint8_t type, Position* pos) {
     if (!node) {
         return NULL;
     }
 
-    Position* pos = (Position*)malloc(sizeof(Position));
-    if (pos == NULL) {
-        // Memory allocation failed
-        return NULL;
-    }
-    pos->x = posX;
-    pos->y = posY;
-
-    // Search for duplicates
-    Room* room = node->parentRoom;
-    Datastore* datastore = room->parentDatastore;
-    if (findActuatorByPos(datastore, pos)) {
-        // There is already a Actuator assigned to that position
-        free(pos);
+    Pixel* pixel = createPixel(node->parentRoom->parentDatastore, NULL, pos);
+    if (!pixel) {
         return NULL;
     }
 
     if (findActuatorByID(node, id)) {
         // There is already a Actuator with this ID assigned to this node
-        free(pos);
+        deletePixel(pixel);
         return NULL;
     }
 
     Actuator* actuator = (Actuator*)malloc(sizeof(Actuator));
     if (actuator == NULL) {
         // Memory allocation failed
-        free(pos);
+        deletePixel(pixel);
         return NULL;
     }
-
-    Color* color = (Color*)malloc(sizeof(Color));
-    if (color == NULL) {
-        // Memory allocation failed
-        free(pos);
-        free(actuator);
-        return NULL;
-    }
-    color->r = 0;
-    color->g = 0;
-    color->b = 0;
 
     list_element* elem = listInsert(node->actuators, actuator, NULL);
     if (elem == NULL) {
         // Insertion failed
-        free(pos);
-        free(color);
         free(actuator);
+        deletePixel(pixel);
         return NULL;
     }
 
     actuator->type = type;
     actuator->parentNode = node;
     actuator->listPtr = elem;
-    actuator->color = color;
-    actuator->pos = pos;
+    actuator->pixel = pixel;
 
     return actuator;
 }
 
-Sensor* createSensor (Node* node, uint8_t type) {
+Sensor* createSensor (Node* node, uint8_t type, Position* pos) {
     if (!node) {
         return NULL;
     }
@@ -235,6 +219,11 @@ Sensor* createSensor (Node* node, uint8_t type) {
 
     if (findSensorByType(node, type)) {
         // There's alreay a sensor with the specified type associated with this node.
+        return NULL;
+    }
+
+    Pixel* pixel = createPixel(node->parentRoom->parentDatastore, NULL, pos);
+    if (!pixel) {
         return NULL;
     }
 
@@ -256,12 +245,17 @@ Sensor* createSensor (Node* node, uint8_t type) {
     sensor->type = type;
     sensor->calculator = sensorCalculatorFunctionPointer(type);
     sensor->value = 0;
+    sensor->pixel = pixel;
 
     return sensor;
 }
 
 Pixel* createPixel (Datastore* datastore, Color* color, Position* pos) {
-    if (!datastore || !color || !pos) {
+    if (!datastore || !pos) {
+        return NULL;
+    }
+
+    if (findPixelByPos(datastore, pos)) {
         return NULL;
     }
 
@@ -271,9 +265,16 @@ Pixel* createPixel (Datastore* datastore, Color* color, Position* pos) {
         return NULL;
     }
 
-    pixelColor->r = color->r;
-    pixelColor->g = color->g;
-    pixelColor->b = color->b;
+    if (color) {
+        pixelColor->r = color->r;
+        pixelColor->g = color->g;
+        pixelColor->b = color->b;
+    }
+    else {
+        pixelColor->r = 0;
+        pixelColor->g = 0;
+        pixelColor->b = 0;
+    }
 
 
     Position* pixelPos = (Position*)malloc(sizeof(Position));
@@ -340,8 +341,7 @@ bool deleteActuator (Actuator* actuator) {
     list_element* elem = actuator->listPtr;
     Node* node = actuator->parentNode;
 
-    free(actuator->color);
-    free(actuator->pos);
+    deletePixel(actuator->pixel);
 
     free(actuator);
     list_element* res = listRemove(node->actuators, elem);
@@ -359,6 +359,8 @@ bool deleteSensor (Sensor* sensor) {
 
     list_element* elem = sensor->listPtr;
     Node* node = sensor->parentNode;
+
+    deletePixel(sensor->pixel);
 
     free(sensor);
     list_element* res = listRemove(node->sensors, elem);
@@ -449,7 +451,7 @@ bool deleteDatastore (Datastore* datastore) {
 
     list_element* aux;
 
-    // Delete all room's nodes
+    // Delete all datastore's rooms
     aux = listStart(datastore->rooms);
     while (aux != NULL) {
         if (deleteRoom(aux->ptr)) {
@@ -459,6 +461,17 @@ bool deleteDatastore (Datastore* datastore) {
         aux = listStart(datastore->rooms);
     }
     deleteList(datastore->rooms);
+
+    // Delete all datastore's pixels
+    aux = listStart(datastore->pixels);
+    while (aux != NULL) {
+        if (deletePixel(aux->ptr)) {
+            // Error
+            return 1;
+        }
+        aux = listStart(datastore->pixels);
+    }
+    deleteList(datastore->pixels);
 
     free(datastore);
 
@@ -619,26 +632,15 @@ Room* findRoomByName (Datastore* datastore, const char* roomName) {
     return NULL;
 }
 
-Actuator* findActuatorByPos (Datastore* datastore, Position* pos) {
+Pixel* findPixelByPos (Datastore* datastore, Position* pos) {
     if (!datastore || !pos) {
         return NULL;
     }
 
-    // For every Room
-    for (list_element* room_elem = listStart(datastore->rooms); room_elem != NULL; room_elem = room_elem->next) {
-        Room* room = (Room*)room_elem->ptr;
-
-        // For every Node
-        for (list_element* node_elem = listStart(room->nodes); node_elem != NULL; node_elem = node_elem->next) {
-            Node* node = (Node*)node_elem->ptr;
-            
-            // For every Actuator
-            for (list_element* actuator_elem = listStart(node->actuators); actuator_elem != NULL; actuator_elem = actuator_elem->next) {
-                Actuator* actuator = (Actuator*)actuator_elem->ptr;
-                if (actuator->pos->x == pos->x && actuator->pos->y == pos->y) {
-                    return actuator;
-                }
-            }
+    LL_iterator(datastore->pixels, pixel_elem) {
+        Pixel* pixel = pixel_elem->ptr;
+        if (pixel->pos->x == pos->x && pixel->pos->y == pos->y) {
+            return pixel;
         }
     }
 

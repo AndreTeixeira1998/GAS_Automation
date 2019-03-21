@@ -66,8 +66,7 @@ struct _actuator {
     list_element* listPtr;
     uint16_t id;
     uint8_t type;
-    Color* color;
-    Position* pos;
+    Pixel* pixel;
 };
 
 /**
@@ -88,6 +87,7 @@ struct _sensor {
     uint8_t type;
     sensorValueCalculator* calculator;
     uint16_t value;
+    Pixel* pixel;
 };
 
 /**
@@ -217,15 +217,17 @@ Node* createNode (Room* room, uint16_t id);
  * @param posY Position in the Y axis on the RGB Matrix output
  * @return Actuator* The pointer to the new Actuator object. NULL if error occurs.
  */
-Actuator* createActuator (Node* node, uint16_t id, uint8_t type, uint16_t posX, uint16_t posY);
+Actuator* createActuator (Node* node, uint16_t id, uint8_t type, Position* pos);
 
 /**
  * @brief Create a Sensor object
  * 
  * @param node A pointer to the Node this Sensor will belong to.
+ * @param type Type of sensor
+ * @param pos Position of the sensor in the RGB Matrix
  * @return Sensor* The pointer to the new Sensor object. NULL if error occurs.
  */
-Sensor* createSensor (Node* node, uint8_t type);
+Sensor* createSensor (Node* node, uint8_t type, Position* pos);
 
 /**
  * @brief Create a Pixel object
@@ -401,14 +403,13 @@ Actuator* findActuatorByID (Node* node, uint16_t actuatorID);
 Room* findRoomByName (Datastore* datastore, const char* roomName);
 
 /**
- * @brief Searches the datastore for a Actuator with the specified position
+ * @brief Searches the datastore for a Pixel with the specified position
  * 
  * @param datastore Datastore object to search
- * @param posX Position in the X axis on the RGB Matrix output
- * @param posY Position in the Y axis on the RGB Matrix output
- * @return Actuator* Actuator object with the desired position. NULL if not found.
+ * @param pos Position on the RGB Matrix output
+ * @return Pixel* Pixel object with the desired position. NULL if not found.
  */
-Actuator* findActuatorByPos (Datastore* datastore, Position* pos);
+Pixel* findPixelByPos (Datastore* datastore, Position* pos);
 
 /**
  * @brief Searches a node's sensors for the one with a specific type.
