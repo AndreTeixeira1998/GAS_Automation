@@ -224,6 +224,7 @@ Actuator* createActuator (Node* node, uint16_t id, uint8_t type, uint16_t posX, 
         return NULL;
     }
 
+    actuator->id = id;
     actuator->type = type;
     actuator->parentNode = node;
     actuator->listPtr = elem;
@@ -683,7 +684,7 @@ Actuator* findActuatorByID (Node* node, uint16_t actuatorID) {
         return NULL;
     }
 
-    for (list_element* actuator_elem = listStart(node->actuators); actuator_elem != NULL; actuator_elem = actuator_elem->next) {
+    LL_iterator(node->actuators, actuator_elem) {
         Actuator* actuator = (Actuator*)actuator_elem->ptr;
         if (actuator->id == actuatorID) {
             return actuator;
