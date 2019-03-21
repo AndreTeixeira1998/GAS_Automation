@@ -779,10 +779,11 @@ bool evaluateRule (Rule* rule) {
     // Test all childs
     LL_iterator(rule->childs, child_elem) {
         Rule* child = child_elem->ptr;
-        if (!evaluateRule(child)) {
-            // Child is not verified
-            return false;
+        if (evaluateRule(child)) {
+            // One Child is verified
+            break;
         }
+        return false;
     }
 
     // Test sensor values against rule value given the rule operation
