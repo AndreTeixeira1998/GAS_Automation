@@ -5,6 +5,13 @@
 #include "ImportConfiguration.h"
 #include "functions.h"
 
+#define X_SIZE  3
+#define Y_SIZE  3
+
+#define DEFAULT_COLOR_R 0
+#define DEFAULT_COLOR_G 0
+#define DEFAULT_COLOR_B 0
+
 int main(int argc, char const *argv[])
 {
     if (argc < 4) {
@@ -26,7 +33,32 @@ int main(int argc, char const *argv[])
         return 1;
     }
 
-    fprintf(outputStream, "[[255,0,255],[255,0,255],[0,0,255],[255,255,255]]\n");
+    
+    fprintf(outputStream, "[");
+    for (int x = 0; x < X_SIZE; x++) {
+        for (int y = 0; y < Y_SIZE; y++) {
+            Position position;
+            position.x = x;
+            position.y = y;
+
+            Pixel* pixel = findPixelByPos(datastore, &position);
+            if (pixel) {
+                fprintf(outputStream, "[%d,%d,%d]", pixel->color->r, pixel->color->g, pixel->color->b);
+            }
+            else {
+                fprintf(outputStream, "[%d,%d,%d]", DEFAULT_COLOR_R, DEFAULT_COLOR_G, DEFAULT_COLOR_B);
+            }
+
+            if (y < X_SIZE-1) {
+                fprintf(outputStream, ",");
+            }
+        }
+
+        if (x < Y_SIZE-1) {
+            fprintf(outputStream, ",");
+        }
+    }
+    fprintf(outputStream, "]\n");
     
     printf("Done\n");
 

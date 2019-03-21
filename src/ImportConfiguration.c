@@ -238,6 +238,56 @@ bool parseRoom (Datastore* datastore, cJSON* json_room) {
     return 0;
 }
 
+bool parseExtraPixel (Datastore* datastore, cJSON* json_pixel) {
+    if (!datastore || !json_pixel) {
+        return true;
+    }
+
+    // Read the pixel attributes
+    uint16_t posX = 0,
+        posY = 0,
+        r = 0,
+        g = 0,
+        b = 0;
+
+    cJSON* json_posX = cJSON_GetObjectItem(json_pixel, "posX");
+    cJSON* json_posY = cJSON_GetObjectItem(json_pixel, "posY");
+    cJSON* json_r = cJSON_GetObjectItem(json_pixel, "r");
+    cJSON* json_g = cJSON_GetObjectItem(json_pixel, "g");
+    cJSON* json_b = cJSON_GetObjectItem(json_pixel, "b");
+    if (cJSON_IsNumber(json_posX) &&
+        cJSON_IsNumber(json_posY) &&
+        cJSON_IsNumber(json_r) &&
+        cJSON_IsNumber(json_g) &&
+        cJSON_IsNumber(json_b)) {
+
+        posX = (uint16_t)json_posX->valueint;
+        posY = (uint16_t)json_posY->valueint;
+        r = (uint16_t)json_r->valueint;
+        g = (uint16_t)json_g->valueint;
+        b = (uint16_t)json_b->valueint;
+    }
+    else {
+        return true;
+    }
+
+    Position position;
+    position.x = posX;
+    position.y = posY;
+
+    Color color;
+    color.r = r;
+    color.g = g;
+    color.b = b;
+
+    Pixel* pixel = createPixel(datastore, &color, &position);
+    if (!pixel) {
+        return true;
+    }
+    
+    return false;
+}
+
 Datastore* importConfiguration(const char* filename) {
     
     char* jsonString = getMinifiedJSONStringFromFile(filename);
@@ -277,7 +327,27 @@ Datastore* importConfiguration(const char* filename) {
         }
     }
 
+    // Parse the extra pixel's data from the configuration file
+    cJSON *pixels = cJSON_GetObjectItem(json, "pixels"),
+        *pixel = NULL;
+    if (!cJSON_IsArray(pixels)) {
+        deleteDatastore(datastore);
+        cJSON_Delete(json);
+        free(jsonString);
+        return NULL;
+    }
+    cJSON_ArrayForEach(pixel, pixels) {
+        if(parseExtraPixel(datastore, pixel)) {
+            // Error parsing extra Pixel
+            deleteDatastore(datastore);
+            cJSON_Delete(json);
+            free(jsonString);
+            return NULL;
+        }
+    }
+
     //printf("%s\n", jsonString);
+    cJSON_Delete(json);
     free(jsonString);
     return datastore;
 }
