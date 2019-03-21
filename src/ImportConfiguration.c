@@ -219,7 +219,14 @@ bool parseRule (Room* room, Rule* parentRule, cJSON* json_rule) {
             char* token2 = strtok(NULL, ".");
 
             Node* node = findNodeByID(room->parentDatastore, atoi(token1));
+            if (!node) {
+                return true;
+            }
+
             Sensor* sensor = findSensorByType(node, atoi(token2));
+            if (!sensor) {
+                return true;
+            }
 
             if (addSensorToRule(rule, sensor)) {
                 return true;
@@ -227,8 +234,35 @@ bool parseRule (Room* room, Rule* parentRule, cJSON* json_rule) {
         }
     }
 
-    cJSON* json_actuator_array = cJSON_GetObjectItem(json_rule, "actuators");
+    cJSON* json_actuator_array = cJSON_GetObjectItem(json_rule, "actuators"),
+        *json_actuator_entry = NULL;;
+    if (!cJSON_IsArray(json_actuator_array)) {
+        return true;
+    }
+    cJSON_ArrayForEach(json_actuator_entry, json_actuator_array) {
+        if (cJSON_IsString(json_actuator_entry) && (json_actuator_entry->valuestring != NULL)) {
+            // FIXME Buffer Overflow Ahoy!!!!
+            char* token1 = strtok(json_actuator_entry->valuestring, ".");
+            char* token2 = strtok(NULL, ".");
 
+            uint16_t val1 = strtoul(token1, NULL, 10);
+            uint16_t val2 = strtoul(token2, NULL, 10);
+
+            Node* node = findNodeByID(room->parentDatastore, val1);
+            if (!node) {
+                return true;
+            }
+
+            Actuator* actuator = findActuatorByID(node, val2);
+            if (!actuator) {
+                return true;
+            }
+
+            if (addActuatorToRule(rule, actuator)) {
+                return true;
+            }
+        }
+    }
 
     
 
