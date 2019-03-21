@@ -104,11 +104,20 @@ Room* createRoom (Datastore* datastore, uint16_t id) {
         return NULL;
     }
 
+    list* rules = newList();
+    if (rules == NULL) {
+        free(room);
+        listRemove(datastore->rooms, elem);
+        deleteList(nodes);
+        return NULL;
+    }
+
     room->id = id;
     room->parentDatastore = datastore;
     room->listPtr = elem;
     room->name = NULL;
     room->nodes = nodes;
+    room->rules = rules;
 
     return room;
 }
@@ -510,9 +519,9 @@ bool deleteRoom (Room* room) {
             // Error
             return 1;
         }
-        aux = listStart(room->nodes);
+        aux = listStart(room->rules);
     }
-    deleteList(room->nodes);
+    deleteList(room->rules);
 
     free(room->name);
     free(room);
