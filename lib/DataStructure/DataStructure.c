@@ -260,6 +260,78 @@ Sensor* createSensor (Node* node, uint8_t type) {
     return sensor;
 }
 
+Pixel* createPixel (Datastore* datastore, Color* color, Position* pos) {
+    if (!datastore || !color || !pos) {
+        return NULL;
+    }
+
+    Color* pixelColor = (Color*)malloc(sizeof(Color));
+    if (pixelColor == NULL) {
+        // Memory allocation failed
+        return NULL;
+    }
+
+    pixelColor->r = color->r;
+    pixelColor->g = color->g;
+    pixelColor->b = color->b;
+
+
+    Position* pixelPos = (Position*)malloc(sizeof(Position));
+    if (pixelPos == NULL) {
+        // Memory allocation failed
+        free(pixelColor);
+        return NULL;
+    }
+
+    pixelPos->x = pos->x;
+    pixelPos->y = pos->y;
+
+
+    Pixel* pixel = (Pixel*)malloc(sizeof(Pixel));
+    if (pixel == NULL) {
+        free(pixelColor);
+        free(pixelPos);
+        // Memory allocation failed
+        return NULL;
+    }
+
+    list_element* elem = listInsert(datastore->pixels, pixel, NULL);
+    if (elem == NULL) {
+        // Insertion failed
+        free(pixelColor);
+        free(pixelPos);
+        free(pixel);
+        return NULL;
+    }
+
+    pixel->color = pixelColor;
+    pixel->pos = pixelPos;
+    pixel->listPtr = elem;
+    pixel->parentDatastore = datastore;
+
+    return pixel;
+}
+
+bool deletePixel (Pixel* pixel) {
+    if (!pixel) {
+        return true;
+    }
+
+    list_element* elem = pixel->listPtr;
+    Datastore* datastore = pixel->parentDatastore;
+
+    free(pixel->color);
+    free(pixel->pos);
+    free(pixel);
+
+    list_element* res = listRemove(datastore->pixels, elem);
+    if (res == NULL && listSize(datastore->pixels)) {
+        return true;
+    }
+
+    return false;
+}
+
 bool deleteActuator (Actuator* actuator) {
     if (actuator == NULL) {
         return 1;

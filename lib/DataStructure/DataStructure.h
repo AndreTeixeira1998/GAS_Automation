@@ -24,6 +24,7 @@ typedef struct _sensor Sensor;
 typedef struct _actuator Actuator;
 typedef struct _position Position;
 typedef struct _color Color;
+typedef struct _pixel Pixel;
 
 
 /**
@@ -43,6 +44,17 @@ struct _color {
     uint8_t r;
     uint8_t g;
     uint8_t b;
+};
+
+/**
+ * @brief Structure to hold all data regarding a pixel in the RGB Matrix
+ * 
+ */
+struct _pixel {
+    Position* pos;
+    Color* color;
+    list_element* listPtr;
+    Datastore* parentDatastore;
 };
 
 /**
@@ -108,6 +120,7 @@ struct _room {
  */
 struct _datastore {
     list* rooms;
+    list* pixels;
 };
 
 
@@ -214,6 +227,24 @@ Actuator* createActuator (Node* node, uint16_t id, uint8_t type, uint16_t posX, 
  */
 Sensor* createSensor (Node* node, uint8_t type);
 
+/**
+ * @brief Create a Pixel object
+ * 
+ * @param datastore Datastore to save the Pixel
+ * @param color Color of the pixel
+ * @param pos Position of the Pixel
+ * @return Pixel* Pointer to the new Pixel object. NULL if error.
+ */
+Pixel* createPixel (Datastore* datastore, Color* color, Position* pos);
+
+/**
+ * @brief Delete a Pixel object
+ * 
+ * @param actuator The pointer to the Pixel object to be deleted.
+ * @return true Error
+ * @return false All good
+ */
+bool deletePixel (Pixel* pixel);
 
 /**
  * @brief Delete a Actuator object
