@@ -17,6 +17,11 @@
 #define TYPE_SENSOR_LIGHT       3
 #define TYPE_SENSOR_CURRENT     4
 
+#define TYPE_RULE_LESS_THEN     0
+#define TYPE_RULE_GREATER_THEN  1
+#define TYPE_RULE_EQUAL_TO      2
+#define TYPE_RULE_WITHIN_MARGIN 3
+
 typedef struct _datastore Datastore;
 typedef struct _room Room;
 typedef struct _node Node;
@@ -24,8 +29,23 @@ typedef struct _sensor Sensor;
 typedef struct _actuator Actuator;
 typedef struct _position Position;
 typedef struct _color Color;
+typedef struct _rule Rule;
 typedef struct _pixel Pixel;
 
+/**
+ * @brief Structure to hold a rule for actuator control
+ * 
+ */
+struct _rule {
+    Room* parentRoom;
+    Rule* parentRule;
+    list_element* listPtr;
+    list* sensors;
+    list* actuators;
+    uint16_t operation;
+    uint16_t value;
+    list* childs;
+};
 
 /**
  * @brief Structure to hold a cartesian position
@@ -112,6 +132,7 @@ struct _room {
     list_element* listPtr;
     char* name;
     list* nodes;
+    list* rules;
 };
 
 /**
@@ -240,6 +261,26 @@ Sensor* createSensor (Node* node, uint8_t type, Position* pos);
 Pixel* createPixel (Datastore* datastore, Color* color, Position* pos);
 
 /**
+ * @brief Create a Rule object
+ * 
+ * @param room Room associated with the rule
+ * @param parent Parent Rule
+ * @param type operation to be made to the value of associated sensors and the rule value
+ * @param value 
+ * @return Rule* Pointer to the new Rule object
+ */
+Rule* createRule (Room* room, Rule* parent, uint16_t type, uint16_t value);
+
+/**
+ * @brief Delete a Rule object
+ * 
+ * @param rule The pointer to the Rule object to be deleted.
+ * @return true Error
+ * @return false All good
+ */
+bool deleteRule (Rule* rule);
+
+/**
  * @brief Delete a Pixel object
  * 
  * @param actuator The pointer to the Pixel object to be deleted.
@@ -331,6 +372,26 @@ bool setRoomName(Room* room, const char* str);
  * @return false All Good
  */
 bool setSensorValue (Sensor* sensor, uint16_t value);
+
+/**
+ * @brief Set the Pixel Position object
+ * 
+ * @param pixel Pointer to the Pixel object
+ * @param pos Pointer to a Position object with the desired specs
+ * @return true Error
+ * @return false All good
+ */
+bool setPixelPosition (Pixel* pixel, Position* pos);
+
+/**
+ * @brief Set the Pixel Color object
+ * 
+ * @param pixel Pointer to the Pixel object
+ * @param color Pointer to a Color object with the desired specs
+ * @return true Error
+ * @return false All good
+ */
+bool setPixelColor (Pixel* pixel, Color* color);
 
 /**
  * @brief Calculate the value of the Sensor object
@@ -427,13 +488,32 @@ Pixel* findPixelByPos (Datastore* datastore, Position* pos);
 Sensor* findSensorByType (Node* node, uint8_t type);
 
 /**
- * @brief Run function through all Actuators in a Datastore. Function should have same return logic.
+ * @brief Adds a Sensor as a condition to a rule
  * 
- * @param datastore Datastore to search for Actuators
- * @param func Function to run for every Actuator
+ * @param rule 
+ * @param sensor 
  * @return true Error
- * @return false All good
+ * @return false All Good
  */
-bool iterateActuators (Datastore* datastore, bool (*func)(Actuator*));
+bool addSensorToRule (Rule* rule, Sensor* sensor);
+
+/**
+ * @brief Adds a Actuator as a condition to a rule
+ * 
+ * @param rule 
+ * @param actuator 
+ * @return true Error
+ * @return false All Good
+ */
+bool addActuatorToRule (Rule* rule, Actuator* actuator);
+
+/**
+ * @brief Execute the control rules
+ * 
+ * @param datastore 
+ * @return true Error
+ * @return false All Good
+ */
+bool executeRules (Datastore* datastore);
 
 #endif

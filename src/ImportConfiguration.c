@@ -186,6 +186,119 @@ bool parseNode (Room* room, cJSON* json_node) {
     return 0;
 }
 
+bool parseRule (Room* room, Rule* parentRule, cJSON* json_rule) {
+    if (!json_rule ||
+        (!room && !parentRule)) {
+        return true;
+    }
+
+
+    uint16_t type = 0,
+        value = 0;
+
+    cJSON* json_type = cJSON_GetObjectItem(json_rule, "type");
+    cJSON* json_value = cJSON_GetObjectItem(json_rule, "value");
+    if (cJSON_IsNumber(json_type) &&
+        cJSON_IsNumber(json_value)) {
+        
+        type = (uint16_t)json_type->valueint;
+        value = (uint16_t)json_value->valueint;
+    }
+    else {
+        return true;
+    }
+
+    // Create Rule instance
+    Rule* rule = NULL;
+    if (parentRule) {
+        rule = createRule(NULL, parentRule, type, value);
+    }
+    else {
+        rule = createRule(room, NULL, type, value);
+    }
+
+    // Check for successfull rule creation
+    if (!rule) {
+        return true;
+    }
+
+    cJSON* json_sensor_array = cJSON_GetObjectItem(json_rule, "sensors"),
+        *json_sensor_entry = NULL;;
+    if (!cJSON_IsArray(json_sensor_array)) {
+        return true;
+    }
+    cJSON_ArrayForEach(json_sensor_entry, json_sensor_array) {
+        if (cJSON_IsString(json_sensor_entry) && (json_sensor_entry->valuestring != NULL)) {
+            // FIXME Buffer Overflow Ahoy!!!!
+            char* token1 = strtok(json_sensor_entry->valuestring, ".");
+            char* token2 = strtok(NULL, ".");
+
+            uint16_t val1 = strtoul(token1, NULL, 10);
+            uint16_t val2 = strtoul(token2, NULL, 10);
+
+            Node* node = findNodeByID(room->parentDatastore, val1);
+            if (!node) {
+                return true;
+            }
+
+            Sensor* sensor = findSensorByType(node, val2);
+            if (!sensor) {
+                return true;
+            }
+
+            if (addSensorToRule(rule, sensor)) {
+                return true;
+            }
+        }
+    }
+
+    cJSON* json_actuator_array = cJSON_GetObjectItem(json_rule, "actuators"),
+        *json_actuator_entry = NULL;;
+    if (!cJSON_IsArray(json_actuator_array)) {
+        return true;
+    }
+    cJSON_ArrayForEach(json_actuator_entry, json_actuator_array) {
+        if (cJSON_IsString(json_actuator_entry) && (json_actuator_entry->valuestring != NULL)) {
+            // FIXME Buffer Overflow Ahoy!!!!
+            char* token1 = strtok(json_actuator_entry->valuestring, ".");
+            char* token2 = strtok(NULL, ".");
+
+            uint16_t val1 = strtoul(token1, NULL, 10);
+            uint16_t val2 = strtoul(token2, NULL, 10);
+
+            Node* node = findNodeByID(room->parentDatastore, val1);
+            if (!node) {
+                return true;
+            }
+
+            Actuator* actuator = findActuatorByID(node, val2);
+            if (!actuator) {
+                return true;
+            }
+
+            if (addActuatorToRule(rule, actuator)) {
+                return true;
+            }
+        }
+    }
+
+    cJSON* json_childs_array = cJSON_GetObjectItem(json_rule, "childs"),
+        *json_childs_entry = NULL;;
+    if (!cJSON_IsArray(json_childs_array)) {
+        return true;
+    }
+    cJSON_ArrayForEach(json_childs_entry, json_childs_array) {
+        if(!cJSON_IsObject(json_childs_entry)) {
+            return true;
+        }
+        else {
+            parseRule(room, rule, json_childs_entry);
+        }
+    }
+
+    return false;
+}
+
 bool parseRoom (Datastore* datastore, cJSON* json_room) {
     if (!datastore || !json_room) {
         return 1;
@@ -231,6 +344,20 @@ bool parseRoom (Datastore* datastore, cJSON* json_room) {
     cJSON_ArrayForEach(node, nodes) {
         if(parseNode(room, node)) {
             // Error parsing node
+            return 1;
+        }
+    }
+
+
+    // Parse the room's rules
+    cJSON *rules = cJSON_GetObjectItem(json_room, "rules"),
+        *rule = NULL;
+    if (!cJSON_IsArray(rules)) {
+        return 1;
+    }
+    cJSON_ArrayForEach(rule, rules) {
+        if(parseRule(room, NULL, rule)) {
+            // Error parsing rule
             return 1;
         }
     }
