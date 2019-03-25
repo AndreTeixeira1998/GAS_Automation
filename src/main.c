@@ -149,6 +149,8 @@ int main(int argc, char const *argv[]) {
         // Read input from sensors
         readInput(datastore, inputStream);
 
+        executeRules(datastore);
+
         // Output Pixel values to  RGB Matrix
         writeOutput(datastore, outputStream);
     }
