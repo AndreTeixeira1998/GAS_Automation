@@ -244,7 +244,7 @@ Sensor* createSensor (Node* node, uint8_t type, Position* pos) {
         return NULL;
     }
 
-    if(!pthread_mutex_init(&sensor->mutex, NULL)) {
+    if(pthread_mutex_init(&sensor->mutex, NULL)) {
         // Mutex init failed
         deletePixel(pixel);
         return NULL;
@@ -314,12 +314,11 @@ Pixel* createPixel (Datastore* datastore, Color* color, Position* pos) {
         // Memory allocation failed
         return NULL;
     }
-
-    if(!pthread_mutex_init(&pixel->mutex, NULL)) {
+    
+    if(pthread_mutex_init(&pixel->mutex, NULL)) {
         // Mutex init failed
         free(pixelColor);
         free(pixelPos);
-        deletePixel(pixel);
         return NULL;
     }
 
