@@ -74,7 +74,16 @@ Datastore* createDatastore () {
         return NULL;
     }
 
+    list* pixels = newList();
+    if (pixels == NULL) {
+        // Error creating list
+        deleteList(rooms);
+        free(datastore);
+        return NULL;
+    }
+
     datastore->rooms = rooms;
+    datastore->pixels = pixels;
 
     return datastore;
 }
@@ -104,11 +113,20 @@ Room* createRoom (Datastore* datastore, uint16_t id) {
         return NULL;
     }
 
+    list* rules = newList();
+    if (rules == NULL) {
+        free(room);
+        listRemove(datastore->rooms, elem);
+        deleteList(nodes);
+        return NULL;
+    }
+
     room->id = id;
     room->parentDatastore = datastore;
     room->listPtr = elem;
     room->name = NULL;
     room->nodes = nodes;
+    room->rules = rules;
 
     return room;
 }
@@ -160,80 +178,47 @@ Node* createNode (Room* room, uint16_t id) {
     return node;
 }
 
-Actuator* createActuator (Node* node, uint16_t id, uint8_t type, uint16_t posX, uint16_t posY) {
+Actuator* createActuator (Node* node, uint16_t id, uint8_t type, Position* pos) {
     if (!node) {
         return NULL;
     }
 
-    Position* pos = (Position*)malloc(sizeof(Position));
-    if (pos == NULL) {
-        // Memory allocation failed
-        return NULL;
-    }
-    pos->x = posX;
-    pos->y = posY;
-
-    // Search for duplicates
-    Room* room = node->parentRoom;
-    Datastore* datastore = room->parentDatastore;
-    if (findActuatorByPos(datastore, pos)) {
-        // There is already a Actuator assigned to that position
-        free(pos);
+    Pixel* pixel = createPixel(node->parentRoom->parentDatastore, NULL, pos);
+    if (!pixel) {
         return NULL;
     }
 
     if (findActuatorByID(node, id)) {
         // There is already a Actuator with this ID assigned to this node
-        free(pos);
+        deletePixel(pixel);
         return NULL;
     }
 
     Actuator* actuator = (Actuator*)malloc(sizeof(Actuator));
     if (actuator == NULL) {
         // Memory allocation failed
-        free(pos);
+        deletePixel(pixel);
         return NULL;
     }
-
-    Color* color = (Color*)malloc(sizeof(Color));
-    if (color == NULL) {
-        // Memory allocation failed
-        free(pos);
-        free(actuator);
-        return NULL;
-    }
-    color->r = 0;
-    color->g = 0;
-    color->b = 0;
-
-    if(!pthread_mutex_init(actuator->mutex, NULL)) {
-        // Mutex init failed
-        free(pos);
-        free(color);
-        free(actuator);
-        return NULL;
-    }
-
+       
     list_element* elem = listInsert(node->actuators, actuator, NULL);
     if (elem == NULL) {
         // Insertion failed
-        pthread_mutex_destroy(actuator->mutex);
-        free(pos);
-        free(color);
         free(actuator);
+        deletePixel(pixel);
         return NULL;
     }
 
+    actuator->id = id;
     actuator->type = type;
     actuator->parentNode = node;
     actuator->listPtr = elem;
-    actuator->color = color;
-    actuator->pos = pos;
+    actuator->pixel = pixel;
 
     return actuator;
 }
 
-Sensor* createSensor (Node* node, uint8_t type) {
+Sensor* createSensor (Node* node, uint8_t type, Position* pos) {
     if (!node) {
         return NULL;
     }
@@ -247,21 +232,29 @@ Sensor* createSensor (Node* node, uint8_t type) {
         return NULL;
     }
 
-    Sensor* sensor = (Sensor*)malloc(sizeof(Sensor));
-    if (sensor == NULL) {
-        // Memory allocation failed
+    Pixel* pixel = createPixel(node->parentRoom->parentDatastore, NULL, pos);
+    if (!pixel) {
         return NULL;
     }
 
-    if(!pthread_mutex_init(sensor->mutex, NULL)) {
+    Sensor* sensor = (Sensor*)malloc(sizeof(Sensor));
+    if (sensor == NULL) {
+        // Memory allocation failed
+        deletePixel(pixel);
+        return NULL;
+    }
+
+    if(!pthread_mutex_init(&sensor->mutex, NULL)) {
         // Mutex init failed
+        deletePixel(pixel);
         return NULL;
     }
 
     list_element* elem = listInsert(node->sensors, sensor, NULL);
     if (elem == NULL) {
         // Insertion failed
-        pthread_mutex_destroy(sensor->mutex);
+        pthread_mutex_destroy(&sensor->mutex);
+        deletePixel(pixel);
         free(sensor);
         return NULL;
     }
@@ -271,8 +264,209 @@ Sensor* createSensor (Node* node, uint8_t type) {
     sensor->type = type;
     sensor->calculator = sensorCalculatorFunctionPointer(type);
     sensor->value = 0;
+    sensor->pixel = pixel;
 
     return sensor;
+}
+
+Pixel* createPixel (Datastore* datastore, Color* color, Position* pos) {
+    if (!datastore || !pos) {
+        return NULL;
+    }
+
+    if (findPixelByPos(datastore, pos)) {
+        return NULL;
+    }
+
+    Color* pixelColor = (Color*)malloc(sizeof(Color));
+    if (pixelColor == NULL) {
+        // Memory allocation failed
+        return NULL;
+    }
+
+    if (color) {
+        pixelColor->r = color->r;
+        pixelColor->g = color->g;
+        pixelColor->b = color->b;
+    }
+    else {
+        pixelColor->r = 0;
+        pixelColor->g = 0;
+        pixelColor->b = 0;
+    }
+
+
+    Position* pixelPos = (Position*)malloc(sizeof(Position));
+    if (pixelPos == NULL) {
+        // Memory allocation failed
+        free(pixelColor);
+        return NULL;
+    }
+
+    pixelPos->x = pos->x;
+    pixelPos->y = pos->y;
+
+
+    Pixel* pixel = (Pixel*)malloc(sizeof(Pixel));
+    if (pixel == NULL) {
+        free(pixelColor);
+        free(pixelPos);
+        // Memory allocation failed
+        return NULL;
+    }
+
+    if(!pthread_mutex_init(&pixel->mutex, NULL)) {
+        // Mutex init failed
+        free(pixelColor);
+        free(pixelPos);
+        deletePixel(pixel);
+        return NULL;
+    }
+
+    list_element* elem = listInsert(datastore->pixels, pixel, NULL);
+    if (elem == NULL) {
+        // Insertion failed
+        pthread_mutex_destroy(&pixel->mutex);
+        free(pixelColor);
+        free(pixelPos);
+        free(pixel);
+        return NULL;
+    }
+
+    pixel->color = pixelColor;
+    pixel->pos = pixelPos;
+    pixel->listPtr = elem;
+    pixel->parentDatastore = datastore;
+
+    return pixel;
+}
+
+Rule* createRule (Room* room, Rule* parent, uint16_t type, uint16_t value) {
+    if ((!room && !parent) || 
+        (room && parent)) {
+        return NULL;
+    }
+
+    // Alocate memory for this rule
+    Rule* rule = (Rule*)malloc(sizeof(Rule));
+    if (!rule) {
+        return NULL;
+    }
+
+    list* sensors = newList();
+    if (sensors == NULL) {
+        free(rule);
+        return NULL;
+    }
+
+    list* actuators = newList();
+    if (actuators == NULL) {
+        deleteList(sensors);
+        free(rule);
+        return NULL;
+    }
+
+    list* childs = newList();
+    if (childs == NULL) {
+        deleteList(sensors);
+        deleteList(actuators);
+        free(rule);
+        return NULL;
+    }
+
+    rule->parentRoom = room;
+    rule->parentRule = parent;
+    rule->sensors = sensors;
+    rule->actuators = actuators;
+    rule->operation = type;
+    rule->value = value;
+    rule->childs = childs;
+
+    list_element* elem = NULL;
+
+    if (room) { // Insert rule in room
+        elem = listInsert(room->rules, rule, NULL);
+    }
+    else if (parent) { // Insert rule in parent rule
+        elem = listInsert(parent->childs, rule, NULL);
+    }
+    
+    if (elem == NULL) {
+        // Insertion failed
+        deleteList(sensors);
+        deleteList(actuators);
+        deleteList(childs);
+        free(rule);
+        return NULL;
+    }
+
+    rule->listPtr = elem;
+
+    return rule;
+}
+
+bool deleteRule (Rule* rule) {
+    if (!rule) {
+        return true;
+    }
+
+    uint16_t retVal = 0;
+
+    deleteList(rule->sensors);
+    deleteList(rule->actuators);
+
+    // Delete all childs
+    list_element* aux = listStart(rule->childs);
+    while (aux != NULL) {
+        if (deleteRule(aux->ptr)) {
+            // Error
+            return 1;
+        }
+        aux = listStart(rule->childs);
+    }
+    deleteList(rule->childs);
+
+
+    list_element *elem = rule->listPtr,
+        *res;
+    
+    if (rule->parentRoom) {
+        res = listRemove(rule->parentRoom->rules, elem);
+        if (res == NULL && listSize(rule->parentRoom->rules)) {
+            retVal++;
+        }
+    }
+    else if (rule->parentRule) {
+        res = listRemove(rule->parentRule->childs, elem);
+        if (res == NULL && listSize(rule->parentRule->childs)) {
+            retVal++;
+        }
+    }
+    
+    free(rule);
+
+    return retVal > 0 ? true : false;
+}
+
+bool deletePixel (Pixel* pixel) {
+    if (!pixel) {
+        return true;
+    }
+
+    list_element* elem = pixel->listPtr;
+    Datastore* datastore = pixel->parentDatastore;
+
+    pthread_mutex_destroy(&pixel->mutex);
+    free(pixel->color);
+    free(pixel->pos);
+    free(pixel);
+
+    list_element* res = listRemove(datastore->pixels, elem);
+    if (res == NULL && listSize(datastore->pixels)) {
+        return true;
+    }
+
+    return false;
 }
 
 bool deleteActuator (Actuator* actuator) {
@@ -280,12 +474,28 @@ bool deleteActuator (Actuator* actuator) {
         return 1;
     }
 
+    // Remove Actuator from existing rules
+    Datastore* datastore = actuator->parentNode->parentRoom->parentDatastore;
+    LL_iterator(datastore->rooms, room_elem) {
+        Room* room = room_elem->ptr;
+        LL_iterator(room->rules, rule_elem) {
+            Rule* rule = rule_elem->ptr;
+            LL_iterator(rule->actuators, ruleActuator_elem) {
+                if (actuator == (ruleActuator_elem->ptr)) {
+                    list_element* rule_remover = listRemove(rule->actuators, ruleActuator_elem);
+                    if (rule_remover == NULL && listSize(rule->actuators)) {
+                        return 1;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
     list_element* elem = actuator->listPtr;
     Node* node = actuator->parentNode;
 
-    free(actuator->color);
-    free(actuator->pos);
-    pthread_mutex_destroy(actuator->mutex);
+    deletePixel(actuator->pixel);
 
     free(actuator);
     list_element* res = listRemove(node->actuators, elem);
@@ -301,9 +511,29 @@ bool deleteSensor (Sensor* sensor) {
         return 1;
     }
 
+    // Remove Sensor from existing rules
+    Datastore* datastore = sensor->parentNode->parentRoom->parentDatastore;
+    LL_iterator(datastore->rooms, room_elem) {
+        Room* room = room_elem->ptr;
+        LL_iterator(room->rules, rule_elem) {
+            Rule* rule = rule_elem->ptr;
+            LL_iterator(rule->sensors, ruleSensor_elem) {
+                if (sensor == (ruleSensor_elem->ptr)) {
+                    list_element* rule_remover = listRemove(rule->sensors, ruleSensor_elem);
+                    if (rule_remover == NULL && listSize(rule->sensors)) {
+                        return 1;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
     list_element* elem = sensor->listPtr;
     Node* node = sensor->parentNode;
-    pthread_mutex_destroy(sensor->mutex);
+    pthread_mutex_destroy(&sensor->mutex);
+
+    deletePixel(sensor->pixel);
 
     free(sensor);
     list_element* res = listRemove(node->sensors, elem);
@@ -377,6 +607,17 @@ bool deleteRoom (Room* room) {
     }
     deleteList(room->nodes);
 
+    // Delete all room's rules
+    aux = listStart(room->rules);
+    while (aux != NULL) {
+        if (deleteRule(aux->ptr)) {
+            // Error
+            return 1;
+        }
+        aux = listStart(room->rules);
+    }
+    deleteList(room->rules);
+
     free(room->name);
     free(room);
     list_element* res = listRemove(datastore->rooms, elem);
@@ -394,7 +635,7 @@ bool deleteDatastore (Datastore* datastore) {
 
     list_element* aux;
 
-    // Delete all room's nodes
+    // Delete all datastore's rooms
     aux = listStart(datastore->rooms);
     while (aux != NULL) {
         if (deleteRoom(aux->ptr)) {
@@ -404,6 +645,17 @@ bool deleteDatastore (Datastore* datastore) {
         aux = listStart(datastore->rooms);
     }
     deleteList(datastore->rooms);
+
+    // Delete all datastore's pixels
+    aux = listStart(datastore->pixels);
+    while (aux != NULL) {
+        if (deletePixel(aux->ptr)) {
+            // Error
+            return 1;
+        }
+        aux = listStart(datastore->pixels);
+    }
+    deleteList(datastore->pixels);
 
     free(datastore);
 
@@ -458,11 +710,34 @@ bool setSensorValue (Sensor* sensor, uint16_t value) {
         return 1;
     }
 
-    pthread_mutex_lock(sensor->mutex);
+    pthread_mutex_lock(&sensor->mutex);
     sensor->value = value;
-    pthread_mutex_unlock(sensor->mutex);
+    pthread_mutex_unlock(&sensor->mutex);
     
     return 0;
+}
+
+bool setPixelPosition (Pixel* pixel, Position* pos) {
+    if (!pixel || !pos) {
+        return true;
+    }
+
+    pixel->pos->x = pos->x;
+    pixel->pos->y = pos->y;
+
+    return false;
+}
+
+bool setPixelColor (Pixel* pixel, Color* color) {
+    if (!pixel || !color) {
+        return true;
+    }
+
+    pixel->color->r = color->r;
+    pixel->color->g = color->g;
+    pixel->color->b = color->b;
+
+    return false;
 }
 
 float getSensorValue (Sensor* sensor) {
@@ -470,41 +745,43 @@ float getSensorValue (Sensor* sensor) {
         return 0;
     }
 
-    pthread_mutex_lock(sensor->mutex);
+    pthread_mutex_lock(&sensor->mutex);
     float res = (sensor->calculator)(sensor->value);
-    pthread_mutex_unlock(sensor->mutex);
+    pthread_mutex_unlock(&sensor->mutex);
 
     return res;
 }
 
-Position* getActuatorPosition (Actuator* actuator) {
+Pixel* getActuatorPixel (Actuator* actuator) {
     if (!actuator) {
         return NULL;
     }
 
-    return actuator->pos;
+    return actuator->pixel;
 }
 
-Color* getActuatorColor (Actuator* actuator) {
-    if (!actuator) {
+Pixel* getSensorPixel (Sensor* sensor) {
+    if (!sensor) {
         return NULL;
     }
 
-    return actuator->color;
+    return sensor->pixel;
 }
 
-bool setActuatorValue (Actuator* actuator, Color* color) {
-    if (!actuator || !color) {
-        return 1;
+Position* getPixelPosition (Pixel* pixel) {
+    if (!pixel) {
+        return NULL;
     }
 
-    pthread_mutex_lock(actuator->mutex);
-    actuator->color->r = color->r;
-    actuator->color->g = color->g;
-    actuator->color->b = color->b;
-    pthread_mutex_unlock(actuator->mutex);
+    return pixel->pos;
+}
 
-    return 0;
+Color* getPixelColor (Pixel* pixel) {
+    if (!pixel) {
+        return NULL;
+    }
+
+    return pixel->color;
 }
 
 Node* findNodeByID (Datastore* datastore, uint16_t nodeID) {
@@ -545,7 +822,7 @@ Actuator* findActuatorByID (Node* node, uint16_t actuatorID) {
         return NULL;
     }
 
-    for (list_element* actuator_elem = listStart(node->actuators); actuator_elem != NULL; actuator_elem = actuator_elem->next) {
+    LL_iterator(node->actuators, actuator_elem) {
         Actuator* actuator = (Actuator*)actuator_elem->ptr;
         if (actuator->id == actuatorID) {
             return actuator;
@@ -572,26 +849,15 @@ Room* findRoomByName (Datastore* datastore, const char* roomName) {
     return NULL;
 }
 
-Actuator* findActuatorByPos (Datastore* datastore, Position* pos) {
+Pixel* findPixelByPos (Datastore* datastore, Position* pos) {
     if (!datastore || !pos) {
         return NULL;
     }
 
-    // For every Room
-    for (list_element* room_elem = listStart(datastore->rooms); room_elem != NULL; room_elem = room_elem->next) {
-        Room* room = (Room*)room_elem->ptr;
-
-        // For every Node
-        for (list_element* node_elem = listStart(room->nodes); node_elem != NULL; node_elem = node_elem->next) {
-            Node* node = (Node*)node_elem->ptr;
-            
-            // For every Actuator
-            for (list_element* actuator_elem = listStart(node->actuators); actuator_elem != NULL; actuator_elem = actuator_elem->next) {
-                Actuator* actuator = (Actuator*)actuator_elem->ptr;
-                if (actuator->pos->x == pos->x && actuator->pos->y == pos->y) {
-                    return actuator;
-                }
-            }
+    LL_iterator(datastore->pixels, pixel_elem) {
+        Pixel* pixel = pixel_elem->ptr;
+        if (pixel->pos->x == pos->x && pixel->pos->y == pos->y) {
+            return pixel;
         }
     }
 
@@ -614,24 +880,132 @@ Sensor* findSensorByType (Node* node, uint8_t type) {
     return NULL;
 }
 
-bool iterateActuators (Datastore* datastore, bool (*func)(Actuator*)) {
-    if (!datastore || !func) {
-        return NULL;
+bool addSensorToRule (Rule* rule, Sensor* sensor) {
+    if (!rule || !sensor) {
+        return true;
     }
 
-    // For every Room
-    for (list_element* room_elem = listStart(datastore->rooms); room_elem != NULL; room_elem = room_elem->next) {
-        Room* room = (Room*)room_elem->ptr;
+    list_element* elem = listInsert(rule->sensors, sensor, NULL);
+    if (elem == NULL) {
+        // Insertion failed
+        return true;
+    }
 
-        // For every Node
-        for (list_element* node_elem = listStart(room->nodes); node_elem != NULL; node_elem = node_elem->next) {
-            Node* node = (Node*)node_elem->ptr;
+    return false;
+}
+
+bool addActuatorToRule (Rule* rule, Actuator* actuator) {
+    if (!rule || !actuator) {
+        return true;
+    }
+
+    list_element* elem = listInsert(rule->actuators, actuator, NULL);
+    if (elem == NULL) {
+        // Insertion failed
+        return true;
+    }
+
+    return false;
+}
+
+bool evaluateRule (Rule* rule) {
+    if (!rule) {
+        return false;
+    }
+
+    // Test all childs
+    LL_iterator(rule->childs, child_elem) {
+        Rule* child = child_elem->ptr;
+        if (evaluateRule(child)) {
+            // One Child is verified
+            break;
+        }
+        return false;
+    }
+
+    // Test sensor values against rule value given the rule operation
+    LL_iterator(rule->sensors, sensor_elem) {
+        Sensor* sensor = sensor_elem->ptr;
+        float val = 0;
+        
+        switch(rule->operation) {
+            case TYPE_RULE_LESS_THEN:
+                if ( !(getSensorValue(sensor) < rule->value) ) {
+                    return false;
+                }
+                break;
+
+            case TYPE_RULE_GREATER_THEN:
+                if ( !(getSensorValue(sensor) > rule->value) ) {
+                    return false;
+                }
+                break;
+
+            case TYPE_RULE_EQUAL_TO:
+                if ( !(getSensorValue(sensor) == rule->value) ) {
+                    return false;
+                }
+                break;
+
+            case TYPE_RULE_WITHIN_MARGIN:
+                val = getSensorValue(sensor);
+                if ( !((val > ((float)(rule->value))*(0.95)) &&
+                    (val < ((float)(rule->value))*(1.05)) )) {
+                    return false;
+                }
+                break;
+                
+            default:
+                return false;
+                break;
+        }
+    }
+
+
+    return true;
+}
+
+bool executeRules (Datastore* datastore) {
+    if (!datastore) {
+        return true;
+    }
+
+    Color colorActive,
+        colorInactive;
+    
+    // Green
+    colorActive.r = 0;
+    colorActive.g = 255;
+    colorActive.b = 0;
+
+    // Red
+    colorInactive.r = 255;
+    colorInactive.g = 0;
+    colorInactive.b = 0;
+
+    LL_iterator(datastore->rooms, room_elem) {
+        Room* room = room_elem->ptr;
+        LL_iterator(room->rules, rule_elem) {
+            Rule* rule = rule_elem->ptr;
             
-            // For every Actuator
-            for (list_element* actuator_elem = listStart(node->actuators); actuator_elem != NULL; actuator_elem = actuator_elem->next) {
-                Actuator* actuator = (Actuator*)actuator_elem->ptr;
-                if ((*func)(actuator)) {
+            LL_iterator(rule->actuators, actuator_elem) {
+                // Clear actuator status
+                // FIXME May create a flicker if using threads
+                Actuator* actuator = actuator_elem->ptr;
+                Pixel* pixel = getActuatorPixel(actuator);
+                if (setPixelColor(pixel, &colorInactive)) {
                     return true;
+                }
+            }
+
+            if (evaluateRule(rule)) {
+                // Rule is active
+                LL_iterator(rule->actuators, actuator_elem) {
+                    Actuator* actuator = actuator_elem->ptr;
+                    Pixel* pixel = getActuatorPixel(actuator);
+                    if (setPixelColor(pixel, &colorActive)) {
+                        return true;
+                    }
                 }
             }
         }

@@ -36,9 +36,13 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 
 
 .PHONY: clean
+.PHONY: run
 
 clean:
 	$(RM) -r $(BUILD_DIR)
+
+run:
+	./run.sh
 
 -include $(DEPS)
 

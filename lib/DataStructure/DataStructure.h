@@ -18,6 +18,11 @@
 #define TYPE_SENSOR_LIGHT       3
 #define TYPE_SENSOR_CURRENT     4
 
+#define TYPE_RULE_LESS_THEN     0
+#define TYPE_RULE_GREATER_THEN  1
+#define TYPE_RULE_EQUAL_TO      2
+#define TYPE_RULE_WITHIN_MARGIN 3
+
 typedef struct _datastore Datastore;
 typedef struct _room Room;
 typedef struct _node Node;
@@ -25,7 +30,23 @@ typedef struct _sensor Sensor;
 typedef struct _actuator Actuator;
 typedef struct _position Position;
 typedef struct _color Color;
+typedef struct _rule Rule;
+typedef struct _pixel Pixel;
 
+/**
+ * @brief Structure to hold a rule for actuator control
+ * 
+ */
+struct _rule {
+    Room* parentRoom;
+    Rule* parentRule;
+    list_element* listPtr;
+    list* sensors;
+    list* actuators;
+    uint16_t operation;
+    uint16_t value;
+    list* childs;
+};
 
 /**
  * @brief Structure to hold a cartesian position
@@ -47,6 +68,18 @@ struct _color {
 };
 
 /**
+ * @brief Structure to hold all data regarding a pixel in the RGB Matrix
+ * 
+ */
+struct _pixel {
+    Position* pos;
+    Color* color;
+    list_element* listPtr;
+    Datastore* parentDatastore;
+    pthread_mutex_t mutex;
+};
+
+/**
  * @brief Structure to hold all data concerning an actuator.
  * 
  */
@@ -55,9 +88,7 @@ struct _actuator {
     list_element* listPtr;
     uint16_t id;
     uint8_t type;
-    Color* color;
-    Position* pos;
-    pthread_mutex_t* mutex;
+    Pixel* pixel;
 };
 
 /**
@@ -78,7 +109,8 @@ struct _sensor {
     uint8_t type;
     sensorValueCalculator* calculator;
     uint16_t value;
-    pthread_mutex_t* mutex;
+    Pixel* pixel;
+    pthread_mutex_t mutex;
 };
 
 /**
@@ -103,6 +135,7 @@ struct _room {
     list_element* listPtr;
     char* name;
     list* nodes;
+    list* rules;
 };
 
 /**
@@ -111,6 +144,7 @@ struct _room {
  */
 struct _datastore {
     list* rooms;
+    list* pixels;
 };
 
 
@@ -207,16 +241,56 @@ Node* createNode (Room* room, uint16_t id);
  * @param posY Position in the Y axis on the RGB Matrix output
  * @return Actuator* The pointer to the new Actuator object. NULL if error occurs.
  */
-Actuator* createActuator (Node* node, uint16_t id, uint8_t type, uint16_t posX, uint16_t posY);
+Actuator* createActuator (Node* node, uint16_t id, uint8_t type, Position* pos);
 
 /**
  * @brief Create a Sensor object
  * 
  * @param node A pointer to the Node this Sensor will belong to.
+ * @param type Type of sensor
+ * @param pos Position of the sensor in the RGB Matrix
  * @return Sensor* The pointer to the new Sensor object. NULL if error occurs.
  */
-Sensor* createSensor (Node* node, uint8_t type);
+Sensor* createSensor (Node* node, uint8_t type, Position* pos);
 
+/**
+ * @brief Create a Pixel object
+ * 
+ * @param datastore Datastore to save the Pixel
+ * @param color Color of the pixel
+ * @param pos Position of the Pixel
+ * @return Pixel* Pointer to the new Pixel object. NULL if error.
+ */
+Pixel* createPixel (Datastore* datastore, Color* color, Position* pos);
+
+/**
+ * @brief Create a Rule object
+ * 
+ * @param room Room associated with the rule
+ * @param parent Parent Rule
+ * @param type operation to be made to the value of associated sensors and the rule value
+ * @param value 
+ * @return Rule* Pointer to the new Rule object
+ */
+Rule* createRule (Room* room, Rule* parent, uint16_t type, uint16_t value);
+
+/**
+ * @brief Delete a Rule object
+ * 
+ * @param rule The pointer to the Rule object to be deleted.
+ * @return true Error
+ * @return false All good
+ */
+bool deleteRule (Rule* rule);
+
+/**
+ * @brief Delete a Pixel object
+ * 
+ * @param actuator The pointer to the Pixel object to be deleted.
+ * @return true Error
+ * @return false All good
+ */
+bool deletePixel (Pixel* pixel);
 
 /**
  * @brief Delete a Actuator object
@@ -303,6 +377,26 @@ bool setRoomName(Room* room, const char* str);
 bool setSensorValue (Sensor* sensor, uint16_t value);
 
 /**
+ * @brief Set the Pixel Position object
+ * 
+ * @param pixel Pointer to the Pixel object
+ * @param pos Pointer to a Position object with the desired specs
+ * @return true Error
+ * @return false All good
+ */
+bool setPixelPosition (Pixel* pixel, Position* pos);
+
+/**
+ * @brief Set the Pixel Color object
+ * 
+ * @param pixel Pointer to the Pixel object
+ * @param color Pointer to a Color object with the desired specs
+ * @return true Error
+ * @return false All good
+ */
+bool setPixelColor (Pixel* pixel, Color* color);
+
+/**
  * @brief Calculate the value of the Sensor object
  * 
  * @param sensor Pointer to the Sensor object
@@ -311,30 +405,36 @@ bool setSensorValue (Sensor* sensor, uint16_t value);
 float getSensorValue (Sensor* sensor);
 
 /**
- * @brief Get the Actuator Position object
+ * @brief Get the Actuator Pixel object
  * 
  * @param actuator Pointer to the Actuator object
- * @return Position* Pointer to the Position of the Actuator. NULL if error.
+ * @return Pixel* Pointer to the Pixel object. NULL if error.
  */
-Position* getActuatorPosition (Actuator* actuator);
+Pixel* getActuatorPixel (Actuator* actuator);
 
 /**
- * @brief Get the Actuator Color object
+ * @brief Get the Sensor Pixel object
  * 
- * @param actuator Pointer to the Actuator object
- * @return Color* Pointer to the Color of the Actuator. NULL if error.
+ * @param actuator Pointer to the Sensor object
+ * @return Pixel* Pointer to the Pixel object. NULL if error.
  */
-Color* getActuatorColor (Actuator* actuator);
+Pixel* getSensorPixel (Sensor* sensor);
 
 /**
- * @brief Set the values for the RGB colour components that represent the value/state of the Actuator object
+ * @brief Get the Pixel Position object
  * 
- * @param actuator Pointer to the Actuator object
- * @param color Pointer to color object to import
- * @return true Error
- * @return false All Good
+ * @param pixel Pointer to the Pixel object
+ * @return Position* Pointer to the Position of the Pixel. NULL if error.
  */
-bool setActuatorValue (Actuator* actuator, Color* color);
+Position* getPixelPosition (Pixel* pixel);
+
+/**
+ * @brief Get the Pixel Color object
+ * 
+ * @param actuator Pointer to the Pixel object
+ * @return Color* Pointer to the Color of the Pixel. NULL if error.
+ */
+Color* getPixelColor (Pixel* pixel);
 
 /**
  * @brief Searches the datastore for a Node with the specified nodeID
@@ -373,14 +473,13 @@ Actuator* findActuatorByID (Node* node, uint16_t actuatorID);
 Room* findRoomByName (Datastore* datastore, const char* roomName);
 
 /**
- * @brief Searches the datastore for a Actuator with the specified position
+ * @brief Searches the datastore for a Pixel with the specified position
  * 
  * @param datastore Datastore object to search
- * @param posX Position in the X axis on the RGB Matrix output
- * @param posY Position in the Y axis on the RGB Matrix output
- * @return Actuator* Actuator object with the desired position. NULL if not found.
+ * @param pos Position on the RGB Matrix output
+ * @return Pixel* Pixel object with the desired position. NULL if not found.
  */
-Actuator* findActuatorByPos (Datastore* datastore, Position* pos);
+Pixel* findPixelByPos (Datastore* datastore, Position* pos);
 
 /**
  * @brief Searches a node's sensors for the one with a specific type.
@@ -392,13 +491,32 @@ Actuator* findActuatorByPos (Datastore* datastore, Position* pos);
 Sensor* findSensorByType (Node* node, uint8_t type);
 
 /**
- * @brief Run function through all Actuators in a Datastore. Function should have same return logic.
+ * @brief Adds a Sensor as a condition to a rule
  * 
- * @param datastore Datastore to search for Actuators
- * @param func Function to run for every Actuator
+ * @param rule 
+ * @param sensor 
  * @return true Error
- * @return false All good
+ * @return false All Good
  */
-bool iterateActuators (Datastore* datastore, bool (*func)(Actuator*));
+bool addSensorToRule (Rule* rule, Sensor* sensor);
+
+/**
+ * @brief Adds a Actuator as a condition to a rule
+ * 
+ * @param rule 
+ * @param actuator 
+ * @return true Error
+ * @return false All Good
+ */
+bool addActuatorToRule (Rule* rule, Actuator* actuator);
+
+/**
+ * @brief Execute the control rules
+ * 
+ * @param datastore 
+ * @return true Error
+ * @return false All Good
+ */
+bool executeRules (Datastore* datastore);
 
 #endif

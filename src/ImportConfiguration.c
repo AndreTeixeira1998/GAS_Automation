@@ -66,16 +66,28 @@ bool parseSensor (Node* node, cJSON* json_sensor) {
     }
 
     // Read the type of the sensor from the parsed json
-    uint16_t type = 0;
+    uint16_t type = 0,
+        posX = 0,
+        posY = 0;
     cJSON* json_type = cJSON_GetObjectItem(json_sensor, "type");
-    if (cJSON_IsNumber(json_type)) {
+    cJSON* json_posX = cJSON_GetObjectItem(json_sensor, "posX");
+    cJSON* json_posY = cJSON_GetObjectItem(json_sensor, "posY");
+    if (cJSON_IsNumber(json_type) &&
+        cJSON_IsNumber(json_posX) &&
+        cJSON_IsNumber(json_posY)) {
         type = (uint16_t)json_type->valueint;
+        posX = (uint16_t)json_posX->valueint;
+        posY = (uint16_t)json_posY->valueint;
     }
     else {
         return 1;
     }
 
-    Sensor* sensor = createSensor(node, type);
+    Position position;
+    position.x = posX;
+    position.y = posY;
+
+    Sensor* sensor = createSensor(node, type, &position);
     if (!sensor) {
         return 1;
     }
@@ -111,8 +123,12 @@ bool parseActuator (Node* node, cJSON* json_actuator) {
         return 1;
     }
 
+    Position position;
+    position.x = posX;
+    position.y = posY;
+
     // Create actuator instance
-    Actuator* actuator = createActuator(node, id, type, posX, posY);
+    Actuator* actuator = createActuator(node, id, type, &position);
     if (!actuator) {
         return 1;
     }
@@ -170,6 +186,119 @@ bool parseNode (Room* room, cJSON* json_node) {
     return 0;
 }
 
+bool parseRule (Room* room, Rule* parentRule, cJSON* json_rule) {
+    if (!json_rule ||
+        (!room && !parentRule)) {
+        return true;
+    }
+
+
+    uint16_t type = 0,
+        value = 0;
+
+    cJSON* json_type = cJSON_GetObjectItem(json_rule, "type");
+    cJSON* json_value = cJSON_GetObjectItem(json_rule, "value");
+    if (cJSON_IsNumber(json_type) &&
+        cJSON_IsNumber(json_value)) {
+        
+        type = (uint16_t)json_type->valueint;
+        value = (uint16_t)json_value->valueint;
+    }
+    else {
+        return true;
+    }
+
+    // Create Rule instance
+    Rule* rule = NULL;
+    if (parentRule) {
+        rule = createRule(NULL, parentRule, type, value);
+    }
+    else {
+        rule = createRule(room, NULL, type, value);
+    }
+
+    // Check for successfull rule creation
+    if (!rule) {
+        return true;
+    }
+
+    cJSON* json_sensor_array = cJSON_GetObjectItem(json_rule, "sensors"),
+        *json_sensor_entry = NULL;;
+    if (!cJSON_IsArray(json_sensor_array)) {
+        return true;
+    }
+    cJSON_ArrayForEach(json_sensor_entry, json_sensor_array) {
+        if (cJSON_IsString(json_sensor_entry) && (json_sensor_entry->valuestring != NULL)) {
+            // FIXME Buffer Overflow Ahoy!!!!
+            char* token1 = strtok(json_sensor_entry->valuestring, ".");
+            char* token2 = strtok(NULL, ".");
+
+            uint16_t val1 = strtoul(token1, NULL, 10);
+            uint16_t val2 = strtoul(token2, NULL, 10);
+
+            Node* node = findNodeByID(room->parentDatastore, val1);
+            if (!node) {
+                return true;
+            }
+
+            Sensor* sensor = findSensorByType(node, val2);
+            if (!sensor) {
+                return true;
+            }
+
+            if (addSensorToRule(rule, sensor)) {
+                return true;
+            }
+        }
+    }
+
+    cJSON* json_actuator_array = cJSON_GetObjectItem(json_rule, "actuators"),
+        *json_actuator_entry = NULL;;
+    if (!cJSON_IsArray(json_actuator_array)) {
+        return true;
+    }
+    cJSON_ArrayForEach(json_actuator_entry, json_actuator_array) {
+        if (cJSON_IsString(json_actuator_entry) && (json_actuator_entry->valuestring != NULL)) {
+            // FIXME Buffer Overflow Ahoy!!!!
+            char* token1 = strtok(json_actuator_entry->valuestring, ".");
+            char* token2 = strtok(NULL, ".");
+
+            uint16_t val1 = strtoul(token1, NULL, 10);
+            uint16_t val2 = strtoul(token2, NULL, 10);
+
+            Node* node = findNodeByID(room->parentDatastore, val1);
+            if (!node) {
+                return true;
+            }
+
+            Actuator* actuator = findActuatorByID(node, val2);
+            if (!actuator) {
+                return true;
+            }
+
+            if (addActuatorToRule(rule, actuator)) {
+                return true;
+            }
+        }
+    }
+
+    cJSON* json_childs_array = cJSON_GetObjectItem(json_rule, "childs"),
+        *json_childs_entry = NULL;;
+    if (!cJSON_IsArray(json_childs_array)) {
+        return true;
+    }
+    cJSON_ArrayForEach(json_childs_entry, json_childs_array) {
+        if(!cJSON_IsObject(json_childs_entry)) {
+            return true;
+        }
+        else {
+            parseRule(room, rule, json_childs_entry);
+        }
+    }
+
+    return false;
+}
+
 bool parseRoom (Datastore* datastore, cJSON* json_room) {
     if (!datastore || !json_room) {
         return 1;
@@ -219,7 +348,71 @@ bool parseRoom (Datastore* datastore, cJSON* json_room) {
         }
     }
 
+
+    // Parse the room's rules
+    cJSON *rules = cJSON_GetObjectItem(json_room, "rules"),
+        *rule = NULL;
+    if (!cJSON_IsArray(rules)) {
+        return 1;
+    }
+    cJSON_ArrayForEach(rule, rules) {
+        if(parseRule(room, NULL, rule)) {
+            // Error parsing rule
+            return 1;
+        }
+    }
+
     return 0;
+}
+
+bool parseExtraPixel (Datastore* datastore, cJSON* json_pixel) {
+    if (!datastore || !json_pixel) {
+        return true;
+    }
+
+    // Read the pixel attributes
+    uint16_t posX = 0,
+        posY = 0,
+        r = 0,
+        g = 0,
+        b = 0;
+
+    cJSON* json_posX = cJSON_GetObjectItem(json_pixel, "posX");
+    cJSON* json_posY = cJSON_GetObjectItem(json_pixel, "posY");
+    cJSON* json_r = cJSON_GetObjectItem(json_pixel, "r");
+    cJSON* json_g = cJSON_GetObjectItem(json_pixel, "g");
+    cJSON* json_b = cJSON_GetObjectItem(json_pixel, "b");
+    if (cJSON_IsNumber(json_posX) &&
+        cJSON_IsNumber(json_posY) &&
+        cJSON_IsNumber(json_r) &&
+        cJSON_IsNumber(json_g) &&
+        cJSON_IsNumber(json_b)) {
+
+        posX = (uint16_t)json_posX->valueint;
+        posY = (uint16_t)json_posY->valueint;
+        r = (uint16_t)json_r->valueint;
+        g = (uint16_t)json_g->valueint;
+        b = (uint16_t)json_b->valueint;
+    }
+    else {
+        return true;
+    }
+
+    Position position;
+    position.x = posX;
+    position.y = posY;
+
+    Color color;
+    color.r = r;
+    color.g = g;
+    color.b = b;
+
+    Pixel* pixel = createPixel(datastore, &color, &position);
+    if (!pixel) {
+        return true;
+    }
+    
+    return false;
 }
 
 Datastore* importConfiguration(const char* filename) {
@@ -261,7 +454,27 @@ Datastore* importConfiguration(const char* filename) {
         }
     }
 
+    // Parse the extra pixel's data from the configuration file
+    cJSON *pixels = cJSON_GetObjectItem(json, "pixels"),
+        *pixel = NULL;
+    if (!cJSON_IsArray(pixels)) {
+        deleteDatastore(datastore);
+        cJSON_Delete(json);
+        free(jsonString);
+        return NULL;
+    }
+    cJSON_ArrayForEach(pixel, pixels) {
+        if(parseExtraPixel(datastore, pixel)) {
+            // Error parsing extra Pixel
+            deleteDatastore(datastore);
+            cJSON_Delete(json);
+            free(jsonString);
+            return NULL;
+        }
+    }
+
     // Free resources
+    //printf("%s\n", jsonString);
     cJSON_Delete(json);
     free(jsonString);
     

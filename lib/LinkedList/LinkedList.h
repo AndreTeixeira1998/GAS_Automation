@@ -19,6 +19,8 @@ typedef struct {
 #define LIST_START 0
 #define LIST_END 1
 
+#define LL_iterator(list, elem_name) for(list_element* elem_name = listStart(list); elem_name != NULL; elem_name = elem_name->next)
+
 /**
  * @brief Creates a new LinkedList
  * 
