@@ -473,8 +473,10 @@ Datastore* importConfiguration(const char* filename) {
         }
     }
 
+    // Free resources
     //printf("%s\n", jsonString);
     cJSON_Delete(json);
     free(jsonString);
+    
     return datastore;
 }

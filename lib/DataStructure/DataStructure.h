@@ -5,6 +5,7 @@
 #include "stdlib.h"
 #include "stdbool.h"
 #include "string.h"
+#include "pthread.h"
 
 #include "LinkedList.h"
 
@@ -21,6 +22,10 @@
 #define TYPE_RULE_GREATER_THEN  1
 #define TYPE_RULE_EQUAL_TO      2
 #define TYPE_RULE_WITHIN_MARGIN 3
+
+#define PIXEL_DEFAULT_RED       255
+#define PIXEL_DEFAULT_GREEN     255
+#define PIXEL_DEFAULT_BLUE      255
 
 typedef struct _datastore Datastore;
 typedef struct _room Room;
@@ -75,6 +80,7 @@ struct _pixel {
     Color* color;
     list_element* listPtr;
     Datastore* parentDatastore;
+    pthread_mutex_t mutex;
 };
 
 /**
@@ -108,6 +114,7 @@ struct _sensor {
     sensorValueCalculator* calculator;
     uint16_t value;
     Pixel* pixel;
+    pthread_mutex_t mutex;
 };
 
 /**
