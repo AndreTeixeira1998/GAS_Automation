@@ -23,6 +23,10 @@
 #define TYPE_RULE_EQUAL_TO      2
 #define TYPE_RULE_WITHIN_MARGIN 3
 
+#define PIXEL_DEFAULT_RED       255
+#define PIXEL_DEFAULT_GREEN     255
+#define PIXEL_DEFAULT_BLUE      255
+
 typedef struct _datastore Datastore;
 typedef struct _room Room;
 typedef struct _node Node;

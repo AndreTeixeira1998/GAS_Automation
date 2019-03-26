@@ -30,14 +30,14 @@
 #define X_SIZE  3
 #define Y_SIZE  3
 
-#define DEFAULT_COLOR_R 0
-#define DEFAULT_COLOR_G 0
-#define DEFAULT_COLOR_B 0
+#define DEFAULT_COLOR_R PIXEL_DEFAULT_RED
+#define DEFAULT_COLOR_G PIXEL_DEFAULT_GREEN
+#define DEFAULT_COLOR_B PIXEL_DEFAULT_BLUE
 
 // Multithreading
 #define THREAD_READINPUT    0
 #define THREAD_EXECUTERULES 1
-#define THREAD_WRITEOUTPUT 2
+#define THREAD_WRITEOUTPUT  2
 
 typedef struct {
     Datastore* datastore;
@@ -143,7 +143,9 @@ void* thread_writeOutput (void* arg) {
 
                 Pixel* pixel = findPixelByPos(datastore, &position);
                 if (pixel) {
+                    pthread_mutex_lock(&pixel->mutex);
                     fprintf(stream, "[%d,%d,%d]", pixel->color->r, pixel->color->g, pixel->color->b);
+                    pthread_mutex_unlock(&pixel->mutex);
                 }
                 else {
                     fprintf(stream, "[%d,%d,%d]", DEFAULT_COLOR_R, DEFAULT_COLOR_G, DEFAULT_COLOR_B);
@@ -165,10 +167,10 @@ void* thread_writeOutput (void* arg) {
 
 
 int main(int argc, char const *argv[]) {
-    /*if (argc < 4) {
+    if (argc < 4) {
         printf("Not enough arguments. Expecting:\n\t%s <configuration-file> <input-stream> <output-stream>\n\n", argv[0]);
         return 1;
-    }*/
+    }
 
     Datastore* datastore = importConfiguration(argv[1]);
     if (!datastore) {
