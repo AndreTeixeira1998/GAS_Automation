@@ -1032,8 +1032,8 @@ bool updateSensorPixel (Sensor* sensor) {
 
     pthread_mutex_lock(&pixel->mutex);
     color->r = 0;
-    color->g = (int)mappedRed;
-    color->b = 0;
+    color->g = 0;
+    color->b = (int)mappedRed;
     pthread_mutex_unlock(&pixel->mutex);
 
     return false;
