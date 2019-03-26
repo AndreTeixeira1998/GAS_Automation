@@ -68,16 +68,24 @@ bool parseSensor (Node* node, cJSON* json_sensor) {
     // Read the type of the sensor from the parsed json
     uint16_t type = 0,
         posX = 0,
-        posY = 0;
+        posY = 0,
+        rangeMin = 0,
+        rangeMax = 0;
     cJSON* json_type = cJSON_GetObjectItem(json_sensor, "type");
     cJSON* json_posX = cJSON_GetObjectItem(json_sensor, "posX");
     cJSON* json_posY = cJSON_GetObjectItem(json_sensor, "posY");
+    cJSON* json_rangeMin = cJSON_GetObjectItem(json_sensor, "rangeMin");
+    cJSON* json_rangeMax = cJSON_GetObjectItem(json_sensor, "rangeMax");
     if (cJSON_IsNumber(json_type) &&
         cJSON_IsNumber(json_posX) &&
-        cJSON_IsNumber(json_posY)) {
+        cJSON_IsNumber(json_posY) &&
+        cJSON_IsNumber(json_rangeMin) &&
+        cJSON_IsNumber(json_rangeMax)) {
         type = (uint16_t)json_type->valueint;
         posX = (uint16_t)json_posX->valueint;
         posY = (uint16_t)json_posY->valueint;
+        rangeMin = (uint16_t)json_rangeMin->valueint;
+        rangeMax = (uint16_t)json_rangeMax->valueint;
     }
     else {
         return 1;
@@ -87,7 +95,7 @@ bool parseSensor (Node* node, cJSON* json_sensor) {
     position.x = posX;
     position.y = posY;
 
-    Sensor* sensor = createSensor(node, type, &position);
+    Sensor* sensor = createSensor(node, type, &position, rangeMin, rangeMax);
     if (!sensor) {
         return 1;
     }

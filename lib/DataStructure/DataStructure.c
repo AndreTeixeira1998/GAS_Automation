@@ -218,7 +218,7 @@ Actuator* createActuator (Node* node, uint16_t id, uint8_t type, Position* pos) 
     return actuator;
 }
 
-Sensor* createSensor (Node* node, uint8_t type, Position* pos) {
+Sensor* createSensor (Node* node, uint8_t type, Position* pos, uint16_t rangeMin, uint16_t rangeMax) {
     if (!node) {
         return NULL;
     }
@@ -265,6 +265,8 @@ Sensor* createSensor (Node* node, uint8_t type, Position* pos) {
     sensor->calculator = sensorCalculatorFunctionPointer(type);
     sensor->value = 0;
     sensor->pixel = pixel;
+    sensor->rangeMin = rangeMin;
+    sensor->rangeMax = rangeMax;
 
     return sensor;
 }
@@ -1000,6 +1002,39 @@ bool executeRules (Datastore* datastore) {
             }
         }
     }
+
+    return false;
+}
+
+float map(float x, float in_min, float in_max, float out_min, float out_max) {
+    return (x - in_min) * (out_max) / (in_max - in_min) + out_min;
+}
+
+bool updateSensorPixel (Sensor* sensor) {
+    if (!sensor) {
+        return true;
+    }
+
+    Pixel* pixel = getSensorPixel(sensor);
+    if (!pixel) {
+        return true;
+    }
+
+    Color* color = getPixelColor(pixel);
+    if (!color) {
+        return true;
+    }
+
+    float sensorValue = getSensorValue(sensor);
+
+    float mappedRed = map(sensorValue, sensor->rangeMin, sensor->rangeMax, 0, 255);
+    //printf("Red: %d  :  %d   :   %f   :   %f\n", sensor->type, sensor->value, sensorValue, mappedRed);
+
+    pthread_mutex_lock(&pixel->mutex);
+    color->r = 0;
+    color->g = (int)mappedRed;
+    color->b = 0;
+    pthread_mutex_unlock(&pixel->mutex);
 
     return false;
 }

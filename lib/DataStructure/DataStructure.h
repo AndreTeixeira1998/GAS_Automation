@@ -115,6 +115,8 @@ struct _sensor {
     uint16_t value;
     Pixel* pixel;
     pthread_mutex_t mutex;
+    uint16_t rangeMin;
+    uint16_t rangeMax;
 };
 
 /**
@@ -253,9 +255,11 @@ Actuator* createActuator (Node* node, uint16_t id, uint8_t type, Position* pos);
  * @param node A pointer to the Node this Sensor will belong to.
  * @param type Type of sensor
  * @param pos Position of the sensor in the RGB Matrix
+ * @param rangeMin min value for color range
+ * @param rangeMax max value for color range
  * @return Sensor* The pointer to the new Sensor object. NULL if error occurs.
  */
-Sensor* createSensor (Node* node, uint8_t type, Position* pos);
+Sensor* createSensor (Node* node, uint8_t type, Position* pos, uint16_t rangeMin, uint16_t rangeMax);
 
 /**
  * @brief Create a Pixel object
@@ -522,5 +526,14 @@ bool addActuatorToRule (Rule* rule, Actuator* actuator);
  * @return false All Good
  */
 bool executeRules (Datastore* datastore);
+
+/**
+ * @brief Update pixel color for sensors
+ * 
+ * @param sensor Pointer to Sensor Object
+ * @return true Error
+ * @return false All good
+ */
+bool updateSensorPixel (Sensor* sensor);
 
 #endif

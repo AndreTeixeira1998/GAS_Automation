@@ -54,7 +54,7 @@ void* thread_readInput (void* arg) {
     char *token;
     char *endptr; 
     char data[PAYLOAD_SIZE][MAX_DATASIZE];
-    int data_type=0, c_vect_index, converted_data[PAYLOAD_SIZE];
+    unsigned int data_type=0, c_vect_index, converted_data[PAYLOAD_SIZE];
 
     while (1) {    
         //while(fgets(str, BUFFER , fp)){
@@ -102,7 +102,7 @@ void* thread_readInput (void* arg) {
             
             printf("Sensor ID: #%d# T= %f ºC\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_TEMPERATURE)));
             printf("Sensor ID: #%d# I= %f A\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_CURRENT)));
-            printf("Sensor ID: #%d# H= %f Kg/m3\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_HUMIDITY)));
+            printf("Sensor ID: #%d# H= %u Kg/m3\n", converted_data[MOTE_ID], converted_data[RAW_HUMIDITY]);
             printf("Sensor ID: #%d# V= %f V\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_VOLTAGE)));
             printf("Sensor ID: #%d# L= %f lx\n", converted_data[MOTE_ID], getSensorValue (findSensorByType(findNodeByID (datastore, converted_data[MOTE_ID]), TYPE_SENSOR_LIGHT)));
 
@@ -122,6 +122,17 @@ void* thread_executeRules (void* arg) {
     
     while (1) {
         executeRules(datastore);
+
+        LL_iterator(datastore->rooms, room_elem) {
+            Room* room = room_elem->ptr;
+            LL_iterator(room->nodes, node_elem) {
+                Node* node = node_elem->ptr;
+                LL_iterator(node->sensors, sensor_elem) {
+                    Sensor* sensor = sensor_elem->ptr;
+                    updateSensorPixel(sensor);
+                }
+            }
+        }
     }
 
     pthread_exit(ret);
@@ -180,6 +191,8 @@ int main(int argc, char const *argv[]) {
     
     FILE* inputStream = fopen(argv[2], "r");
     FILE* outputStream = fopen(argv[3], "w");
+    //FILE* inputStream = stdin;
+    //FILE* outputStream = stdout;
     if (!inputStream || !outputStream) {
         printf("Error reading streams. Please verify.\n");
         return 1;

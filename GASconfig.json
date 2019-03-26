@@ -2,25 +2,24 @@
     "rooms": [
         {
             "id": 0,
-            "name": "My Bedroom",
+            "name": "Pool Room",
             "nodes": [
                 {
-                    "id": 0,
+                    "id": 1,
                     "sensors": [
                         {
-                            "type": 0,
+                            "type": 1,
                             "posX": 0,
-                            "posY": 0
+                            "posY": 0,
+                            "rangeMin": 10,
+                            "rangeMax": 40
                         },
                         {
                             "type": 2,
                             "posX": 0,
-                            "posY": 1
-                        },
-                        {
-                            "type": 3,
-                            "posX": 0,
-                            "posY": 2
+                            "posY": 1,
+                            "rangeMin": 15,
+                            "rangeMax": 100
                         }
                     ],
                     "actuators": [
@@ -35,12 +34,18 @@
                             "type": 0,
                             "posX": 1,
                             "posY": 1
-                        },
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "sensors": [],
+                    "actuators": [
                         {
-                            "id": 2,
+                            "id": 0,
                             "type": 0,
-                            "posX": 1,
-                            "posY": 2
+                            "posX": 2,
+                            "posY": 0
                         }
                     ]
                 }
@@ -48,16 +53,16 @@
             "rules": [
                 {
                     "type": 0,
-                    "value": 10,
-                    "sensors": ["0.0"],
-                    "actuators": ["0.0"],
+                    "value": 20,
+                    "sensors": ["1.1"],
+                    "actuators": ["1.0"],
                     "childs": []
                 },
                 {
                     "type": 1,
-                    "value": 10,
-                    "sensors": ["0.2"],
-                    "actuators": ["0.1"],
+                    "value": 50,
+                    "sensors": ["1.2"],
+                    "actuators": ["1.1"],
                     "childs": []
                 }
             ]
