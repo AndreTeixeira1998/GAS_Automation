@@ -2,7 +2,7 @@
     "rooms": [
         {
             "id": 0,
-            "name": "Pool Room",
+            "name": "Room 0",
             "nodes": [
                 {
                     "id": 1,
@@ -36,18 +36,6 @@
                             "posY": 1
                         }
                     ]
-                },
-                {
-                    "id": 2,
-                    "sensors": [],
-                    "actuators": [
-                        {
-                            "id": 0,
-                            "type": 0,
-                            "posX": 2,
-                            "posY": 0
-                        }
-                    ]
                 }
             ],
             "rules": [
@@ -63,6 +51,131 @@
                     "value": 50,
                     "sensors": ["1.2"],
                     "actuators": ["1.1"],
+                    "childs": []
+                }
+            ]
+        },
+        {
+            "id": 1,
+            "name": "Room 1",
+            "nodes": [
+                {
+                    "id": 2,
+                    "sensors": [
+                        {
+                            "type": 1,
+                            "posX": 0,
+                            "posY": 2,
+                            "rangeMin": 10,
+                            "rangeMax": 40
+                        },
+                        {
+                            "type": 2,
+                            "posX": 0,
+                            "posY": 3,
+                            "rangeMin": 15,
+                            "rangeMax": 100
+                        }
+                    ],
+                    "actuators": [
+                        {
+                            "id": 0,
+                            "type": 0,
+                            "posX": 1,
+                            "posY": 2
+                        },
+                        {
+                            "id": 1,
+                            "type": 0,
+                            "posX": 1,
+                            "posY": 3
+                        }
+                    ]
+                }
+            ],
+            "rules": [
+                {
+                    "type": 0,
+                    "value": 20,
+                    "sensors": ["2.1"],
+                    "actuators": ["2.0"],
+                    "childs": []
+                },
+                {
+                    "type": 1,
+                    "value": 30,
+                    "sensors": ["2.1"],
+                    "actuators": ["2.0"],
+                    "childs": []
+                },
+                {
+                    "type": 1,
+                    "value": 50,
+                    "sensors": ["2.2"],
+                    "actuators": ["2.1"],
+                    "childs": []
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Room 2",
+            "nodes": [
+                {
+                    "id": 3,
+                    "sensors": [
+                        {
+                            "type": 1,
+                            "posX": 0,
+                            "posY": 4,
+                            "rangeMin": 10,
+                            "rangeMax": 40
+                        },
+                        {
+                            "type": 2,
+                            "posX": 0,
+                            "posY": 5,
+                            "rangeMin": 15,
+                            "rangeMax": 100
+                        }
+                    ],
+                    "actuators": [
+                        {
+                            "id": 0,
+                            "type": 0,
+                            "posX": 1,
+                            "posY": 4
+                        },
+                        {
+                            "id": 1,
+                            "type": 0,
+                            "posX": 1,
+                            "posY": 5
+                        }
+                    ]
+                }
+            ],
+            "rules": [
+                {
+                    "type": 0,
+                    "value": 30,
+                    "sensors": ["3.1"],
+                    "actuators": ["3.0"],
+                    "childs": [
+                        {
+                            "type": 1,
+                            "value": 20,
+                            "sensors": ["3.1"],
+                            "actuators": [],
+                            "childs": []
+                        }
+                    ]
+                },
+                {
+                    "type": 1,
+                    "value": 50,
+                    "sensors": ["3.2"],
+                    "actuators": ["3.1"],
                     "childs": []
                 }
             ]
