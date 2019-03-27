@@ -27,7 +27,7 @@
 #define END 22
 
 // RGB Matrix configuration
-#define X_SIZE  7
+#define X_SIZE  30
 #define Y_SIZE  X_SIZE
 
 #define DEFAULT_COLOR_R PIXEL_DEFAULT_RED
