@@ -1,5 +1,8 @@
 # HAS_A51
 
+## [Project Usage and Compilation](https://github.com/SINF-FEUP/HAS_A51/wiki/Project-Usage-and-Compilation)
+
+
 ## Product Vision Statement:
 
 Para donos de ginásios que pretendem minimizar os seus custos ao melhorar a sua eficiência energética e utilizar menos recursos humanos, assim como satisfazer os seus utilizadores, o GAS é o sistema de automação que resolve todos estes problemas.
