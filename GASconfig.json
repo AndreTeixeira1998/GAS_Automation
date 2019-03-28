@@ -6,7 +6,15 @@
             "nodes": [
                 {
                     "id": 0, 
-                    "sensors": [],
+                    "sensors": [
+                        {
+                        "type": 4,
+                        "posX": 2,
+                        "posY": 1,
+                        "rangeMin": 10,
+                        "rangeMax": 40
+                        }
+                    ],
                     "actuators": [
                         {
                             "id": 0,
@@ -29,7 +37,15 @@
                     ]
                 }
             ],
-            "rules": []
+            "rules": [
+                {
+                    "type": 0,
+                    "value": 20,
+                    "sensors": ["0.4"],
+                    "actuators": ["0.0","0.1","0.2"],
+                    "childs": []
+                }
+            ]
         }
     ],
     "pixels": [
