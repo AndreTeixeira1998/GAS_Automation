@@ -3,6 +3,7 @@
 build/
 sims/
 lib/cJSON
+.passfile
 
 # Prerequisites
 *.d

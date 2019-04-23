@@ -179,8 +179,21 @@ void* thread_writeOutput (void* arg) {
 
 
 int main(int argc, char const *argv[]) {
-    if (argc < 4) {
-        printf("Not enough arguments. Expecting:\n\t%s <configuration-file> <input-stream> <output-stream>\n\n", argv[0]);
+    if (argc < 5) {
+        printf("Not enough arguments. Expecting:\n\t%s <configuration-file> <input-stream> <output-stream> <db-conn-configuration-file>\n\n", argv[0]);
+        return 1;
+    }
+
+    char* connStr = getConnectionStringFromFile(argv[4]);
+    if (!connStr) {
+        printf("Error reading the DB connection string Configuration File\n");
+        return 1;
+    }
+
+    PGconn* conn = NULL;
+    conn = PQconnectdb(connStr);
+    if (PQstatus(conn)) {
+        printf("\nError connecting to DB. Error code: %d\n", PQstatus(conn));
         return 1;
     }
 

@@ -21,7 +21,7 @@ P4=$!
 
 sleep 3
 
-bash -c "./GAS.out GASconfig.json /dev/pts/$firstout /dev/pts/$secondin"
+bash -c "./GAS.out GASconfig.json /dev/pts/$firstout /dev/pts/$secondin connString.conf"
 #python sims/write_matrix.py > /dev/pts/$secondin
 P5=$!
 
