@@ -5,6 +5,7 @@
 #include "DataStructure.h"
 #include "functions.h"
 #include "ImportConfiguration.h"
+#include "DBLink.h"
 
 //Here some definitions for stings and data sizes
 #define BUFFER 256 
