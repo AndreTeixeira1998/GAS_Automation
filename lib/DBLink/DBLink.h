@@ -5,6 +5,7 @@
 #include "DataStructure.h"
 
 char* getConnectionStringFromFile (const char* filename);
-Datastore* importConfigurationFromDB (PGconn* conn);
+void DB_prepareAllSQLQueries (PGconn* conn);
+Datastore* DB_importConfiguration (PGconn* conn);
 
 #endif

@@ -198,6 +198,8 @@ int main(int argc, char const *argv[]) {
         return 1;
     }
 
+    DB_prepareAllSQLQueries(conn);
+
     Datastore* datastore = importConfiguration(argv[1]);
     if (!datastore) {
         printf("Error in config file.\n");

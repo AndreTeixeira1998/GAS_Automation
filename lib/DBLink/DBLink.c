@@ -64,7 +64,62 @@ char* getConnectionStringFromFile (const char* filename) {
     return str;
 }
 
-Datastore* importConfigurationFromDB (PGconn* conn) {
+typedef struct {
+    PGconn* conn;
+    char* name;
+    char* query;
+    int nParams;
+} DBQuery;
+
+void __DB_prepareQuery (DBQuery query) {
+    
+    PGresult* stmt = PQprepare(
+        query.conn,
+        query.name,
+        query.query,
+        query.nParams,
+        NULL);
+    
+    fprintf(stderr, "%s", PQresultErrorMessage(stmt));
+}
+
+void DB_prepareAllSQLQueries (PGconn* conn) {
+    if (!conn || PQstatus(conn) != CONNECTION_OK) {
+        return true;
+    }
+
+    int nQueries = 2; // Change to match number of nodes below
+
+    DBQuery nodes[2] = {
+        // {
+        //     connection_to_db,
+        //     query_name,
+        //     query_part_1
+        //     query_part_2,
+        //     0
+        // },
+        {
+            conn,
+            "create_node",
+            "INSERT INTO sinf.node "
+            "DEFAULT VALUES;",
+            0
+        },
+        {
+            conn,
+            "create_actuator",
+            "INSERT INTO sinf.actuator(type, pixel_id) "
+            "VALUES($1, $2);",
+            2
+        }
+    };
+
+    for (int i = 0; i < nQueries; i++) {
+        __DB_prepareQuery(nodes[i]);
+    }
+}
+
+Datastore* DB_importConfiguration (PGconn* conn) {
     if (!conn || PQstatus(conn) != CONNECTION_OK) {
         return NULL;
     }
@@ -75,5 +130,5 @@ Datastore* importConfigurationFromDB (PGconn* conn) {
         return NULL;
     }
 
-    return NULL;
+    return datastore;
 }
