@@ -1,5 +1,5 @@
-#include "stdlib.h"
-#include "stdio.h"
+#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "DataStructure.h"
@@ -43,6 +43,7 @@
 typedef struct {
     Datastore* datastore;
     FILE* stream;
+    bool active;
 }ThreadArgs;
 
 void* thread_readInput (void* arg) {
@@ -57,7 +58,7 @@ void* thread_readInput (void* arg) {
     char data[PAYLOAD_SIZE][MAX_DATASIZE];
     unsigned int data_type=0, c_vect_index, converted_data[PAYLOAD_SIZE];
 
-    while (1) {    
+    while (args->active) {
         //while(fgets(str, BUFFER , fp)){
         if (fgets(str, BUFFER, stream)) {
             
@@ -121,7 +122,7 @@ void* thread_executeRules (void* arg) {
     //FILE* stream = args->stream;
     int* ret = calloc(1, sizeof(int));
     
-    while (1) {
+    while (args->active) {
         executeRules(datastore);
 
         LL_iterator(datastore->rooms, room_elem) {
@@ -145,7 +146,7 @@ void* thread_writeOutput (void* arg) {
     FILE* stream = args->stream;
     int* ret = calloc(1, sizeof(int));
     
-    while (1) {
+    while (args->active) {
         fprintf(stream, "[");
         for (int x = 0; x < X_SIZE; x++) {
             for (int y = 0; y < Y_SIZE; y++) {
@@ -220,18 +221,30 @@ int main(int argc, char const *argv[]) {
     // Prepare thread arguments
     thread_args[THREAD_READINPUT].datastore = datastore;
     thread_args[THREAD_READINPUT].stream = inputStream;
+    thread_args[THREAD_READINPUT].active = true;
 
     thread_args[THREAD_EXECUTERULES].datastore = datastore;
     thread_args[THREAD_EXECUTERULES].stream = NULL;
+    thread_args[THREAD_EXECUTERULES].active = true;
 
     thread_args[THREAD_WRITEOUTPUT].datastore = datastore;
     thread_args[THREAD_WRITEOUTPUT].stream = outputStream;
+    thread_args[THREAD_WRITEOUTPUT].active = true;
 
     
     // Create the threads
     thread_IDs[THREAD_READINPUT] = pthread_create(&threads[THREAD_READINPUT], NULL, &thread_readInput, &thread_args[THREAD_READINPUT]);
     thread_IDs[THREAD_EXECUTERULES] = pthread_create(&threads[THREAD_EXECUTERULES], NULL, &thread_executeRules, &thread_args[THREAD_EXECUTERULES]);
     thread_IDs[THREAD_WRITEOUTPUT] = pthread_create(&threads[THREAD_WRITEOUTPUT], NULL, &thread_writeOutput, &thread_args[THREAD_WRITEOUTPUT]);
+
+    // Run until asked to quit
+    printf("\n\nPress ENTER to exit...");
+    getchar();
+
+    // Signal threads to die
+    thread_args[THREAD_READINPUT].active = false;
+    thread_args[THREAD_EXECUTERULES].active = false;
+    thread_args[THREAD_WRITEOUTPUT].active = false;
 
     // Wait for thread endings
     pthread_join(threads[THREAD_READINPUT], &thread_retValues[THREAD_READINPUT]);
