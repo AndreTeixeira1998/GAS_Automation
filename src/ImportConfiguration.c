@@ -198,9 +198,9 @@ bool parseNode (Room* room, cJSON* json_node) {
     return 0;
 }
 
-bool parseRule (Room* room, Rule* parentRule, cJSON* json_rule) {
+bool parseRule (Datastore* datastore, Rule* parentRule, cJSON* json_rule) {
     if (!json_rule ||
-        (!room && !parentRule)) {
+        (!datastore && !parentRule)) {
         return true;
     }
 
@@ -226,7 +226,7 @@ bool parseRule (Room* room, Rule* parentRule, cJSON* json_rule) {
         rule = createRule(NULL, parentRule, type, value);
     }
     else {
-        rule = createRule(room, NULL, type, value);
+        rule = createRule(datastore, NULL, type, value);
     }
 
     // Check for successfull rule creation
@@ -240,20 +240,10 @@ bool parseRule (Room* room, Rule* parentRule, cJSON* json_rule) {
         return true;
     }
     cJSON_ArrayForEach(json_sensor_entry, json_sensor_array) {
-        if (cJSON_IsString(json_sensor_entry) && (json_sensor_entry->valuestring != NULL)) {
-            // FIXME Buffer Overflow Ahoy!!!!
-            char* token1 = strtok(json_sensor_entry->valuestring, ".");
-            char* token2 = strtok(NULL, ".");
-
-            uint16_t val1 = strtoul(token1, NULL, 10);
-            uint16_t val2 = strtoul(token2, NULL, 10);
-
-            Node* node = findNodeByID(room->parentDatastore, val1);
-            if (!node) {
-                return true;
-            }
-
-            Sensor* sensor = findSensorByType(node, val2);
+        if (cJSON_IsNumber(json_sensor_entry)) {
+            uint16_t id = (uint16_t)json_sensor_entry->valueint;
+            
+            Sensor* sensor = findSensorByID(datastore, id);
             if (!sensor) {
                 return true;
             }
@@ -270,20 +260,10 @@ bool parseRule (Room* room, Rule* parentRule, cJSON* json_rule) {
         return true;
     }
     cJSON_ArrayForEach(json_actuator_entry, json_actuator_array) {
-        if (cJSON_IsString(json_actuator_entry) && (json_actuator_entry->valuestring != NULL)) {
-            // FIXME Buffer Overflow Ahoy!!!!
-            char* token1 = strtok(json_actuator_entry->valuestring, ".");
-            char* token2 = strtok(NULL, ".");
+        if (cJSON_IsNumber(json_actuator_entry)) {
+            uint16_t id = (uint16_t)json_actuator_entry->valueint;
 
-            uint16_t val1 = strtoul(token1, NULL, 10);
-            uint16_t val2 = strtoul(token2, NULL, 10);
-
-            Node* node = findNodeByID(room->parentDatastore, val1);
-            if (!node) {
-                return true;
-            }
-
-            Actuator* actuator = findActuatorByID(node, val2);
+            Actuator* actuator = findActuatorByID(datastore, id);
             if (!actuator) {
                 return true;
             }
@@ -304,7 +284,7 @@ bool parseRule (Room* room, Rule* parentRule, cJSON* json_rule) {
             return true;
         }
         else {
-            parseRule(room, rule, json_childs_entry);
+            parseRule(datastore, rule, json_childs_entry);
         }
     }
 
@@ -356,20 +336,6 @@ bool parseRoom (Datastore* datastore, cJSON* json_room) {
     cJSON_ArrayForEach(node, nodes) {
         if(parseNode(room, node)) {
             // Error parsing node
-            return 1;
-        }
-    }
-
-
-    // Parse the room's rules
-    cJSON *rules = cJSON_GetObjectItem(json_room, "rules"),
-        *rule = NULL;
-    if (!cJSON_IsArray(rules)) {
-        return 1;
-    }
-    cJSON_ArrayForEach(rule, rules) {
-        if(parseRule(room, NULL, rule)) {
-            // Error parsing rule
             return 1;
         }
     }
@@ -459,6 +425,25 @@ Datastore* importConfiguration(const char* filename) {
     cJSON_ArrayForEach(room, rooms) {
         if(parseRoom(datastore, room)) {
             // Error parsing room
+            deleteDatastore(datastore);
+            cJSON_Delete(json);
+            free(jsonString);
+            return NULL;
+        }
+    }
+
+    // Parse the rule's data from the configuration file
+    cJSON *rules = cJSON_GetObjectItem(json, "rules"),
+        *rule = NULL;
+    if (!cJSON_IsArray(rules)) {
+        deleteDatastore(datastore);
+        cJSON_Delete(json);
+        free(jsonString);
+        return NULL;
+    }
+    cJSON_ArrayForEach(rule, rules) {
+        if(parseRule(datastore, NULL, rule)) {
+            // Error parsing rule
             deleteDatastore(datastore);
             cJSON_Delete(json);
             free(jsonString);
