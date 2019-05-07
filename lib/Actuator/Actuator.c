@@ -10,8 +10,11 @@ Actuator* createActuator (Node* node, uint16_t id, uint8_t type, Position* pos) 
         return NULL;
     }
 
-    if (findActuatorByID(node, id)) {
-        // There is already a Actuator with this ID assigned to this node
+    Room* room = (Room*)node->parentRoom;
+    Datastore* datastore = (Datastore*)room->parentDatastore;
+    
+    if (findActuatorByID(datastore, id)) {
+        // There is already a Actuator with this ID
         deletePixel(pixel);
         return NULL;
     }
@@ -82,17 +85,24 @@ Pixel* getActuatorPixel (Actuator* actuator) {
     return actuator->pixel;
 }
 
-Actuator* findActuatorByID (Node* node, uint16_t actuatorID) {
-    if (!node) {
+Actuator* findActuatorByID (Datastore* datastore, uint16_t actuatorID) {
+    if (!datastore) {
         return NULL;
     }
 
-    LL_iterator(node->actuators, actuator_elem) {
-        Actuator* actuator = (Actuator*)actuator_elem->ptr;
-        if (actuator->id == actuatorID) {
-            return actuator;
+    LL_iterator(datastore->rooms, room_elem) {
+        Room* room = (Room*)room_elem->ptr;
+        LL_iterator(room->nodes, node_elem) {
+            Node* node = (Node*)node_elem->ptr;
+            LL_iterator(node->actuators, actuator_elem) {
+                Actuator* actuator = (Actuator*)actuator_elem->ptr;
+                if (actuator->id == actuatorID) {
+                    return actuator;
+                }
+            }
         }
     }
+
 
     return NULL;
 }

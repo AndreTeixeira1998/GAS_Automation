@@ -12,6 +12,7 @@ typedef struct _actuator Actuator;
 #include "Pixel.h"
 #include "Rule.h"
 #include "Node.h"
+#include "Position.h"
 
 
 /**
@@ -30,7 +31,7 @@ struct _actuator {
  * @brief Create a Actuator object
  * 
  * @param node A pointer to the Node this Actuator will belong to.
- * @param id The ID of the new Actuator. Must be unique inside the Node.
+ * @param id The ID of the new Actuator.
  * @param type Type of the Actuator
  * @param posX Position in the X axis on the RGB Matrix output
  * @param posY Position in the Y axis on the RGB Matrix output
@@ -56,12 +57,12 @@ bool deleteActuator (Actuator* actuator);
 Pixel* getActuatorPixel (Actuator* actuator);
 
 /**
- * @brief Searches the node for a Actuator with the specified actuatorID
+ * @brief Searches the datastore for a Actuator with the specified actuatorID
  * 
- * @param node Node object to search
+ * @param datastore Datastore object to search
  * @param actuatorID ID of the actuator to find
  * @return Actuator* Actuator object with 'actuatorID' id. NULL if not found.
  */
-Actuator* findActuatorByID (Node* node, uint16_t actuatorID);
+Actuator* findActuatorByID (Datastore* datastore, uint16_t actuatorID);
 
 #endif
