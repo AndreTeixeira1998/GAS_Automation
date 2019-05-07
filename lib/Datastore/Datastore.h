@@ -11,6 +11,7 @@ typedef struct _datastore Datastore;
 #include "Room.h"
 #include "Rule.h"
 #include "Pixel.h"
+#include "Profile.h"
 
 
 
@@ -22,6 +23,7 @@ struct _datastore {
     list* rooms;
     list* pixels;
     list* rules;
+    list* profiles;
 };
 
 /**

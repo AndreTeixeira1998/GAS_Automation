@@ -11,6 +11,7 @@ typedef struct _rule Rule;
 
 #include "Sensor.h"
 #include "Actuator.h"
+#include "Profile.h"
 
 #define TYPE_RULE_LESS_THEN     0
 #define TYPE_RULE_GREATER_THEN  1
@@ -32,6 +33,7 @@ struct _rule {
     uint16_t operation;
     uint16_t value;
     list* childs;
+    list* profiles;
 };
 
 /**
@@ -92,5 +94,25 @@ bool executeRules (Datastore* datastore);
  * @return Rule* Rule object with specified ID. NULL if error or not found.
  */
 Rule* findRuleByID (Datastore* datastore, uint16_t id);
+
+/**
+ * @brief Adds the profile to the rule
+ * 
+ * @param rule Rule object
+ * @param profile Profile Object
+ * @return true Error
+ * @return false All good
+ */
+bool addProfileToRule (Rule* rule, Profile* profile);
+
+/**
+ * @brief Removes the profile from the rule
+ * 
+ * @param rule Rule object
+ * @param profile Profile Object
+ * @return true Error
+ * @return false All good
+ */
+bool removeProfileFromRule (Rule* rule, Profile* profile);
 
 #endif

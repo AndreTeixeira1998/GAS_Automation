@@ -94,13 +94,13 @@ bool deleteRule (Rule* rule) {
     list_element *elem = rule->listPtr,
         *res;
     
-    if (rule->parentDatastore) {
-        res = listRemove(rule->parentDatastore->rules, elem);
-        if (res == NULL && listSize(rule->parentDatastore->rules)) {
-            retVal++;
-        }
+    res = listRemove(rule->parentDatastore->rules, elem);
+    if (res == NULL && listSize(rule->parentDatastore->rules)) {
+        // TODO check this for logic error
+        retVal++;
     }
-    else if (rule->parentRule) {
+
+    if (rule->parentRule) {
         res = listRemove(rule->parentRule->childs, elem);
         if (res == NULL && listSize(rule->parentRule->childs)) {
             retVal++;
@@ -259,4 +259,37 @@ Rule* findRuleByID (Datastore* datastore, uint16_t id) {
     }
 
     return findRuleByIDinLinkedList(datastore->rules, id);
+}
+
+bool addProfileToRule (Rule* rule, Profile* profile) {
+    if (!rule || !profile) {
+        return true;
+    }
+
+    list_element* elem = listInsert(rule->profiles, profile, NULL);
+    if (!elem) {
+        // Error while inserting
+        return true;
+    }
+
+    return false;
+}
+
+bool removeProfileFromRule (Rule* rule, Profile* profile) {
+    if (!rule || !profile) {
+        return true;
+    }
+
+    LL_iterator(rule->profiles, rule_profile_elem) {
+        Profile* rule_profile = (Profile*)rule_profile_elem->ptr;
+        if (rule_profile == profile) {
+            list_element* res = listRemove(rule->profiles, rule_profile_elem);
+            if (res == NULL && listSize(profile->parentDatastore->profiles)) {
+                // TODO check this for logic error
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
