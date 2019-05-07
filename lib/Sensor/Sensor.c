@@ -59,7 +59,7 @@ sensorValueCalculator* sensorCalculatorFunctionPointer (uint8_t type) {
     return ptr;
 }
 
-Sensor* createSensor (Node* node, uint8_t type, Position* pos, uint16_t rangeMin, uint16_t rangeMax) {
+Sensor* createSensor (Node* node, uint16_t id, uint8_t type, Position* pos, uint16_t rangeMin, uint16_t rangeMax) {
     if (!node) {
         return NULL;
     }
@@ -68,10 +68,18 @@ Sensor* createSensor (Node* node, uint8_t type, Position* pos, uint16_t rangeMin
         return NULL;
     }
 
+    Room* room = (Room*)node->parentRoom;
+    Datastore* datastore = (Datastore*)room->parentDatastore;
+    if (findSensorByID(datastore, id)) {
+        // There's alreay a sensor with the specified ID.
+        return NULL;
+    }
+
     if (findSensorByType(node, type)) {
         // There's alreay a sensor with the specified type associated with this node.
         return NULL;
     }
+
 
     Pixel* pixel = createPixel(node->parentRoom->parentDatastore, NULL, pos);
     if (!pixel) {
@@ -102,6 +110,7 @@ Sensor* createSensor (Node* node, uint8_t type, Position* pos, uint16_t rangeMin
 
     sensor->parentNode = node;
     sensor->listPtr = elem;
+    sensor->id = id;
     sensor->type = type;
     sensor->calculator = sensorCalculatorFunctionPointer(type);
     sensor->value = 0;
@@ -184,11 +193,33 @@ Sensor* findSensorByType (Node* node, uint8_t type) {
         return NULL;
     }
 
-    for (list_element* elem = listStart(node->sensors); elem != NULL; elem = elem->next) {
-        Sensor* sensor = elem->ptr;
+    LL_iterator(node->sensors, sensor_elem) {
+        Sensor* sensor = sensor_elem->ptr;
         if (sensor->type == type) {
             // There's already a sensor of this type registered on to this node
             return sensor;
+        }
+    }
+
+    return NULL;
+}
+
+Sensor* findSensorByID (Datastore* datastore, uint16_t id) {
+    if (!datastore) {
+        return NULL;
+    }
+
+    LL_iterator(datastore->rooms, room_elem) {
+        Room* room = room_elem->ptr;
+        LL_iterator(room->nodes, node_elem) {
+            Node* node = node_elem->ptr;
+            LL_iterator(node->sensors, sensor_elem) {
+                Sensor* sensor = sensor_elem->ptr;
+                if (sensor->id == id) {
+                    // There's already a sensor registered with this ID
+                    return sensor;
+                }
+            }
         }
     }
 

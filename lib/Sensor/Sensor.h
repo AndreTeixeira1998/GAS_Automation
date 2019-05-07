@@ -37,6 +37,7 @@ typedef float sensorValueCalculator(uint16_t value);
 struct _sensor {
     Node* parentNode;
     list_element* listPtr;
+    uint16_t id;
     uint8_t type;
     sensorValueCalculator* calculator;
     uint16_t value;
@@ -107,13 +108,14 @@ bool isValidSensorType (uint8_t type);
  * @brief Create a Sensor object
  * 
  * @param node A pointer to the Node this Sensor will belong to.
+ * @param id ID of the sensor
  * @param type Type of sensor
  * @param pos Position of the sensor in the RGB Matrix
  * @param rangeMin min value for color range
  * @param rangeMax max value for color range
  * @return Sensor* The pointer to the new Sensor object. NULL if error occurs.
  */
-Sensor* createSensor (Node* node, uint8_t type, Position* pos, uint16_t rangeMin, uint16_t rangeMax);
+Sensor* createSensor (Node* node, uint16_t id, uint8_t type, Position* pos, uint16_t rangeMin, uint16_t rangeMax);
 
 /**
  * @brief Delete a Sensor object
@@ -157,6 +159,15 @@ Pixel* getSensorPixel (Sensor* sensor);
  * @return Sensor* sensor object with specified type. NULL if error or not found.
  */
 Sensor* findSensorByType (Node* node, uint8_t type);
+
+/**
+ * @brief Searches the datastore for a sensor with the specified ID.
+ * 
+ * @param datastore Datastore to search
+ * @param id ID of sensor to find
+ * @return Sensor* sensor object with specified ID. NULL if error or not found.
+ */
+Sensor* findSensorByID (Datastore* datastore, uint16_t id);
 
 /**
  * @brief Update pixel color for sensors
