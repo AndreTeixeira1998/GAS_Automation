@@ -254,7 +254,7 @@ bool parseRule (Datastore* datastore, Rule* parentRule, cJSON* json_rule) {
     }
 
     cJSON* json_actuator_array = cJSON_GetObjectItem(json_rule, "actuators"),
-        *json_actuator_entry = NULL;;
+        *json_actuator_entry = NULL;
     if (!cJSON_IsArray(json_actuator_array)) {
         return true;
     }
