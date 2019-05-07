@@ -1,8 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <pthread.h>
 
-#include "DataStructure.h"
+#include "Datastore.h"
+#include "Rule.h"
+#include "Node.h"
+#include "Sensor.h"
 #include "functions.h"
 #include "ImportConfiguration.h"
 #include "DBLink.h"

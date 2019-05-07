@@ -1,7 +1,12 @@
 #ifndef __IMPORTCONFIGURATION_H__
 #define __IMPORTCONFIGURATION_H__
 
-#include "DataStructure.h"
+#include "Datastore.h"
+#include "Rule.h"
+#include "Room.h"
+#include "Node.h"
+#include "Sensor.h"
+#include "Actuator.h"
 #include "cJSON.h"
 
 /**

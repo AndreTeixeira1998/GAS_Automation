@@ -2,7 +2,7 @@
 #define __DBLINK__
 
 #include <libpq-fe.h>
-#include "DataStructure.h"
+#include "Datastore.h"
 
 typedef struct {
     PGconn* conn;
