@@ -205,14 +205,18 @@ bool parseRule (Datastore* datastore, Rule* parentRule, cJSON* json_rule) {
     }
 
 
-    uint16_t type = 0,
+    uint16_t id = 0,
+        type = 0,
         value = 0;
 
+    cJSON* json_id = cJSON_GetObjectItem(json_rule, "id");
     cJSON* json_type = cJSON_GetObjectItem(json_rule, "type");
     cJSON* json_value = cJSON_GetObjectItem(json_rule, "value");
-    if (cJSON_IsNumber(json_type) &&
+    if (cJSON_IsNumber(json_id) &&
+        cJSON_IsNumber(json_type) &&
         cJSON_IsNumber(json_value)) {
         
+        id = (uint16_t)json_id->valueint;
         type = (uint16_t)json_type->valueint;
         value = (uint16_t)json_value->valueint;
     }
@@ -222,12 +226,7 @@ bool parseRule (Datastore* datastore, Rule* parentRule, cJSON* json_rule) {
 
     // Create Rule instance
     Rule* rule = NULL;
-    if (parentRule) {
-        rule = createRule(NULL, parentRule, type, value);
-    }
-    else {
-        rule = createRule(datastore, NULL, type, value);
-    }
+    rule = createRule(datastore, parentRule, id, type, value);
 
     // Check for successfull rule creation
     if (!rule) {

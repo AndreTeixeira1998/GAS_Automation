@@ -25,6 +25,7 @@ typedef struct _rule Rule;
 struct _rule {
     Datastore* parentDatastore;
     Rule* parentRule;
+    uint16_t id;
     list_element* listPtr;
     list* sensors;
     list* actuators;
@@ -38,11 +39,12 @@ struct _rule {
  * 
  * @param datastore Datastore associated with the rule
  * @param parent Parent Rule
+ * @param id ID of the new rule. Must be globaly unique
  * @param type operation to be made to the value of associated sensors and the rule value
  * @param value 
  * @return Rule* Pointer to the new Rule object
  */
-Rule* createRule (Datastore* datastore, Rule* parent, uint16_t type, uint16_t value);
+Rule* createRule (Datastore* datastore, Rule* parentRule, uint16_t id, uint16_t type, uint16_t value);
 
 /**
  * @brief Delete a Rule object
@@ -81,5 +83,14 @@ bool addActuatorToRule (Rule* rule, Actuator* actuator);
  * @return false All Good
  */
 bool executeRules (Datastore* datastore);
+
+/**
+ * @brief Search the datastore for a Rule with the specified ID
+ * 
+ * @param datastore Pointer to the Datastore object to be searched
+ * @param id ID of the Rule to find
+ * @return Rule* Rule object with specified ID. NULL if error or not found.
+ */
+Rule* findRuleByID (Datastore* datastore, uint16_t id);
 
 #endif

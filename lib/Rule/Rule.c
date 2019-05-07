@@ -1,8 +1,12 @@
 #include "Rule.h"
 
-Rule* createRule (Datastore* datastore, Rule* parent, uint16_t type, uint16_t value) {
-    if ((!datastore && !parent) || 
-        (datastore && parent)) {
+Rule* createRule (Datastore* datastore, Rule* parentRule, uint16_t id, uint16_t type, uint16_t value) {
+    if (!datastore) {
+        return NULL;
+    }
+
+    if (findRuleByID(datastore, id)) {
+        // There's already a rule with the specified ID
         return NULL;
     }
 
@@ -34,7 +38,8 @@ Rule* createRule (Datastore* datastore, Rule* parent, uint16_t type, uint16_t va
     }
 
     rule->parentDatastore = datastore;
-    rule->parentRule = parent;
+    rule->parentRule = parentRule;
+    rule->id = id;
     rule->sensors = sensors;
     rule->actuators = actuators;
     rule->operation = type;
@@ -43,11 +48,11 @@ Rule* createRule (Datastore* datastore, Rule* parent, uint16_t type, uint16_t va
 
     list_element* elem = NULL;
 
-    if (datastore) { // Insert rule in datastore
-        elem = listInsert(datastore->rules, rule, NULL);
+    if (parentRule) { // Insert rule in parent rule
+        elem = listInsert(parentRule->childs, rule, NULL);
     }
-    else if (parent) { // Insert rule in parent rule
-        elem = listInsert(parent->childs, rule, NULL);
+    else { // Insert rule in datastore
+        elem = listInsert(datastore->rules, rule, NULL);
     }
     
     if (elem == NULL) {
@@ -225,4 +230,33 @@ bool executeRules (Datastore* datastore) {
     }
 
     return false;
+}
+
+Rule* findRuleByIDinLinkedList (list* linkedList, uint16_t id) {
+    if (!linkedList) {
+        return NULL;
+    }
+
+    LL_iterator(linkedList, rule_elem) {
+        Rule* rule = (Rule*)rule_elem->ptr;
+
+        if (rule->id == id) {
+            return rule;
+        }
+
+        Rule* result = findRuleByIDinLinkedList(rule->childs, id);
+        if (result) {
+            return result;
+        }
+    }
+
+    return NULL;
+}
+
+Rule* findRuleByID (Datastore* datastore, uint16_t id) {
+    if (!datastore) {
+        return NULL;
+    }
+
+    return findRuleByIDinLinkedList(datastore->rules, id);
 }
