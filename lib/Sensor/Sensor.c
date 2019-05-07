@@ -119,18 +119,15 @@ bool deleteSensor (Sensor* sensor) {
 
     // Remove Sensor from existing rules
     Datastore* datastore = sensor->parentNode->parentRoom->parentDatastore;
-    LL_iterator(datastore->rooms, room_elem) {
-        Room* room = room_elem->ptr;
-        LL_iterator(room->rules, rule_elem) {
-            Rule* rule = rule_elem->ptr;
-            LL_iterator(rule->sensors, ruleSensor_elem) {
-                if (sensor == (ruleSensor_elem->ptr)) {
-                    list_element* rule_remover = listRemove(rule->sensors, ruleSensor_elem);
-                    if (rule_remover == NULL && listSize(rule->sensors)) {
-                        return 1;
-                    }
-                    break;
+    LL_iterator(datastore->rules, rule_elem) {
+        Rule* rule = rule_elem->ptr;
+        LL_iterator(rule->sensors, ruleSensor_elem) {
+            if (sensor == (ruleSensor_elem->ptr)) {
+                list_element* rule_remover = listRemove(rule->sensors, ruleSensor_elem);
+                if (rule_remover == NULL && listSize(rule->sensors)) {
+                    return 1;
                 }
+                break;
             }
         }
     }

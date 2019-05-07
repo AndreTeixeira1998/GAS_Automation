@@ -47,18 +47,15 @@ bool deleteActuator (Actuator* actuator) {
 
     // Remove Actuator from existing rules
     Datastore* datastore = actuator->parentNode->parentRoom->parentDatastore;
-    LL_iterator(datastore->rooms, room_elem) {
-        Room* room = room_elem->ptr;
-        LL_iterator(room->rules, rule_elem) {
-            Rule* rule = rule_elem->ptr;
-            LL_iterator(rule->actuators, ruleActuator_elem) {
-                if (actuator == (ruleActuator_elem->ptr)) {
-                    list_element* rule_remover = listRemove(rule->actuators, ruleActuator_elem);
-                    if (rule_remover == NULL && listSize(rule->actuators)) {
-                        return 1;
-                    }
-                    break;
+    LL_iterator(datastore->rules, rule_elem) {
+        Rule* rule = rule_elem->ptr;
+        LL_iterator(rule->actuators, ruleActuator_elem) {
+            if (actuator == (ruleActuator_elem->ptr)) {
+                list_element* rule_remover = listRemove(rule->actuators, ruleActuator_elem);
+                if (rule_remover == NULL && listSize(rule->actuators)) {
+                    return 1;
                 }
+                break;
             }
         }
     }

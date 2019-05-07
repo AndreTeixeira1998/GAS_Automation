@@ -22,7 +22,7 @@ typedef struct _rule Rule;
  * 
  */
 struct _rule {
-    Room* parentRoom;
+    Datastore* parentDatastore;
     Rule* parentRule;
     list_element* listPtr;
     list* sensors;
@@ -35,13 +35,13 @@ struct _rule {
 /**
  * @brief Create a Rule object
  * 
- * @param room Room associated with the rule
+ * @param datastore Datastore associated with the rule
  * @param parent Parent Rule
  * @param type operation to be made to the value of associated sensors and the rule value
  * @param value 
  * @return Rule* Pointer to the new Rule object
  */
-Rule* createRule (Room* room, Rule* parent, uint16_t type, uint16_t value);
+Rule* createRule (Datastore* datastore, Rule* parent, uint16_t type, uint16_t value);
 
 /**
  * @brief Delete a Rule object

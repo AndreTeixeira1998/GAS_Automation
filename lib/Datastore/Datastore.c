@@ -23,8 +23,17 @@ Datastore* createDatastore () {
         return NULL;
     }
 
+    list* rules = newList();
+    if (rules == NULL) {
+        deleteList(pixels);
+        deleteList(rooms);
+        free(datastore);
+        return NULL;
+    }
+
     datastore->rooms = rooms;
     datastore->pixels = pixels;
+    datastore->rules = rules;
 
     return datastore;
 }
@@ -57,6 +66,17 @@ bool deleteDatastore (Datastore* datastore) {
         aux = listStart(datastore->pixels);
     }
     deleteList(datastore->pixels);
+
+    // Delete all room's rules
+    aux = listStart(datastore->rules);
+    while (aux != NULL) {
+        if (deleteRule(aux->ptr)) {
+            // Error
+            return 1;
+        }
+        aux = listStart(datastore->rules);
+    }
+    deleteList(datastore->rules);
 
     free(datastore);
 

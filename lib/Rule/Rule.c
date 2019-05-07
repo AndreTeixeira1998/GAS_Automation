@@ -1,8 +1,8 @@
 #include "Rule.h"
 
-Rule* createRule (Room* room, Rule* parent, uint16_t type, uint16_t value) {
-    if ((!room && !parent) || 
-        (room && parent)) {
+Rule* createRule (Datastore* datastore, Rule* parent, uint16_t type, uint16_t value) {
+    if ((!datastore && !parent) || 
+        (datastore && parent)) {
         return NULL;
     }
 
@@ -33,7 +33,7 @@ Rule* createRule (Room* room, Rule* parent, uint16_t type, uint16_t value) {
         return NULL;
     }
 
-    rule->parentRoom = room;
+    rule->parentDatastore = datastore;
     rule->parentRule = parent;
     rule->sensors = sensors;
     rule->actuators = actuators;
@@ -43,8 +43,8 @@ Rule* createRule (Room* room, Rule* parent, uint16_t type, uint16_t value) {
 
     list_element* elem = NULL;
 
-    if (room) { // Insert rule in room
-        elem = listInsert(room->rules, rule, NULL);
+    if (datastore) { // Insert rule in datastore
+        elem = listInsert(datastore->rules, rule, NULL);
     }
     else if (parent) { // Insert rule in parent rule
         elem = listInsert(parent->childs, rule, NULL);
@@ -89,9 +89,9 @@ bool deleteRule (Rule* rule) {
     list_element *elem = rule->listPtr,
         *res;
     
-    if (rule->parentRoom) {
-        res = listRemove(rule->parentRoom->rules, elem);
-        if (res == NULL && listSize(rule->parentRoom->rules)) {
+    if (rule->parentDatastore) {
+        res = listRemove(rule->parentDatastore->rules, elem);
+        if (res == NULL && listSize(rule->parentDatastore->rules)) {
             retVal++;
         }
     }
@@ -210,19 +210,16 @@ bool executeRules (Datastore* datastore) {
     colorInactive.g = 0;
     colorInactive.b = 0;
 
-    LL_iterator(datastore->rooms, room_elem) {
-        Room* room = room_elem->ptr;
-        LL_iterator(room->rules, rule_elem) {
-            Rule* rule = rule_elem->ptr;
-            bool active = evaluateRule(rule);
+    LL_iterator(datastore->rules, rule_elem) {
+        Rule* rule = rule_elem->ptr;
+        bool active = evaluateRule(rule);
 
-            // Rule is active
-            LL_iterator(rule->actuators, actuator_elem) {
-                Actuator* actuator = actuator_elem->ptr;
-                Pixel* pixel = getActuatorPixel(actuator);
-                if (setPixelColor(pixel, active ? &colorActive : &colorInactive)) {
-                    return true;
-                }
+        // Rule is active
+        LL_iterator(rule->actuators, actuator_elem) {
+            Actuator* actuator = actuator_elem->ptr;
+            Pixel* pixel = getActuatorPixel(actuator);
+            if (setPixelColor(pixel, active ? &colorActive : &colorInactive)) {
+                return true;
             }
         }
     }

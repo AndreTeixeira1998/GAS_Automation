@@ -20,6 +20,7 @@ typedef struct _datastore Datastore;
 struct _datastore {
     list* rooms;
     list* pixels;
+    list* rules;
 };
 
 /**

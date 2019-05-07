@@ -25,7 +25,6 @@ struct _room {
     list_element* listPtr;
     char* name;
     list* nodes;
-    list* rules;
 };
 
 /**
