@@ -4,8 +4,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <pthread.h>
 
 #include "LinkedList.h"
+
+typedef struct _pixel Pixel;
 
 #include "Datastore.h"
 #include "Position.h"
@@ -15,7 +18,6 @@
 #define PIXEL_DEFAULT_GREEN     255
 #define PIXEL_DEFAULT_BLUE      255
 
-typedef struct _pixel Pixel;
 
 /**
  * @brief Structure to hold all data regarding a pixel in the RGB Matrix

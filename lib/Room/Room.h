@@ -8,12 +8,14 @@
 
 #include "LinkedList.h"
 
+typedef struct _room Room;
+
 #include "Datastore.h"
+#include "Node.h"
 
 
 #define NAME_MAX_LENGTH 24
 
-typedef struct _room Room;
 
 /**
  * @brief Structure to hold all data concerning a Room.

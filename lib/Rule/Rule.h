@@ -7,6 +7,8 @@
 
 #include "LinkedList.h"
 
+typedef struct _rule Rule;
+
 #include "Sensor.h"
 #include "Actuator.h"
 
@@ -15,7 +17,6 @@
 #define TYPE_RULE_EQUAL_TO      2
 #define TYPE_RULE_WITHIN_MARGIN 3
 
-typedef struct _rule Rule;
 
 /**
  * @brief Structure to hold a rule for actuator control

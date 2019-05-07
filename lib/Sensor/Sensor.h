@@ -13,6 +13,7 @@ typedef struct _sensor Sensor;
 #include "Pixel.h"
 #include "Rule.h"
 #include "Node.h"
+#include "Position.h"
 
 #define N_TYPE_SENSOR           5
 #define TYPE_SENSOR_VOLTAGE     0

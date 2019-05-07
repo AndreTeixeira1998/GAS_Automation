@@ -7,11 +7,13 @@
 
 #include "LinkedList.h"
 
+typedef struct _node Node;
+
 #include "Datastore.h"
 #include "Room.h"
+#include "Sensor.h"
+#include "Actuator.h"
 
-
-typedef struct _node Node;
 
 /**
  * @brief Structure to hold all data concerning a Node.

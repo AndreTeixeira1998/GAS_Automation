@@ -9,6 +9,7 @@ typedef struct _datastore Datastore;
 #include "LinkedList.h"
 
 #include "Room.h"
+#include "Rule.h"
 #include "Pixel.h"
 
 
