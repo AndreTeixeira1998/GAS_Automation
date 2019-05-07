@@ -76,13 +76,14 @@ void __DB_prepareQuery (DBQuery query) {
     fprintf(stderr, "%s", PQresultErrorMessage(stmt));
 }
 
-void DB_prepareAllSQLQueries (PGconn* conn) {
+void DB_prepareAllSQLQueries (PGconn* conn, DBQuery** queryArray, uint queryArraySize) {
     if (!conn || PQstatus(conn) != CONNECTION_OK) {
         return;
     }
 
-    for (int i = 0; i < queryArraySize; i++) {
-        __DB_prepareQuery(queryArray[i]);
+    for (uint i = 0; i < queryArraySize; i++) {
+        (*queryArray)[i].conn = conn;
+        __DB_prepareQuery((*queryArray)[i]);
     }
 }
 

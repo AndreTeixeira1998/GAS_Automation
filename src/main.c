@@ -6,6 +6,7 @@
 #include "functions.h"
 #include "ImportConfiguration.h"
 #include "DBLink.h"
+#include "database_queries.h"
 
 //Here some definitions for stings and data sizes
 #define BUFFER 256 
@@ -198,7 +199,7 @@ int main(int argc, char const *argv[]) {
         return 1;
     }
 
-    DB_prepareAllSQLQueries(conn);
+    DB_prepareAllSQLQueries(conn, queryArray, QUERY_ARRAY_SIZE);
 
     Datastore* datastore = importConfiguration(argv[1]);
     if (!datastore) {
