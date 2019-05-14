@@ -158,7 +158,8 @@ DBQuery create_table_pixel = {
     "CREATE TABLE IF NOT EXISTS sinf.pixel("
     "pixel_id SERIAL NOT NULL PRIMARY KEY,"
     "x_position INTEGER NOT NULL,"
-    "y_position INTEGER NOT NULL);",
+    "y_position INTEGER NOT NULL,"
+    "CONSTRAINT unique_position UNIQUE (x_position, y_position));",
     0
 };
 

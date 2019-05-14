@@ -207,7 +207,8 @@ int main(int argc, char const *argv[]) {
 
     DB_prepareAllQueries(conn, queryList);
     // PQexecPrepared(conn, "create_table_profile", 0, NULL, NULL, NULL, 0);
-    DB_exec(queryList, "create_table_profile", NULL);
+    DB_exec(queryList, "create_table_pixel", NULL);
+    DB_prepareAllQueries(conn, queryList);
 
     Datastore* datastore = importConfiguration(argv[1]);
     if (!datastore) {

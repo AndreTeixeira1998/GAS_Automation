@@ -107,9 +107,9 @@ void DB_prepareAllQueries (PGconn* conn, list* queryList) {
     DB_prepareSQLQueries(conn, queryList);
 }
 
-void DB_exec (list* queryList, char* query_name, char* paramValues[]) {
-    if (!queryList) {
-        return;
+DBQuery* findQueryByName (list* queryList, char* query_name) {
+    if (!queryList || ! query_name) {
+        return NULL;
     }
 
     DBQuery* query = NULL;
@@ -121,6 +121,14 @@ void DB_exec (list* queryList, char* query_name, char* paramValues[]) {
     }
     if (!query) {
         fprintf(stderr, "Query name not found.");
+        return NULL;
+    }
+
+    return query;
+}
+
+void __DB_exec (list* queryList, DBQuery* query, char* paramValues[]) {
+    if (!queryList || !query) {
         return;
     }
 
@@ -144,6 +152,18 @@ void DB_exec (list* queryList, char* query_name, char* paramValues[]) {
     fprintf(stderr, "%s", PQresultErrorMessage(stmt));
 }
 
+void DB_exec (list* queryList, char* query_name, char* paramValues[]) {
+    if (!queryList) {
+        return;
+    }
+
+    DBQuery* query = findQueryByName(queryList, query_name);
+
+    __DB_exec(queryList, query, paramValues);
+
+    return;
+}
+
 void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
     if (!datastore) {
         return;
@@ -152,18 +172,20 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
     LL_iterator(datastore->pixels, pixel_elem) {
         Pixel* pixel = (Pixel*)pixel_elem->ptr;
 
-        char* params[2];
+        DBQuery* query = findQueryByName(queryList, "create_pixel");
+
+        char* params[query->nParams];
         params[0] = malloc(12*sizeof(char));
         params[1] = malloc(12*sizeof(char));
         sprintf(params[0], "%d", pixel->pos->x);
-        sprintf(params[1], "%d", pixel->pos->x);
+        sprintf(params[1], "%d", pixel->pos->y);
 
-        DB_exec(queryList,
-            "create_pixel",
+        __DB_exec(queryList,
+            query,
             params
         );
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < query->nParams; i++) {
             free(params[i]);
         }
     }
