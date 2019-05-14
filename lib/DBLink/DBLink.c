@@ -190,6 +190,38 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
         }
     }
 
+    LL_iterator(datastore->rules, rule_elem) {
+        Rule* rule = (Rule*)rule_elem->ptr;
+
+        DBQuery* query = NULL;
+        if (rule->parentRule) {
+            query = findQueryByName(queryList, "create_rule_with_parent");
+        }
+        else {
+            query = findQueryByName(queryList, "create_rule");
+        }
+
+        char* params[query->nParams];
+        for (int i = 0; i < query->nParams; i++) {
+            params[i] = malloc(12*sizeof(char));
+        }
+        
+        sprintf(params[0], "%d", rule->operation);
+        sprintf(params[1], "%d", rule->value);
+        if (rule->parentRule) {
+            sprintf(params[2], "%d", rule->parentRule->id);
+        }
+
+        __DB_exec(queryList,
+            query,
+            params
+        );
+
+        for (int i = 0; i < query->nParams; i++) {
+            free(params[i]);
+        }
+    }
+
     return;
 }
 

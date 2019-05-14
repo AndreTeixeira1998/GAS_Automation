@@ -340,6 +340,14 @@ DBQuery create_table_rule = {
 DBQuery create_rule = {
     NULL,
     "create_rule",
+    "INSERT INTO sinf.rule(operation, value) "
+    "VALUES($1, $2);",
+    2
+};
+
+DBQuery create_rule_with_parent = {
+    NULL,
+    "create_rule_with_parent",
     "INSERT INTO sinf.rule(operation, value, parent_id) "
     "VALUES($1, $2, $3);",
     3
@@ -355,5 +363,6 @@ DBQuery delete_rule = {
 void prepareRuleQueries (list* queryList) {
     addQuerytoList(&create_table_rule, queryList);
     addQuerytoList(&create_rule, queryList);
+    addQuerytoList(&create_rule_with_parent, queryList);
     addQuerytoList(&delete_rule, queryList);
 }
