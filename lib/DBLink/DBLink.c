@@ -106,6 +106,9 @@ void DB_prepareAllQueries (PGconn* conn, list* queryList) {
 }
 
 void DB_exec (list* queryList, char* query_name, char* paramValues[]) {
+    if (!queryList) {
+        return;
+    }
 
     DBQuery* query = NULL;
     LL_iterator(queryList, query_elem) {
