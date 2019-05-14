@@ -1,14 +1,14 @@
 {
     "rooms": [
         {
-            "id": 0,
+            "id": 1,
             "name": "Reception",
             "nodes": [
                 {
-                    "id": 0, 
+                    "id": 1, 
                     "sensors": [
                         {
-                            "id": 0,
+                            "id": 1,
                             "type": 0,
                             "posX": 24,
                             "posY": 1,
@@ -16,7 +16,7 @@
                             "rangeMax": 600
                         },
                         {
-                            "id": 1,
+                            "id": 2,
                             "type": 4,
                             "posX": 25,
                             "posY": 1,
@@ -24,7 +24,7 @@
                             "rangeMax": 40
                         },
                         {
-                            "id": 2,
+                            "id": 3,
                             "type": 3,
                             "posX": 17,
                             "posY": 4,
@@ -34,19 +34,19 @@
                     ],
                     "actuators": [
                         {
-                            "id": 0,
+                            "id": 1,
                             "type": 4,
                             "posX": 22,
                             "posY": 1
                         },
                         {
-                            "id": 1,
+                            "id": 2,
                             "type": 3,
                             "posX": 16,
                             "posY": 4
                         },
                         {
-                            "id": 2,
+                            "id": 3,
                             "type": 3,
                             "posX": 15,
                             "posY": 9
@@ -56,59 +56,24 @@
             ]
         },
         {
-            "id": 1,
-            "name": "WC Male",
-            "nodes": [
-                {
-                    "id": 1, 
-                    "sensors": [
-                        {
-                            "id": 3,
-                            "type": 4,
-                            "posX": 20,
-                            "posY": 6,
-                            "rangeMin": 0,
-                            "rangeMax": 6
-                        },
-                        {
-                            "id": 4,
-                            "type": 3,
-                            "posX": 20,
-                            "posY": 10,
-                            "rangeMin": 200,
-                            "rangeMax": 2000
-                        }
-                    ],
-                    "actuators": [
-                        {
-                            "id": 3,
-                            "type": 4,
-                            "posX": 20,
-                            "posY": 8
-                        }
-                    ]
-                }
-            ]
-        },
-        {
             "id": 2,
-            "name": "WC Female",
+            "name": "WC Male",
             "nodes": [
                 {
                     "id": 2, 
                     "sensors": [
                         {
-                            "id": 5,
+                            "id": 4,
                             "type": 4,
-                            "posX": 24,
+                            "posX": 20,
                             "posY": 6,
                             "rangeMin": 0,
                             "rangeMax": 6
                         },
                         {
-                            "id": 6,
+                            "id": 5,
                             "type": 3,
-                            "posX": 24,
+                            "posX": 20,
                             "posY": 10,
                             "rangeMin": 200,
                             "rangeMax": 2000
@@ -118,7 +83,7 @@
                         {
                             "id": 4,
                             "type": 4,
-                            "posX": 24,
+                            "posX": 20,
                             "posY": 8
                         }
                     ]
@@ -127,13 +92,48 @@
         },
         {
             "id": 3,
+            "name": "WC Female",
+            "nodes": [
+                {
+                    "id": 3,
+                    "sensors": [
+                        {
+                            "id": 6,
+                            "type": 4,
+                            "posX": 24,
+                            "posY": 6,
+                            "rangeMin": 0,
+                            "rangeMax": 6
+                        },
+                        {
+                            "id": 7,
+                            "type": 3,
+                            "posX": 24,
+                            "posY": 10,
+                            "rangeMin": 200,
+                            "rangeMax": 2000
+                        }
+                    ],
+                    "actuators": [
+                        {
+                            "id": 5,
+                            "type": 4,
+                            "posX": 24,
+                            "posY": 8
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 4,
             "name": "Training Room",
             "nodes": [
                 {
-                    "id": 3, 
+                    "id": 4,
                     "sensors": [
                         {
-                            "id": 7,
+                            "id": 8,
                             "type": 4,
                             "posX": 13,
                             "posY": 4,
@@ -141,7 +141,7 @@
                             "rangeMax": 6
                         },
                         {
-                            "id": 8,
+                            "id": 9,
                             "type": 0,
                             "posX": 3,
                             "posY": 2,
@@ -151,19 +151,19 @@
                     ],
                     "actuators": [
                         {
-                            "id": 5,
+                            "id": 6,
                             "type": 0,
                             "posX": 4,
                             "posY": 2
                         },
                         {
-                            "id": 6,
+                            "id": 7,
                             "type": 3,
                             "posX": 11,
                             "posY": 10
                         },
                         {
-                            "id": 7,
+                            "id": 8,
                             "type": 3,
                             "posX": 5,
                             "posY": 5
@@ -171,10 +171,10 @@
                     ]
                 },
                 {
-                    "id": 4, 
+                    "id": 5, 
                     "sensors": [
                         {
-                            "id": 9,
+                            "id": 10,
                             "type": 4,
                             "posX": 9,
                             "posY": 4,
@@ -182,7 +182,7 @@
                             "rangeMax": 6
                         },
                         {
-                            "id": 10,
+                            "id": 11,
                             "type": 0,
                             "posX": 8,
                             "posY": 4,
@@ -192,7 +192,7 @@
                     ],
                     "actuators": [
                         {
-                            "id": 8,
+                            "id": 9,
                             "type": 4,
                             "posX": 9,
                             "posY": 3
@@ -202,14 +202,14 @@
             ]
         },
         {
-            "id": 4,
+            "id": 5,
             "name": "Shower Room Male",
             "nodes": [
                 {
-                    "id": 5, 
+                    "id": 6, 
                     "sensors": [
                         {
-                            "id": 11,
+                            "id": 12,
                             "type": 4,
                             "posX": 3,
                             "posY": 7,
@@ -217,7 +217,7 @@
                             "rangeMax": 6
                         },
                         {
-                            "id": 12,
+                            "id": 13,
                             "type": 3,
                             "posX": 2,
                             "posY": 7,
@@ -225,7 +225,7 @@
                             "rangeMax": 2000
                         },
                         {
-                            "id": 13,
+                            "id": 14,
                             "type": 2,
                             "posX": 1,
                             "posY": 7,
@@ -235,13 +235,13 @@
                     ],
                     "actuators": [
                         {
-                            "id": 9,
+                            "id": 10,
                             "type": 3,
                             "posX": 2,
                             "posY": 6
                         },
                         {
-                            "id": 10,
+                            "id": 11,
                             "type": 2,
                             "posX": 1,
                             "posY": 6
@@ -251,14 +251,14 @@
             ]
         },
         {
-            "id": 5,
+            "id": 6,
             "name": "Shower Room Female",
             "nodes": [
                 {
-                    "id": 6, 
+                    "id": 7, 
                     "sensors": [
                         {
-                            "id": 14,
+                            "id": 15,
                             "type": 4,
                             "posX": 3,
                             "posY": 11,
@@ -266,7 +266,7 @@
                             "rangeMax": 6
                         },
                         {
-                            "id": 15,
+                            "id": 16,
                             "type": 3,
                             "posX": 2,
                             "posY": 11,
@@ -274,7 +274,7 @@
                             "rangeMax": 2000
                         },
                         {
-                            "id": 16,
+                            "id": 17,
                             "type": 2,
                             "posX": 1,
                             "posY": 11,
@@ -284,13 +284,13 @@
                     ],
                     "actuators": [
                         {
-                            "id": 11,
+                            "id": 12,
                             "type": 3,
                             "posX": 2,
                             "posY": 10
                         },
                         {
-                            "id": 12,
+                            "id": 13,
                             "type": 2,
                             "posX": 1,
                             "posY": 10
@@ -302,159 +302,159 @@
     ],
     "rules": [
         {
-            "id": 0,
+            "id": 1,
             "type": 0,
             "value": 1200,
-            "sensors": [2],
-            "actuators": [1,2],
-            "childs": []
-        },
-        {
-            "id": 1,
-            "type": 1,
-            "value": 400,
-            "sensors": [0],
-            "actuators": [0],
+            "sensors": [3],
+            "actuators": [2,3],
             "childs": []
         },
         {
             "id": 2,
             "type": 1,
-            "value": 30,
+            "value": 400,
             "sensors": [1],
-            "actuators": [0],
+            "actuators": [1],
             "childs": []
         },
         {
             "id": 3,
-            "type": 2,
-            "value": 0,
-            "sensors": [3],
-            "actuators": [3],
-            "childs": [
-                {
-                    "id": 4,
-                    "type": 0,
-                    "value": 800,
-                    "sensors": [4],
-                    "actuators": [3],
-                    "childs": []
-                }
-            ]
-        },
-        {
-            "id": 5,
-            "type": 0,
-            "value": 1200,
-            "sensors": [4],
-            "actuators": [3],
+            "type": 1,
+            "value": 30,
+            "sensors": [2],
+            "actuators": [1],
             "childs": []
         },
         {
-            "id": 6,
+            "id": 4,
             "type": 2,
             "value": 0,
-            "sensors": [5],
+            "sensors": [4],
             "actuators": [4],
             "childs": [
                 {
-                    "id": 7,
+                    "id": 5,
                     "type": 0,
                     "value": 800,
-                    "sensors": [6],
+                    "sensors": [5],
                     "actuators": [4],
                     "childs": []
                 }
             ]
         },
         {
-            "id": 8,
+            "id": 6,
             "type": 0,
             "value": 1200,
-            "sensors": [6],
+            "sensors": [5],
             "actuators": [4],
             "childs": []
         },
         {
+            "id": 7,
+            "type": 2,
+            "value": 0,
+            "sensors": [6],
+            "actuators": [5],
+            "childs": [
+                {
+                    "id": 8,
+                    "type": 0,
+                    "value": 800,
+                    "sensors": [7],
+                    "actuators": [5],
+                    "childs": []
+                }
+            ]
+        },
+        {
             "id": 9,
-            "type": 1,
-            "value": 60,
-            "sensors": [8],
+            "type": 0,
+            "value": 1200,
+            "sensors": [7],
             "actuators": [5],
             "childs": []
         },
         {
             "id": 10,
-            "type": 2,
-            "value": 0,
-            "sensors": [7],
-            "actuators": [6,7],
+            "type": 1,
+            "value": 60,
+            "sensors": [9],
+            "actuators": [6],
             "childs": []
         },
         {
             "id": 11,
             "type": 2,
             "value": 0,
-            "sensors": [11],
-            "actuators": [9],
+            "sensors": [8],
+            "actuators": [7,8],
+            "childs": []
+        },
+        {
+            "id": 12,
+            "type": 2,
+            "value": 0,
+            "sensors": [12],
+            "actuators": [10],
             "childs": [
                 {
-                    "id": 12,
+                    "id": 13,
                     "type": 0,
                     "value": 800,
-                    "sensors": [12],
-                    "actuators": [9],
+                    "sensors": [13],
+                    "actuators": [10],
                     "childs": []
                 }
             ]
         },
         {
-            "id": 13,
+            "id": 14,
             "type": 0,
             "value": 300,
-            "sensors": [13],
-            "actuators": [10],
-            "childs": []
-        },
-        {
-            "id": 14,
-            "type": 1,
-            "value": 800,
-            "sensors": [13],
-            "actuators": [10],
+            "sensors": [14],
+            "actuators": [11],
             "childs": []
         },
         {
             "id": 15,
-            "type": 2,
-            "value": 0,
+            "type": 1,
+            "value": 800,
             "sensors": [14],
             "actuators": [11],
+            "childs": []
+        },
+        {
+            "id": 16,
+            "type": 2,
+            "value": 0,
+            "sensors": [15],
+            "actuators": [12],
             "childs": [
                 {
-                    "id": 16,
+                    "id": 17,
                     "type": 0,
                     "value": 800,
-                    "sensors": [15],
-                    "actuators": [11],
+                    "sensors": [16],
+                    "actuators": [12],
                     "childs": []
                 }
             ]
         },
         {
-            "id": 17,
+            "id": 18,
             "type": 0,
             "value": 300,
-            "sensors": [16],
-            "actuators": [12],
+            "sensors": [17],
+            "actuators": [13],
             "childs": []
         },
         {
-            "id": 18,
+            "id": 19,
             "type": 1,
             "value": 800,
-            "sensors": [16],
-            "actuators": [12],
+            "sensors": [17],
+            "actuators": [13],
             "childs": []
         }
     ],

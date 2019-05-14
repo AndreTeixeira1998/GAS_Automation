@@ -208,6 +208,12 @@ int main(int argc, char const *argv[]) {
     DB_prepareAllQueries(conn, queryList);
     // PQexecPrepared(conn, "create_table_profile", 0, NULL, NULL, NULL, 0);
     DB_exec(queryList, "create_table_pixel", NULL);
+    DB_exec(queryList, "create_table_room", NULL);
+    DB_exec(queryList, "create_table_rule", NULL);
+    DB_exec(queryList, "create_table_sensor", NULL);
+    DB_exec(queryList, "create_table_actuator", NULL);
+    DB_exec(queryList, "create_table_node", NULL);
+    DB_exec(queryList, "create_table_node_room", NULL);
     DB_prepareAllQueries(conn, queryList);
 
     Datastore* datastore = importConfiguration(argv[1]);

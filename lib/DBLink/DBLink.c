@@ -169,6 +169,7 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
         return;
     }
 
+    // PIXELS
     LL_iterator(datastore->pixels, pixel_elem) {
         Pixel* pixel = (Pixel*)pixel_elem->ptr;
 
@@ -190,6 +191,65 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
         }
     }
 
+
+    // ROOMS
+    LL_iterator(datastore->rooms, room_elem) {
+        Room* room = (Room*)room_elem->ptr;
+
+        DBQuery* query = findQueryByName(queryList, "create_room");
+
+        char* params[query->nParams];
+        params[0] = room->name;
+
+        __DB_exec(queryList,
+            query,
+            params
+        );
+
+        for (int i = 0; i < query->nParams; i++) {
+            free(params[i]);
+        }
+    }
+
+
+    // NODES
+    LL_iterator(datastore->rooms, room_elem) {
+        Room* room = (Room*)room_elem->ptr;
+        LL_iterator(room->nodes, node_elem) {
+            Node* node = (Node*)node_elem->ptr;
+
+            // add node
+            DBQuery* query = findQueryByName(queryList, "create_node");
+
+            __DB_exec(queryList,
+                query,
+                NULL
+            );
+
+            // Add node to room
+            query = findQueryByName(queryList, "add_node_to_room");
+
+            char* params[query->nParams];
+            for (int i = 0; i < query->nParams; i++) {
+                params[i] = malloc(12*sizeof(char));
+            }
+            
+            sprintf(params[0], "%d", node->id);
+            sprintf(params[1], "%d", node->parentRoom->id);
+
+            __DB_exec(queryList,
+                query,
+                params
+            );
+
+            for (int i = 0; i < query->nParams; i++) {
+                free(params[i]);
+            }
+        }
+    }
+
+
+    // RULES
     LL_iterator(datastore->rules, rule_elem) {
         Rule* rule = (Rule*)rule_elem->ptr;
 

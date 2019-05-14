@@ -135,7 +135,7 @@ DBQuery create_table_room = {
     "create_table_room",
     "CREATE TABLE IF NOT EXISTS sinf.room("
     "room_id SERIAL NOT NULL PRIMARY KEY,"
-    "name STRING);",
+    "name CHAR(30) UNIQUE);",
     0
 };
 
@@ -154,8 +154,32 @@ DBQuery delete_room = {
     1
 };
 
+DBQuery create_table_node_room = {
+    NULL,
+    "create_table_node_room",
+    "CREATE TABLE IF NOT EXISTS sinf.node_room("
+    "node_id INTEGER NOT NULL,"
+    "room_id INTEGER NOT NULL,"
+    "start_date TIMESTAMP NOT NULL DEFAULT NOW(),"
+    "end_date TIMESTAMP,"
+    "FOREIGN KEY (node_id) REFERENCES sinf.node(node_id) ON UPDATE CASCADE ON DELETE CASCADE,"
+    "FOREIGN KEY (room_id) REFERENCES sinf.room(room_id) ON UPDATE CASCADE ON DELETE CASCADE);",
+    0
+};
+
+DBQuery add_node_to_room = {
+    NULL,
+    "add_node_to_room",
+    "INSERT INTO sinf.node_room(node_id, room_id) "
+    "VALUES($1, $2);",
+    2
+};
+
+
 void prepareRoomQueries (list* queryList) {
     addQuerytoList(&create_table_room, queryList);
     addQuerytoList(&create_room, queryList);
     addQuerytoList(&delete_room, queryList);
+    addQuerytoList(&create_table_node_room, queryList);
+    addQuerytoList(&add_node_to_room, queryList);
 }
