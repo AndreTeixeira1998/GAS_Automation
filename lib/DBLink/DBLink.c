@@ -339,6 +339,50 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
         for (int i = 0; i < query->nParams; i++) {
             free(params[i]);
         }
+
+        LL_iterator(rule->sensors, sensor_elem) {
+            Sensor* sensor = (Sensor*)sensor_elem->ptr;
+            query = findQueryByName(queryList, "add_sensor_to_rule");
+
+            char* params[query->nParams];
+            for (int i = 0; i < query->nParams; i++) {
+                params[i] = malloc(12*sizeof(char));
+            }
+            
+            sprintf(params[0], "%d", sensor->id);
+            sprintf(params[1], "%d", rule->id);
+
+            __DB_exec(queryList,
+                query,
+                params
+            );
+
+            for (int i = 0; i < query->nParams; i++) {
+                free(params[i]);
+            }
+        }
+
+        LL_iterator(rule->actuators, actuator_elem) {
+            Actuator* actuator = (Actuator*)actuator_elem->ptr;
+            query = findQueryByName(queryList, "add_actuator_to_rule");
+
+            char* params[query->nParams];
+            for (int i = 0; i < query->nParams; i++) {
+                params[i] = malloc(12*sizeof(char));
+            }
+            
+            sprintf(params[0], "%d", actuator->id);
+            sprintf(params[1], "%d", rule->id);
+
+            __DB_exec(queryList,
+                query,
+                params
+            );
+
+            for (int i = 0; i < query->nParams; i++) {
+                free(params[i]);
+            }
+        }
     }
 
     return;
