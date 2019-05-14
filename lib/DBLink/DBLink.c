@@ -89,14 +89,28 @@ void DB_prepareSQLQueries (PGconn* conn, list* queryList) {
         return;
     }
 
+    // Priority queries first
     LL_iterator(queryList, query_elem) {
         DBQuery* query = (DBQuery*)query_elem->ptr;
-        query->conn = conn;
-        __DB_prepareQuery(query);
+        if (!query->conn) {
+            query->conn = conn;
+            __DB_prepareQuery(query);
+        }
     }
 }
 
-void DB_prepareAllQueries (PGconn* conn, list* queryList) {
+void DB_preparePriorityQueries (PGconn* conn, list* queryList) {
+    preparePriorityProfileQueries(queryList);
+    preparePriorityPixelQueries(queryList);
+    preparePriorityRuleQueries(queryList);
+    preparePriorityRoomQueries(queryList);
+    preparePriorityNodeQueries(queryList);
+    preparePrioritySensorQueries(queryList);
+    preparePriorityActuatorQueries(queryList);
+    DB_prepareSQLQueries(conn, queryList);
+}
+
+void DB_prepareRegularQueries (PGconn* conn, list* queryList) {
     prepareProfileQueries(queryList);
     preparePixelQueries(queryList);
     prepareRuleQueries(queryList);

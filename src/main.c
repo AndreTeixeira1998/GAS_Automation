@@ -205,8 +205,9 @@ int main(int argc, char const *argv[]) {
 
     list* queryList = newList();
 
-    DB_prepareAllQueries(conn, queryList);
+    DB_preparePriorityQueries(conn, queryList);
     // PQexecPrepared(conn, "create_table_profile", 0, NULL, NULL, NULL, 0);
+    DB_exec(queryList, "create_table_profile", NULL);
     DB_exec(queryList, "create_table_pixel", NULL);
     DB_exec(queryList, "create_table_room", NULL);
     DB_exec(queryList, "create_table_rule", NULL);
@@ -214,7 +215,7 @@ int main(int argc, char const *argv[]) {
     DB_exec(queryList, "create_table_actuator", NULL);
     DB_exec(queryList, "create_table_node", NULL);
     DB_exec(queryList, "create_table_node_room", NULL);
-    DB_prepareAllQueries(conn, queryList);
+    DB_prepareRegularQueries(conn, queryList);
 
     Datastore* datastore = importConfiguration(argv[1]);
     if (!datastore) {

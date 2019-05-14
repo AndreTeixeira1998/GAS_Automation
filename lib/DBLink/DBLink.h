@@ -19,7 +19,8 @@ struct _dbquery {
 
 char* getConnectionStringFromFile (const char* filename);
 void DB_prepareSQLQueries (PGconn* conn, list* queryList);
-void DB_prepareAllQueries (PGconn* conn, list* queryList);
+void DB_preparePriorityQueries (PGconn* conn, list* queryList);
+void DB_prepareRegularQueries (PGconn* conn, list* queryList);
 void DB_exec (list* queryList, char* query_name, char* paramValues[]);
 void DB_uploadConfiguration (Datastore* datastore, list* queryList);
 Datastore* DB_importConfiguration (PGconn* conn, list* queryList);

@@ -360,8 +360,11 @@ DBQuery delete_rule = {
     1
 };
 
-void prepareRuleQueries (list* queryList) {
+void preparePriorityRuleQueries (list* queryList) {
     addQuerytoList(&create_table_rule, queryList);
+}
+
+void prepareRuleQueries (list* queryList) {
     addQuerytoList(&create_rule, queryList);
     addQuerytoList(&create_rule_with_parent, queryList);
     addQuerytoList(&delete_rule, queryList);

@@ -105,8 +105,11 @@ DBQuery delete_profile = {
     1
 };
 
-void prepareProfileQueries (list* queryList) {
+void preparePriorityProfileQueries (list* queryList) {
     addQuerytoList(&create_table_profile, queryList);
+}
+
+void prepareProfileQueries (list* queryList) {
     addQuerytoList(&create_profile, queryList);
     addQuerytoList(&delete_profile, queryList);
 }

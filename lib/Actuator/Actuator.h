@@ -66,5 +66,6 @@ Pixel* getActuatorPixel (Actuator* actuator);
 Actuator* findActuatorByID (Datastore* datastore, uint16_t actuatorID);
 
 void prepareActuatorQueries (list* queryList);
+void preparePriorityActuatorQueries (list* queryList);
 
 #endif

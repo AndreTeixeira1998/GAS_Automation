@@ -289,8 +289,11 @@ DBQuery delete_sensor = {
     1
 };
 
-void prepareSensorQueries (list* queryList) {
+void preparePrioritySensorQueries (list* queryList) {
     addQuerytoList(&create_table_sensor, queryList);
+}
+
+void prepareSensorQueries (list* queryList) {
     addQuerytoList(&create_sensor, queryList);
     addQuerytoList(&delete_sensor, queryList);
 }

@@ -178,8 +178,11 @@ DBQuery delete_pixel = {
     1
 };
 
-void preparePixelQueries (list* queryList) {
+void preparePriorityPixelQueries (list* queryList) {
     addQuerytoList(&create_table_pixel, queryList);
+}
+
+void preparePixelQueries (list* queryList) {
     addQuerytoList(&create_pixel, queryList);
     addQuerytoList(&delete_pixel, queryList);
 }

@@ -97,5 +97,6 @@ Position* getPixelPosition (Pixel* pixel);
 Pixel* findPixelByPos (Datastore* datastore, Position* pos);
 
 void preparePixelQueries (list* queryList);
+void preparePriorityPixelQueries (list* queryList);
 
 #endif

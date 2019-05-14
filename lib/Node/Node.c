@@ -148,8 +148,11 @@ DBQuery delete_node = {
     1
 };
 
-void prepareNodeQueries (list* queryList) {
+void preparePriorityNodeQueries (list* queryList) {
     addQuerytoList(&create_table_node, queryList);
+}
+
+void prepareNodeQueries (list* queryList) {
     addQuerytoList(&create_node, queryList);
     addQuerytoList(&delete_node, queryList);
 }

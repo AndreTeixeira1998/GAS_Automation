@@ -137,8 +137,11 @@ DBQuery delete_actuator = {
     1
 };
 
-void prepareActuatorQueries (list* queryList) {
+void preparePriorityActuatorQueries (list* queryList) {
     addQuerytoList(&create_table_actuator, queryList);
+}
+
+void prepareActuatorQueries (list* queryList) {
     addQuerytoList(&create_actuator, queryList);
     addQuerytoList(&delete_actuator, queryList);
 }

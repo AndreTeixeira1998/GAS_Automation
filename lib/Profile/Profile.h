@@ -50,5 +50,6 @@ bool deleteProfile (Profile* profile);
 Profile* findProfileByID (Datastore* datastore, uint16_t id);
 
 void prepareProfileQueries (list* queryList);
+void preparePriorityProfileQueries (list* queryList);
 
 #endif

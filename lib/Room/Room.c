@@ -175,11 +175,13 @@ DBQuery add_node_to_room = {
     2
 };
 
+void preparePriorityRoomQueries (list* queryList) {
+    addQuerytoList(&create_table_room, queryList);
+    addQuerytoList(&create_table_node_room, queryList);
+}
 
 void prepareRoomQueries (list* queryList) {
-    addQuerytoList(&create_table_room, queryList);
     addQuerytoList(&create_room, queryList);
     addQuerytoList(&delete_room, queryList);
-    addQuerytoList(&create_table_node_room, queryList);
     addQuerytoList(&add_node_to_room, queryList);
 }

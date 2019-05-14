@@ -86,5 +86,6 @@ Room* findRoomByID (Datastore* datastore, uint16_t roomID);
 Room* findRoomByName (Datastore* datastore, const char* roomName);
 
 void prepareRoomQueries (list* queryList);
+void preparePriorityRoomQueries (list* queryList);
 
 #endif
