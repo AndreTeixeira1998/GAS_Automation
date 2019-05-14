@@ -144,7 +144,34 @@ void DB_exec (list* queryList, char* query_name, char* paramValues[]) {
     fprintf(stderr, "%s", PQresultErrorMessage(stmt));
 }
 
-Datastore* DB_importConfiguration (PGconn* conn) {
+void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
+    if (!datastore) {
+        return;
+    }
+
+    LL_iterator(datastore->pixels, pixel_elem) {
+        Pixel* pixel = (Pixel*)pixel_elem->ptr;
+
+        char* params[2];
+        params[0] = malloc(12*sizeof(char));
+        params[1] = malloc(12*sizeof(char));
+        sprintf(params[0], "%d", pixel->pos->x);
+        sprintf(params[1], "%d", pixel->pos->x);
+
+        DB_exec(queryList,
+            "create_pixel",
+            params
+        );
+
+        for (int i = 0; i < 2; i++) {
+            free(params[i]);
+        }
+    }
+
+    return;
+}
+
+Datastore* DB_importConfiguration (PGconn* conn, list* queryList) {
     if (!conn || PQstatus(conn) != CONNECTION_OK) {
         return NULL;
     }

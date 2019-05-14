@@ -2,6 +2,7 @@
 #define __DBLINK__
 
 #include <libpq-fe.h>
+#include <stdlib.h>
 
 typedef struct _dbquery DBQuery;
 
@@ -20,7 +21,8 @@ char* getConnectionStringFromFile (const char* filename);
 void DB_prepareSQLQueries (PGconn* conn, list* queryList);
 void DB_prepareAllQueries (PGconn* conn, list* queryList);
 void DB_exec (list* queryList, char* query_name, char* paramValues[]);
-Datastore* DB_importConfiguration (PGconn* conn);
+void DB_uploadConfiguration (Datastore* datastore, list* queryList);
+Datastore* DB_importConfiguration (PGconn* conn, list* queryList);
 
 void addQuerytoList (DBQuery* query, list* queryList);
 

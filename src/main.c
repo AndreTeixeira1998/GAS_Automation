@@ -215,6 +215,8 @@ int main(int argc, char const *argv[]) {
         return 1;
     }
     
+    DB_uploadConfiguration(datastore, queryList);
+    
     FILE* inputStream = fopen(argv[3], "r");
     FILE* outputStream = fopen(argv[4], "w");
     //FILE* inputStream = stdin;
