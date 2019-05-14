@@ -360,12 +360,56 @@ DBQuery delete_rule = {
     1
 };
 
+DBQuery create_table_actuator_rule = {
+    NULL,
+    "create_table_actuator_rule",
+    "CREATE TABLE IF NOT EXISTS sinf.actuator_rule("
+    "actuator_id INTEGER NOT NULL,"
+    "rule_id INTEGER NOT NULL,"
+    "FOREIGN KEY (actuator_id) REFERENCES sinf.actuator(actuator_id) ON UPDATE CASCADE ON DELETE CASCADE,"
+    "FOREIGN KEY (rule_id) REFERENCES sinf.rule(rule_id) ON UPDATE CASCADE ON DELETE CASCADE"
+    ");",
+    0
+};
+
+DBQuery add_actuator_to_rule = {
+    NULL,
+    "add_actuator_to_rule",
+    "INSERT INTO sinf.actuator_rule(actuator_id, rule_id) "
+    "VALUES($1, $2);",
+    2
+};
+
+DBQuery create_table_sensor_rule = {
+    NULL,
+    "create_table_sensor_rule",
+    "CREATE TABLE IF NOT EXISTS sinf.sensor_rule("
+    "sensor_id INTEGER NOT NULL,"
+    "rule_id INTEGER NOT NULL,"
+    "FOREIGN KEY (sensor_id) REFERENCES sinf.sensor(sensor_id) ON UPDATE CASCADE ON DELETE CASCADE,"
+    "FOREIGN KEY (rule_id) REFERENCES sinf.rule(rule_id) ON UPDATE CASCADE ON DELETE CASCADE"
+    ");",
+    0
+};
+
+DBQuery add_sensor_to_rule = {
+    NULL,
+    "add_sensor_to_rule",
+    "INSERT INTO sinf.sensor_rule(sensor_id, rule_id) "
+    "VALUES($1, $2);",
+    2
+};
+
 void preparePriorityRuleQueries (list* queryList) {
     addQuerytoList(&create_table_rule, queryList);
+    addQuerytoList(&create_table_actuator_rule, queryList);
+    addQuerytoList(&create_table_sensor_rule, queryList);
 }
 
 void prepareRuleQueries (list* queryList) {
     addQuerytoList(&create_rule, queryList);
     addQuerytoList(&create_rule_with_parent, queryList);
     addQuerytoList(&delete_rule, queryList);
+    addQuerytoList(&add_actuator_to_rule, queryList);
+    addQuerytoList(&add_sensor_to_rule, queryList);
 }

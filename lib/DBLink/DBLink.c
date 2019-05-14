@@ -226,7 +226,7 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
     }
 
 
-    // NODES
+    // NODES & SENSORS
     LL_iterator(datastore->rooms, room_elem) {
         Room* room = (Room*)room_elem->ptr;
         LL_iterator(room->nodes, node_elem) {
@@ -258,6 +258,51 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
 
             for (int i = 0; i < query->nParams; i++) {
                 free(params[i]);
+            }
+
+
+            // add sensor
+            LL_iterator(node->sensors, sensor_elem) {
+                Sensor* sensor = (Sensor*)sensor_elem->ptr;
+                query = findQueryByName(queryList, "create_sensor");
+
+                char* params[query->nParams];
+                for (int i = 0; i < query->nParams; i++) {
+                    params[i] = malloc(12*sizeof(char));
+                }
+                
+                sprintf(params[0], "%d", sensor->type);
+
+                __DB_exec(queryList,
+                    query,
+                    params
+                );
+
+                for (int i = 0; i < query->nParams; i++) {
+                    free(params[i]);
+                }
+            }
+
+            // add actuator
+            LL_iterator(node->actuators, actuator_elem) {
+                Actuator* actuator = (Actuator*)actuator_elem->ptr;
+                query = findQueryByName(queryList, "create_actuator");
+
+                char* params[query->nParams];
+                for (int i = 0; i < query->nParams; i++) {
+                    params[i] = malloc(12*sizeof(char));
+                }
+                
+                sprintf(params[0], "%d", actuator->type);
+
+                __DB_exec(queryList,
+                    query,
+                    params
+                );
+
+                for (int i = 0; i < query->nParams; i++) {
+                    free(params[i]);
+                }
             }
         }
     }
