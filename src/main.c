@@ -215,6 +215,7 @@ int main(int argc, char const *argv[]) {
     DB_exec(queryList, "create_table_room", NULL);
     DB_exec(queryList, "create_table_rule", NULL);
     DB_exec(queryList, "create_table_actuator_rule", NULL);
+    DB_exec(queryList, "create_table_sensor_rule", NULL);
     DB_exec(queryList, "create_table_node_room", NULL);
     DB_prepareRegularQueries(conn, queryList);
 
