@@ -106,3 +106,39 @@ Actuator* findActuatorByID (Datastore* datastore, uint16_t actuatorID) {
 
     return NULL;
 }
+
+/**********************************/
+/*        DATABASE QUERIES        */
+/**********************************/
+
+DBQuery create_table_actuator = {
+    NULL,
+    "create_table_actuator",
+    "CREATE TABLE IF NOT EXISTS sinf.actuator("
+    "actuator_id SERIAL NOT NULL PRIMARY KEY,"
+    "type INTEGER NOT NULL,"
+    "pixel_id INTEGER UNIQUE NOT NULL,"
+    "FOREIGN KEY (pixel_id) REFERENCES sinf.pixel(pixel_id) ON UPDATE CASCADE ON DELETE CASCADE);",
+    0
+};
+
+DBQuery create_actuator = {
+    NULL,
+    "create_actuator",
+    "INSERT INTO sinf.actuator(type, pixel_id) "
+    "VALUES($1, $2);",
+    2
+};
+
+DBQuery delete_actuator = {
+    NULL,
+    "delete_actuator",
+    "DELETE FROM sinf.actuator WHERE actuator_id=$1;",
+    1
+};
+
+void prepareActuatorQueries (list* queryList) {
+    addQuerytoList(&create_table_actuator, queryList);
+    addQuerytoList(&create_actuator, queryList);
+    addQuerytoList(&delete_actuator, queryList);
+}

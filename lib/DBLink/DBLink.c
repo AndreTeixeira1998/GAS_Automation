@@ -102,6 +102,8 @@ void DB_prepareAllQueries (PGconn* conn, list* queryList) {
     prepareRuleQueries(queryList);
     prepareRoomQueries(queryList);
     prepareNodeQueries(queryList);
+    prepareSensorQueries(queryList);
+    prepareActuatorQueries(queryList);
     DB_prepareSQLQueries(conn, queryList);
 }
 

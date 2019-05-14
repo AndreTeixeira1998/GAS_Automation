@@ -258,3 +258,40 @@ bool updateSensorPixel (Sensor* sensor) {
 
     return false;
 }
+
+/**********************************/
+/*        DATABASE QUERIES        */
+/**********************************/
+
+DBQuery create_table_sensor = {
+    NULL,
+    "create_table_sensor",
+    "CREATE TABLE IF NOT EXISTS sinf.sensor("
+    "sensor_id SERIAL NOT NULL PRIMARY KEY,"
+    "type INTEGER NOT NULL,"
+    "pixel_id INTEGER UNIQUE NOT NULL,"
+    "FOREIGN KEY (pixel_id) REFERENCES sinf.pixel(pixel_id) ON UPDATE CASCADE ON DELETE CASCADE);",
+    0
+};
+
+DBQuery create_sensor = {
+    NULL,
+    "create_sensor",
+    "INSERT INTO sinf.sensor(type, pixel_id) "
+    "VALUES($1, $2);",
+    2
+};
+
+DBQuery delete_sensor = {
+    NULL,
+    "delete_sensor",
+    "DELETE FROM sinf.sensor WHERE sensor_id=$1;",
+    1
+};
+
+void prepareSensorQueries (list* queryList) {
+    addQuerytoList(&create_table_sensor, queryList);
+    addQuerytoList(&create_sensor, queryList);
+    addQuerytoList(&delete_sensor, queryList);
+}
+
