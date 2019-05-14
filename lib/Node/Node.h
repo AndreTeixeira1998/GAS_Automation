@@ -64,4 +64,6 @@ bool setNodeID (Node* node, uint16_t id);
  */
 Node* findNodeByID (Datastore* datastore, uint16_t nodeID);
 
+void prepareNodeQueries (list* queryList);
+
 #endif

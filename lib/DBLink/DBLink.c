@@ -101,6 +101,7 @@ void DB_prepareAllQueries (PGconn* conn, list* queryList) {
     preparePixelQueries(queryList);
     prepareRuleQueries(queryList);
     prepareRoomQueries(queryList);
+    prepareNodeQueries(queryList);
     DB_prepareSQLQueries(conn, queryList);
 }
 

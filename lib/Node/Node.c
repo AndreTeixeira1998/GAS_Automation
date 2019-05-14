@@ -120,3 +120,36 @@ Node* findNodeByID (Datastore* datastore, uint16_t nodeID) {
 
     return NULL;
 }
+
+/**********************************/
+/*        DATABASE QUERIES        */
+/**********************************/
+
+DBQuery create_table_node = {
+    NULL,
+    "create_table_node",
+    "CREATE TABLE IF NOT EXISTS sinf.node("
+    "node_id SERIAL NOT NULL PRIMARY KEY);",
+    0
+};
+
+DBQuery create_node = {
+    NULL,
+    "create_node",
+    "INSERT INTO sinf.node "
+    "DEFAULT VALUES;",
+    0
+};
+
+DBQuery delete_node = {
+    NULL,
+    "delete_node",
+    "DELETE FROM sinf.node WHERE node_id=$1;",
+    1
+};
+
+void prepareNodeQueries (list* queryList) {
+    addQuerytoList(&create_table_node, queryList);
+    addQuerytoList(&create_node, queryList);
+    addQuerytoList(&delete_node, queryList);
+}
