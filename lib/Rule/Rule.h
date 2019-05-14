@@ -28,6 +28,7 @@ struct _rule {
     Rule* parentRule;
     uint16_t id;
     list_element* listPtr;
+    list_element* listPtr_parentRule;
     list* sensors;
     list* actuators;
     uint16_t operation;

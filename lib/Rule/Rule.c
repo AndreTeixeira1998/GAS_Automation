@@ -37,6 +37,15 @@ Rule* createRule (Datastore* datastore, Rule* parentRule, uint16_t id, uint16_t 
         return NULL;
     }
 
+    list* profiles = newList();
+    if (profiles == NULL) {
+        deleteList(childs);
+        deleteList(sensors);
+        deleteList(actuators);
+        free(rule);
+        return NULL;
+    }
+
     rule->parentDatastore = datastore;
     rule->parentRule = parentRule;
     rule->id = id;
@@ -45,6 +54,7 @@ Rule* createRule (Datastore* datastore, Rule* parentRule, uint16_t id, uint16_t 
     rule->operation = type;
     rule->value = value;
     rule->childs = childs;
+    rule->profiles = profiles;
 
     list_element *elem = NULL,
         *parentRuleElem = NULL;
@@ -57,8 +67,8 @@ Rule* createRule (Datastore* datastore, Rule* parentRule, uint16_t id, uint16_t 
             deleteList(sensors);
             deleteList(actuators);
             deleteList(childs);
+            deleteList(profiles);
             free(rule);
-            printf("1\n");
             return NULL;
         }
     }
@@ -73,12 +83,13 @@ Rule* createRule (Datastore* datastore, Rule* parentRule, uint16_t id, uint16_t 
         deleteList(sensors);
         deleteList(actuators);
         deleteList(childs);
+        deleteList(profiles);
         free(rule);
-        printf("2\n");
         return NULL;
     }
 
     rule->listPtr = elem;
+    rule->listPtr_parentRule = parentRuleElem;
 
     return rule;
 }
@@ -92,6 +103,7 @@ bool deleteRule (Rule* rule) {
 
     deleteList(rule->sensors);
     deleteList(rule->actuators);
+    deleteList(rule->profiles);
 
     // Delete all childs
     list_element* aux = listStart(rule->childs);
@@ -115,10 +127,7 @@ bool deleteRule (Rule* rule) {
     }
 
     if (rule->parentRule) {
-        LL_iterator(rule->parentRule->childs, ruleElem) {
-            if (ruleElem->ptr == rule)
-                elem = ruleElem;
-        }
+        elem = rule->listPtr_parentRule;
         res = listRemove(rule->parentRule->childs, elem);
         if (res == NULL && listSize(rule->parentRule->childs)) {
             retVal++;

@@ -274,6 +274,6 @@ int main(int argc, char const *argv[]) {
 
     fclose(inputStream);
     fclose(outputStream);
-    deleteDatastore(datastore);
+    //deleteDatastore(datastore);
     return 0;
 }
