@@ -116,4 +116,6 @@ bool addProfileToRule (Rule* rule, Profile* profile);
  */
 bool removeProfileFromRule (Rule* rule, Profile* profile);
 
+void prepareRuleQueries (list* queryList);
+
 #endif

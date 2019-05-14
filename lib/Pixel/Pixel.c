@@ -147,3 +147,38 @@ Pixel* findPixelByPos (Datastore* datastore, Position* pos) {
 
     return NULL;
 }
+
+/**********************************/
+/*        DATABASE QUERIES        */
+/**********************************/
+
+DBQuery create_table_pixel = {
+    NULL,
+    "create_table_pixel",
+    "CREATE TABLE IF NOT EXISTS sinf.pixel("
+    "pixel_id SERIAL NOT NULL PRIMARY KEY,"
+    "x_position INTEGER NOT NULL,"
+    "y_position INTEGER NOT NULL);",
+    0
+};
+
+DBQuery create_pixel = {
+    NULL,
+    "create_pixel",
+    "INSERT INTO sinf.pixel(x_position, y_position) "
+    "VALUES($1, $2);",
+    2
+};
+
+DBQuery delete_pixel = {
+    NULL,
+    "delete_pixel",
+    "DELETE FROM sinf.pixel WHERE pixel_id=$1;",
+    1
+};
+
+void preparePixelQueries (list* queryList) {
+    addQuerytoList(&create_table_pixel, queryList);
+    addQuerytoList(&create_pixel, queryList);
+    addQuerytoList(&delete_pixel, queryList);
+}

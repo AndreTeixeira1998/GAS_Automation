@@ -3,14 +3,14 @@
 #include <string.h>
 #include <pthread.h>
 
+#include "DBLink.h"
 #include "Datastore.h"
 #include "Rule.h"
 #include "Node.h"
 #include "Sensor.h"
+#include "Profile.h"
 #include "functions.h"
 #include "ImportConfiguration.h"
-#include "DBLink.h"
-#include "database_queries.h"
 
 //Here some definitions for stings and data sizes
 #define BUFFER 256 
@@ -196,14 +196,18 @@ int main(int argc, char const *argv[]) {
         return 1;
     }
 
-    // PGconn* conn = NULL;
-    // conn = PQconnectdb(connStr);
-    // if (PQstatus(conn)) {
-    //     printf("\nError connecting to DB. Error code: %d\n", PQstatus(conn));
-    //     return 1;
-    // }
+    PGconn* conn = NULL;
+    conn = PQconnectdb(connStr);
+    if (PQstatus(conn)) {
+        printf("\nError connecting to DB. Error code: %d\n", PQstatus(conn));
+        return 1;
+    }
 
-    // DB_prepareAllSQLQueries(conn, queryArray, QUERY_ARRAY_SIZE);
+    list* queryList = newList();
+
+    DB_prepareAllQueries(conn, queryList);
+    // PQexecPrepared(conn, "create_table_profile", 0, NULL, NULL, NULL, 0);
+    DB_exec(queryList, "create_table_profile", NULL);
 
     Datastore* datastore = importConfiguration(argv[1]);
     if (!datastore) {
@@ -274,6 +278,7 @@ int main(int argc, char const *argv[]) {
 
     fclose(inputStream);
     fclose(outputStream);
+    deleteList(queryList);
     //deleteDatastore(datastore);
     return 0;
 }

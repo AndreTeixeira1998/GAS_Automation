@@ -320,3 +320,40 @@ bool removeProfileFromRule (Rule* rule, Profile* profile) {
 
     return false;
 }
+
+/**********************************/
+/*        DATABASE QUERIES        */
+/**********************************/
+
+DBQuery create_table_rule = {
+    NULL,
+    "create_table_rule",
+    "CREATE TABLE IF NOT EXISTS sinf.rule("
+    "rule_id SERIAL NOT NULL PRIMARY KEY,"
+    "operation INTEGER NOT NULL,"
+    "value INTEGER NOT NULL,"
+    "parent_id INTEGER,"
+    "FOREIGN KEY (parent_id) REFERENCES sinf.rule(rule_id) ON UPDATE CASCADE ON DELETE CASCADE);",
+    0
+};
+
+DBQuery create_rule = {
+    NULL,
+    "create_rule",
+    "INSERT INTO sinf.rule(operation, value, parent_id) "
+    "VALUES($1, $2, $3);",
+    3
+};
+
+DBQuery delete_rule = {
+    NULL,
+    "delete_rule",
+    "DELETE FROM sinf.rule WHERE rule_id=$1;",
+    1
+};
+
+void prepareRuleQueries (list* queryList) {
+    addQuerytoList(&create_table_rule, queryList);
+    addQuerytoList(&create_rule, queryList);
+    addQuerytoList(&delete_rule, queryList);
+}

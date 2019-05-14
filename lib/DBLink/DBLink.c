@@ -1,5 +1,13 @@
 #include "DBLink.h"
 
+void addQuerytoList (DBQuery* query, list* queryList) {
+    if (!query || !queryList) {
+        return;
+    }
+
+    listInsert(queryList, query, NULL);
+}
+
 char* getConnectionStringFromFile (const char* filename) {
     if (!filename) {
         return NULL;
@@ -64,31 +72,69 @@ char* getConnectionStringFromFile (const char* filename) {
     return str;
 }
 
-void __DB_prepareQuery (DBQuery query) {
+void __DB_prepareQuery (DBQuery* query) {
     
     PGresult* stmt = PQprepare(
-        query.conn,
-        query.name,
-        query.query,
-        query.nParams,
+        query->conn,
+        query->name,
+        query->query,
+        query->nParams,
         NULL);
     
     fprintf(stderr, "%s", PQresultErrorMessage(stmt));
 }
 
-void DB_prepareAllSQLQueries (PGconn* conn, DBQuery** queryArray, uint queryArraySize) {
+void DB_prepareSQLQueries (PGconn* conn, list* queryList) {
     if (!conn || PQstatus(conn) != CONNECTION_OK) {
         return;
     }
 
-    for (uint i = 0; i < queryArraySize; i++) {
-        (*queryArray)[i].conn = conn;
-        __DB_prepareQuery((*queryArray)[i]);
+    LL_iterator(queryList, query_elem) {
+        DBQuery* query = (DBQuery*)query_elem->ptr;
+        query->conn = conn;
+        __DB_prepareQuery(query);
     }
 }
 
-void DB_createNode () {
+void DB_prepareAllQueries (PGconn* conn, list* queryList) {
+    prepareProfileQueries(queryList);
+    preparePixelQueries(queryList);
+    prepareRuleQueries(queryList);
+    DB_prepareSQLQueries(conn, queryList);
+}
 
+void DB_exec (list* queryList, char* query_name, char* paramValues[]) {
+
+    DBQuery* query = NULL;
+    LL_iterator(queryList, query_elem) {
+        DBQuery* query_obj = (DBQuery*)query_elem->ptr;
+        if (!strcmp(query_obj->name, query_name)) {
+            query = query_obj;
+        }
+    }
+    if (!query) {
+        fprintf(stderr, "Query name not found.");
+        return;
+    }
+
+    int paramLengths[query->nParams];
+    int paramFormats[query->nParams];
+    for (int i = 0; i < query->nParams; i++) {
+        paramLengths[i] = strlen(paramValues[i]);
+        paramFormats[i] = 0;
+    }
+
+    PGresult* stmt = PQexecPrepared(
+        query->conn,
+        query->name,
+        query->nParams,
+        paramValues,
+        paramLengths,
+        paramFormats,
+        0
+    );
+
+    fprintf(stderr, "%s", PQresultErrorMessage(stmt));
 }
 
 Datastore* DB_importConfiguration (PGconn* conn) {

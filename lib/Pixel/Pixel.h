@@ -13,6 +13,7 @@ typedef struct _pixel Pixel;
 #include "Datastore.h"
 #include "Position.h"
 #include "Color.h"
+#include "DBLink.h"
 
 #define PIXEL_DEFAULT_RED       255
 #define PIXEL_DEFAULT_GREEN     255
@@ -94,5 +95,7 @@ Position* getPixelPosition (Pixel* pixel);
  * @return Pixel* Pixel object with the desired position. NULL if not found.
  */
 Pixel* findPixelByPos (Datastore* datastore, Position* pos);
+
+void preparePixelQueries (list* queryList);
 
 #endif

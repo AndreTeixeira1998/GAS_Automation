@@ -75,3 +75,38 @@ Profile* findProfileByID (Datastore* datastore, uint16_t id) {
 
     return NULL;
 }
+
+/**********************************/
+/*        DATABASE QUERIES        */
+/**********************************/
+
+DBQuery create_table_profile = {
+    NULL,
+    "create_table_profile",
+    "CREATE TABLE IF NOT EXISTS sinf.profile("
+    "profile_id SERIAL NOT NULL PRIMARY KEY,"
+    "start_date TIME,"
+    "end_date TIME);",
+    0
+};
+
+DBQuery create_profile = {
+    NULL,
+    "create_profile",
+    "INSERT INTO sinf.profile(start_date, end_date) "
+    "VALUES($1, $2);",
+    2
+};
+
+DBQuery delete_profile = {
+    NULL,
+    "delete_profile",
+    "DELETE FROM sinf.profile WHERE profile_id=$1;",
+    1
+};
+
+void prepareProfileQueries (list* queryList) {
+    addQuerytoList(&create_table_profile, queryList);
+    addQuerytoList(&create_profile, queryList);
+    addQuerytoList(&delete_profile, queryList);
+}
