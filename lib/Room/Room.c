@@ -125,3 +125,37 @@ Room* findRoomByName (Datastore* datastore, const char* roomName) {
 
     return NULL;
 }
+
+/**********************************/
+/*        DATABASE QUERIES        */
+/**********************************/
+
+DBQuery create_table_room = {
+    NULL,
+    "create_table_room",
+    "CREATE TABLE IF NOT EXISTS sinf.room("
+    "room_id SERIAL NOT NULL PRIMARY KEY,"
+    "name STRING);",
+    0
+};
+
+DBQuery create_room = {
+    NULL,
+    "create_room",
+    "INSERT INTO sinf.room(name) "
+    "VALUES($1);",
+    1
+};
+
+DBQuery delete_room = {
+    NULL,
+    "delete_room",
+    "DELETE FROM sinf.room WHERE room_id=$1;",
+    1
+};
+
+void prepareRoomQueries (list* queryList) {
+    addQuerytoList(&create_table_room, queryList);
+    addQuerytoList(&create_room, queryList);
+    addQuerytoList(&delete_room, queryList);
+}
