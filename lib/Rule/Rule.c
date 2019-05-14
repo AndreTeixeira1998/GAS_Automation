@@ -46,21 +46,35 @@ Rule* createRule (Datastore* datastore, Rule* parentRule, uint16_t id, uint16_t 
     rule->value = value;
     rule->childs = childs;
 
-    list_element* elem = NULL;
+    list_element *elem = NULL,
+        *parentRuleElem = NULL;
 
     if (parentRule) { // Insert rule in parent rule
-        elem = listInsert(parentRule->childs, rule, NULL);
-    }
-    else { // Insert rule in datastore
-        elem = listInsert(datastore->rules, rule, NULL);
-    }
+        parentRuleElem = listInsert(parentRule->childs, rule, NULL);
     
+        if (parentRuleElem == NULL) {
+            // Insertion failed
+            deleteList(sensors);
+            deleteList(actuators);
+            deleteList(childs);
+            free(rule);
+            printf("1\n");
+            return NULL;
+        }
+    }
+
+    // Insert rule in datastore
+    elem = listInsert(datastore->rules, rule, NULL);
     if (elem == NULL) {
         // Insertion failed
+        if (parentRule) {
+            listRemove(parentRule->childs, parentRuleElem);
+        }
         deleteList(sensors);
         deleteList(actuators);
         deleteList(childs);
         free(rule);
+        printf("2\n");
         return NULL;
     }
 
@@ -101,6 +115,10 @@ bool deleteRule (Rule* rule) {
     }
 
     if (rule->parentRule) {
+        LL_iterator(rule->parentRule->childs, ruleElem) {
+            if (ruleElem->ptr == rule)
+                elem = ruleElem;
+        }
         res = listRemove(rule->parentRule->childs, elem);
         if (res == NULL && listSize(rule->parentRule->childs)) {
             retVal++;

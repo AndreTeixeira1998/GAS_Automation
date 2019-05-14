@@ -186,24 +186,24 @@ void* thread_writeOutput (void* arg) {
 
 int main(int argc, char const *argv[]) {
     if (argc < 5) {
-        printf("Not enough arguments. Expecting:\n\t%s <configuration-file> <input-stream> <output-stream> <db-conn-configuration-file>\n\n", argv[0]);
+        printf("Not enough arguments. Expecting:\n\t%s <configuration-file> <db-conn-configuration-file> <input-stream> <output-stream>\n\n", argv[0]);
         return 1;
     }
 
-    char* connStr = getConnectionStringFromFile(argv[4]);
+    char* connStr = getConnectionStringFromFile(argv[2]);
     if (!connStr) {
         printf("Error reading the DB connection string Configuration File\n");
         return 1;
     }
 
-    PGconn* conn = NULL;
-    conn = PQconnectdb(connStr);
-    if (PQstatus(conn)) {
-        printf("\nError connecting to DB. Error code: %d\n", PQstatus(conn));
-        return 1;
-    }
+    // PGconn* conn = NULL;
+    // conn = PQconnectdb(connStr);
+    // if (PQstatus(conn)) {
+    //     printf("\nError connecting to DB. Error code: %d\n", PQstatus(conn));
+    //     return 1;
+    // }
 
-    DB_prepareAllSQLQueries(conn, queryArray, QUERY_ARRAY_SIZE);
+    // DB_prepareAllSQLQueries(conn, queryArray, QUERY_ARRAY_SIZE);
 
     Datastore* datastore = importConfiguration(argv[1]);
     if (!datastore) {
@@ -211,8 +211,8 @@ int main(int argc, char const *argv[]) {
         return 1;
     }
     
-    FILE* inputStream = fopen(argv[2], "r");
-    FILE* outputStream = fopen(argv[3], "w");
+    FILE* inputStream = fopen(argv[3], "r");
+    FILE* outputStream = fopen(argv[4], "w");
     //FILE* inputStream = stdin;
     //FILE* outputStream = stdout;
     if (!inputStream || !outputStream) {

@@ -199,8 +199,7 @@ bool parseNode (Room* room, cJSON* json_node) {
 }
 
 bool parseRule (Datastore* datastore, Rule* parentRule, cJSON* json_rule) {
-    if (!json_rule ||
-        (!datastore && !parentRule)) {
+    if (!json_rule || !datastore) {
         return true;
     }
 
