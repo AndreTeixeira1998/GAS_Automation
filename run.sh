@@ -21,7 +21,12 @@ P4=$!
 
 sleep 3
 
-bash -c "./GAS.out GASconfig.json connString.conf /dev/pts/$firstout /dev/pts/$secondin"
+if getopts v: option then
+    bash -c "valgrind ./GAS.out GASconfig.json connString.conf /dev/pts/$firstout /dev/pts/$secondin"
+else
+    bash -c "./GAS.out GASconfig.json connString.conf /dev/pts/$firstout /dev/pts/$secondin"
+fi
+
 #python sims/write_matrix.py > /dev/pts/$secondin
 P5=$!
 

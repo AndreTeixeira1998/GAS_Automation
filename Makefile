@@ -42,12 +42,16 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 
 .PHONY: clean
 .PHONY: run
+.PHONY: valgrind
 
 clean:
 	$(RM) -r $(BUILD_DIR)
 
 run:
 	./run.sh
+
+valgrind:
+	./run.sh -v
 
 -include $(DEPS)
 
