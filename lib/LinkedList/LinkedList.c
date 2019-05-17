@@ -146,7 +146,7 @@ list_element *listRemove(list *lst, list_element *pos) {
 
     // Swap pointers to remove element
     if (pos->prev != NULL) {
-        pos->prev->next = pos->prev;
+        pos->prev->next = pos->next;
     }
     else {
         // Is first
