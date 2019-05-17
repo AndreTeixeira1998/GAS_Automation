@@ -232,9 +232,9 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
             params
         );
 
-        for (int i = 0; i < query->nParams; i++) {
+        /*for (int i = 0; i < query->nParams; i++) { // DO NOT FREE THE ROOM NAME AS IT IS NOT A COPY
             free(params[i]);
-        }
+        }*/
     }
 
 
