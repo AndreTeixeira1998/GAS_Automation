@@ -188,6 +188,10 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
         Pixel* pixel = (Pixel*)pixel_elem->ptr;
 
         DBQuery* query = findQueryByName(queryList, "create_pixel");
+        if (!query) {
+            fprintf(stderr, "Error uploading configuration to DB.\n");
+            return;
+        }
 
         char* params[query->nParams];
         params[0] = malloc(12*sizeof(char));
@@ -211,6 +215,10 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
         Room* room = (Room*)room_elem->ptr;
 
         DBQuery* query = findQueryByName(queryList, "create_room");
+        if (!query) {
+            fprintf(stderr, "Error uploading configuration to DB.\n");
+            return;
+        }
 
         char* params[query->nParams];
         params[0] = room->name;
@@ -234,6 +242,10 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
 
             // add node
             DBQuery* query = findQueryByName(queryList, "create_node");
+            if (!query) {
+                fprintf(stderr, "Error uploading configuration to DB.\n");
+                return;
+            }
 
             __DB_exec(queryList,
                 query,
@@ -242,6 +254,10 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
 
             // Add node to room
             query = findQueryByName(queryList, "add_node_to_room");
+            if (!query) {
+                fprintf(stderr, "Error uploading configuration to DB.\n");
+                return;
+            }
 
             char* params[query->nParams];
             for (int i = 0; i < query->nParams; i++) {
@@ -265,6 +281,10 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
             LL_iterator(node->sensors, sensor_elem) {
                 Sensor* sensor = (Sensor*)sensor_elem->ptr;
                 query = findQueryByName(queryList, "create_sensor");
+                if (!query) {
+                    fprintf(stderr, "Error uploading configuration to DB.\n");
+                    return;
+                }
 
                 char* params[query->nParams];
                 for (int i = 0; i < query->nParams; i++) {
@@ -287,6 +307,10 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
             LL_iterator(node->actuators, actuator_elem) {
                 Actuator* actuator = (Actuator*)actuator_elem->ptr;
                 query = findQueryByName(queryList, "create_actuator");
+                if (!query) {
+                    fprintf(stderr, "Error uploading configuration to DB.\n");
+                    return;
+                }
 
                 char* params[query->nParams];
                 for (int i = 0; i < query->nParams; i++) {
@@ -319,6 +343,10 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
         else {
             query = findQueryByName(queryList, "create_rule");
         }
+        if (!query) {
+            fprintf(stderr, "Error uploading configuration to DB.\n");
+            return;
+        }
 
         char* params[query->nParams];
         for (int i = 0; i < query->nParams; i++) {
@@ -343,6 +371,10 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
         LL_iterator(rule->sensors, sensor_elem) {
             Sensor* sensor = (Sensor*)sensor_elem->ptr;
             query = findQueryByName(queryList, "add_sensor_to_rule");
+            if (!query) {
+                fprintf(stderr, "Error uploading configuration to DB.\n");
+                return;
+            }
 
             char* params[query->nParams];
             for (int i = 0; i < query->nParams; i++) {
@@ -365,6 +397,10 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
         LL_iterator(rule->actuators, actuator_elem) {
             Actuator* actuator = (Actuator*)actuator_elem->ptr;
             query = findQueryByName(queryList, "add_actuator_to_rule");
+            if (!query) {
+                fprintf(stderr, "Error uploading configuration to DB.\n");
+                return;
+            }
 
             char* params[query->nParams];
             for (int i = 0; i < query->nParams; i++) {
