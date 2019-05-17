@@ -77,6 +77,17 @@ bool deleteDatastore (Datastore* datastore) {
     }
     deleteList(datastore->pixels);
 
+    // Delete all room's profiles
+    aux = listStart(datastore->profiles);
+    while (aux != NULL) {
+        if (deleteProfile(aux->ptr)) {
+            // Error
+            return 1;
+        }
+        aux = listStart(datastore->profiles);
+    }
+    deleteList(datastore->profiles);
+
     // Delete all room's rules
     aux = listStart(datastore->rules);
     while (aux != NULL) {
@@ -88,16 +99,6 @@ bool deleteDatastore (Datastore* datastore) {
     }
     deleteList(datastore->rules);
 
-    // Delete all room's profiles
-    aux = listStart(datastore->profiles);
-    while (aux != NULL) {
-        if (deleteRule(aux->ptr)) {
-            // Error
-            return 1;
-        }
-        aux = listStart(datastore->profiles);
-    }
-    deleteList(datastore->profiles);
 
     free(datastore);
 
