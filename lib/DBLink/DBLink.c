@@ -153,6 +153,10 @@ void __DB_exec (list* queryList, DBQuery* query, char* paramValues[]) {
         paramFormats[i] = 0;
     }
 
+    if (!query->conn) {
+        return;
+    }
+
     PGresult* stmt = PQexecPrepared(
         query->conn,
         query->name,

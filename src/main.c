@@ -200,8 +200,8 @@ int main(int argc, char const *argv[]) {
     conn = PQconnectdb(connStr);
     if (PQstatus(conn)) {
         printf("\nError connecting to DB. Error code: %d\n", PQstatus(conn));
-        return 1;
     }
+    free(connStr);
 
     list* queryList = newList();
 
@@ -291,6 +291,6 @@ int main(int argc, char const *argv[]) {
     fclose(inputStream);
     fclose(outputStream);
     deleteList(queryList);
-    //deleteDatastore(datastore);
+    deleteDatastore(datastore);
     return 0;
 }
