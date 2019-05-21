@@ -206,7 +206,6 @@ int main(int argc, char const *argv[]) {
     list* queryList = newList();
 
     DB_preparePriorityQueries(conn, queryList);
-    // PQexecPrepared(conn, "create_table_profile", 0, NULL, NULL, NULL, 0);
     DB_exec(queryList, "create_table_profile", NULL);
     DB_exec(queryList, "create_table_pixel", NULL);
     DB_exec(queryList, "create_table_sensor", NULL);
@@ -275,9 +274,10 @@ int main(int argc, char const *argv[]) {
     pthread_join(threads[THREAD_WRITEOUTPUT], &thread_retValues[THREAD_WRITEOUTPUT]);
 
     // Print Thread return values
-    printf("%d\n", *(int*)thread_retValues[THREAD_READINPUT]);
-    printf("%d\n", *(int*)thread_retValues[THREAD_EXECUTERULES]);
-    printf("%d\n", *(int*)thread_retValues[THREAD_WRITEOUTPUT]);
+    fprintf(stderr, "Thread return values:\n");
+    fprintf(stderr, "\t%d\n", *(int*)thread_retValues[THREAD_READINPUT]);
+    fprintf(stderr, "\t%d\n", *(int*)thread_retValues[THREAD_EXECUTERULES]);
+    fprintf(stderr, "\t%d\n", *(int*)thread_retValues[THREAD_WRITEOUTPUT]);
 
     // Free memory used by threads to return a value to the parent process
     uint8_t nThreads = sizeof(thread_retValues)/sizeof(thread_retValues[0]);
@@ -286,7 +286,7 @@ int main(int argc, char const *argv[]) {
     }
     
     
-    printf("Done\n");
+    printf("Done\n\n");
 
     fclose(inputStream);
     fclose(outputStream);
