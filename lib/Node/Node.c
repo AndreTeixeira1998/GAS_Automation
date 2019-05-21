@@ -129,16 +129,16 @@ DBQuery create_table_node = {
     NULL,
     "create_table_node",
     "CREATE TABLE IF NOT EXISTS sinf.node("
-    "node_id SERIAL NOT NULL PRIMARY KEY);",
+    "node_id INTEGER NOT NULL PRIMARY KEY);",
     0
 };
 
 DBQuery create_node = {
     NULL,
     "create_node",
-    "INSERT INTO sinf.node "
-    "DEFAULT VALUES;",
-    0
+    "INSERT INTO sinf.node(node_id)"
+    "VALUES($1);",
+    1
 };
 
 DBQuery delete_node = {

@@ -84,7 +84,7 @@ DBQuery create_table_profile = {
     NULL,
     "create_table_profile",
     "CREATE TABLE IF NOT EXISTS sinf.profile("
-    "profile_id SERIAL NOT NULL PRIMARY KEY,"
+    "profile_id INTEGER NOT NULL PRIMARY KEY,"
     "start_date TIME,"
     "end_date TIME);",
     0
@@ -93,9 +93,9 @@ DBQuery create_table_profile = {
 DBQuery create_profile = {
     NULL,
     "create_profile",
-    "INSERT INTO sinf.profile(start_date, end_date) "
-    "VALUES($1, $2);",
-    2
+    "INSERT INTO sinf.profile(profile_id, start_date, end_date) "
+    "VALUES($1, $2, $3);",
+    3
 };
 
 DBQuery delete_profile = {

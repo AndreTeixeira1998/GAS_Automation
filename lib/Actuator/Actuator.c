@@ -115,10 +115,10 @@ DBQuery create_table_actuator = {
     NULL,
     "create_table_actuator",
     "CREATE TABLE IF NOT EXISTS sinf.actuator("
-    "actuator_id SERIAL NOT NULL PRIMARY KEY,"
-    "type INTEGER NOT NULL"
-    //"pixel_id INTEGER UNIQUE NOT NULL,"
-    //"FOREIGN KEY (pixel_id) REFERENCES sinf.pixel(pixel_id) ON UPDATE CASCADE ON DELETE CASCADE"
+    "actuator_id INTEGER NOT NULL PRIMARY KEY,"
+    "type INTEGER NOT NULL,"
+    "pixel_id INTEGER NOT NULL,"
+    "FOREIGN KEY (pixel_id) REFERENCES sinf.pixel(pixel_id) ON UPDATE CASCADE ON DELETE CASCADE"
     ");",
     0
 };
@@ -126,11 +126,9 @@ DBQuery create_table_actuator = {
 DBQuery create_actuator = {
     NULL,
     "create_actuator",
-    //"INSERT INTO sinf.actuator(type, pixel_id) "
-    //"VALUES($1, $2);",
-    "INSERT INTO sinf.actuator(type) "
-    "VALUES($1);",
-    1
+    "INSERT INTO sinf.actuator(actuator_id, type, pixel_id) "
+    "VALUES($1, $2, $3);",
+    3
 };
 
 DBQuery delete_actuator = {

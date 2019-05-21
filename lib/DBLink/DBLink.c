@@ -238,7 +238,7 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
     }
 
 
-    // NODES & SENSORS
+    // NODES, SENSORS & ACTUATORS
     LL_iterator(datastore->rooms, room_elem) {
         Room* room = (Room*)room_elem->ptr;
         LL_iterator(room->nodes, node_elem) {

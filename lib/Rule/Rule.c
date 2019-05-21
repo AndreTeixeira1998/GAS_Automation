@@ -329,7 +329,7 @@ DBQuery create_table_rule = {
     NULL,
     "create_table_rule",
     "CREATE TABLE IF NOT EXISTS sinf.rule("
-    "rule_id SERIAL NOT NULL PRIMARY KEY,"
+    "rule_id INTEGER NOT NULL PRIMARY KEY,"
     "operation INTEGER NOT NULL,"
     "value INTEGER NOT NULL,"
     "parent_id INTEGER,"
@@ -340,17 +340,17 @@ DBQuery create_table_rule = {
 DBQuery create_rule = {
     NULL,
     "create_rule",
-    "INSERT INTO sinf.rule(operation, value) "
-    "VALUES($1, $2);",
-    2
+    "INSERT INTO sinf.rule(rule_id, operation, value) "
+    "VALUES($1, $2, $3);",
+    3
 };
 
 DBQuery create_rule_with_parent = {
     NULL,
     "create_rule_with_parent",
-    "INSERT INTO sinf.rule(operation, value, parent_id) "
-    "VALUES($1, $2, $3);",
-    3
+    "INSERT INTO sinf.rule(rule_id, operation, value, parent_id) "
+    "VALUES($1, $2, $3, $4);",
+    4
 };
 
 DBQuery delete_rule = {
@@ -367,7 +367,8 @@ DBQuery create_table_actuator_rule = {
     "actuator_id INTEGER NOT NULL,"
     "rule_id INTEGER NOT NULL,"
     "FOREIGN KEY (actuator_id) REFERENCES sinf.actuator(actuator_id) ON UPDATE CASCADE ON DELETE CASCADE,"
-    "FOREIGN KEY (rule_id) REFERENCES sinf.rule(rule_id) ON UPDATE CASCADE ON DELETE CASCADE"
+    "FOREIGN KEY (rule_id) REFERENCES sinf.rule(rule_id) ON UPDATE CASCADE ON DELETE CASCADE,"
+    "PRIMARY KEY (actuator_id, rule_id)"
     ");",
     0
 };
@@ -387,7 +388,8 @@ DBQuery create_table_sensor_rule = {
     "sensor_id INTEGER NOT NULL,"
     "rule_id INTEGER NOT NULL,"
     "FOREIGN KEY (sensor_id) REFERENCES sinf.sensor(sensor_id) ON UPDATE CASCADE ON DELETE CASCADE,"
-    "FOREIGN KEY (rule_id) REFERENCES sinf.rule(rule_id) ON UPDATE CASCADE ON DELETE CASCADE"
+    "FOREIGN KEY (rule_id) REFERENCES sinf.rule(rule_id) ON UPDATE CASCADE ON DELETE CASCADE,"
+    "PRIMARY KEY (sensor_id, rule_id)"
     ");",
     0
 };

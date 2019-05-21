@@ -134,7 +134,7 @@ DBQuery create_table_room = {
     NULL,
     "create_table_room",
     "CREATE TABLE IF NOT EXISTS sinf.room("
-    "room_id SERIAL NOT NULL PRIMARY KEY,"
+    "room_id INTEGER NOT NULL PRIMARY KEY,"
     "name CHAR(30) UNIQUE);",
     0
 };
@@ -142,9 +142,9 @@ DBQuery create_table_room = {
 DBQuery create_room = {
     NULL,
     "create_room",
-    "INSERT INTO sinf.room(name) "
-    "VALUES($1);",
-    1
+    "INSERT INTO sinf.room(room_id, name) "
+    "VALUES($1, $2);",
+    2
 };
 
 DBQuery delete_room = {

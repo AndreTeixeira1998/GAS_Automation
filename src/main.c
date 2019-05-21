@@ -218,7 +218,7 @@ int main(int argc, char const *argv[]) {
     DB_exec(queryList, "create_table_node_room", NULL);
     DB_prepareRegularQueries(conn, queryList);
 
-    Datastore* datastore = importConfiguration(argv[1]);
+    /*Datastore* datastore = importConfiguration(argv[1]);
     if (!datastore) {
         printf("Error in config file.\n");
         return 1;
@@ -284,13 +284,15 @@ int main(int argc, char const *argv[]) {
     for (int i = 0; i < nThreads; i++) {
         free(thread_retValues[i]);
     }
-    
-    
-    printf("Done\n\n");
+
 
     fclose(inputStream);
     fclose(outputStream);
+    PQfinish(conn);
     deleteList(queryList);
-    deleteDatastore(datastore);
+    deleteDatastore(datastore);*/
+
+
+    printf("Done\n\n");
     return 0;
 }

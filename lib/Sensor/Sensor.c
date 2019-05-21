@@ -267,10 +267,10 @@ DBQuery create_table_sensor = {
     NULL,
     "create_table_sensor",
     "CREATE TABLE IF NOT EXISTS sinf.sensor("
-    "sensor_id SERIAL NOT NULL PRIMARY KEY,"
-    "type INTEGER NOT NULL"
-//    "pixel_id INTEGER UNIQUE NOT NULL,"
-//    "FOREIGN KEY (pixel_id) REFERENCES sinf.pixel(pixel_id) ON UPDATE CASCADE ON DELETE CASCADE"
+    "sensor_id INTEGER NOT NULL PRIMARY KEY,"
+    "type INTEGER NOT NULL,"
+    "pixel_id INTEGER NOT NULL,"
+    "FOREIGN KEY (pixel_id) REFERENCES sinf.pixel(pixel_id) ON UPDATE CASCADE ON DELETE CASCADE"
     ");",
     0
 };
@@ -278,11 +278,9 @@ DBQuery create_table_sensor = {
 DBQuery create_sensor = {
     NULL,
     "create_sensor",
-    //"INSERT INTO sinf.sensor(type, pixel_id) "
-    //"VALUES($1, $2);",
-    "INSERT INTO sinf.sensor(type) "
-    "VALUES($1);",
-    1
+    "INSERT INTO sinf.sensor(sensor_id, type, pixel_id) "
+    "VALUES($1, $2, $3);",
+    3
 };
 
 DBQuery delete_sensor = {

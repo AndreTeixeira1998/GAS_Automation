@@ -63,6 +63,7 @@ Pixel* createPixel (Datastore* datastore, Color* color, Position* pos) {
         return NULL;
     }
 
+    pixel->remote_id = 0;
     pixel->color = pixelColor;
     pixel->pos = pixelPos;
     pixel->listPtr = elem;
@@ -156,10 +157,11 @@ DBQuery create_table_pixel = {
     NULL,
     "create_table_pixel",
     "CREATE TABLE IF NOT EXISTS sinf.pixel("
-    "pixel_id SERIAL NOT NULL PRIMARY KEY,"
+    "pixel_id SERIAL UNIQUE NOT NULL,"
     "x_position INTEGER NOT NULL,"
     "y_position INTEGER NOT NULL,"
-    "CONSTRAINT unique_position UNIQUE (x_position, y_position));",
+    "PRIMARY KEY (x_position, y_position)"
+    ");",
     0
 };
 
@@ -167,7 +169,8 @@ DBQuery create_pixel = {
     NULL,
     "create_pixel",
     "INSERT INTO sinf.pixel(x_position, y_position) "
-    "VALUES($1, $2);",
+    "VALUES($1, $2) "
+    "RETURNING pixel_id;",
     2
 };
 

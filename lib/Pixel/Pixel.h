@@ -25,6 +25,7 @@ typedef struct _pixel Pixel;
  * 
  */
 struct _pixel {
+    uint16_t remote_id;
     Position* pos;
     Color* color;
     list_element* listPtr;
