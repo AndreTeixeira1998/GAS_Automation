@@ -152,6 +152,23 @@ DBQuery create_table_node_actuator = {
     0
 };
 
+DBQuery add_actuator_to_node = {
+    NULL,
+    "add_actuator_to_node",
+    "INSERT INTO sinf.node_actuator(node_id, actuator_id) "
+    "VALUES($1, $2);",
+    2
+};
+
+DBQuery remove_actuator_from_node = {
+    NULL,
+    "remove_actuator_from_node",
+    "UPDATE sinf.node_actuator "
+    "SET end_date = NOW() "
+    "WHERE node_id = $1 AND actuator_id = $2 AND end_date = NULL;",
+    2
+};
+
 void preparePriorityActuatorQueries (list* queryList) {
     addQuerytoList(&create_table_actuator, queryList);
     addQuerytoList(&create_table_node_actuator, queryList);
@@ -160,4 +177,6 @@ void preparePriorityActuatorQueries (list* queryList) {
 void prepareActuatorQueries (list* queryList) {
     addQuerytoList(&create_actuator, queryList);
     addQuerytoList(&delete_actuator, queryList);
+    addQuerytoList(&add_actuator_to_node, queryList);
+    addQuerytoList(&remove_actuator_from_node, queryList);
 }

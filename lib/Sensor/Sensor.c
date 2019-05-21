@@ -304,6 +304,23 @@ DBQuery create_table_node_sensor = {
     0
 };
 
+DBQuery add_sensor_to_node = {
+    NULL,
+    "add_sensor_to_node",
+    "INSERT INTO sinf.node_sensor(node_id, sensor_id) "
+    "VALUES($1, $2);",
+    2
+};
+
+DBQuery remove_sensor_from_node = {
+    NULL,
+    "remove_sensor_from_node",
+    "UPDATE sinf.node_sensor "
+    "SET end_date = NOW() "
+    "WHERE node_id = $1 AND sensor_id = $2 AND end_date = NULL;",
+    2
+};
+
 void preparePrioritySensorQueries (list* queryList) {
     addQuerytoList(&create_table_sensor, queryList);
     addQuerytoList(&create_table_node_sensor, queryList);
@@ -312,5 +329,7 @@ void preparePrioritySensorQueries (list* queryList) {
 void prepareSensorQueries (list* queryList) {
     addQuerytoList(&create_sensor, queryList);
     addQuerytoList(&delete_sensor, queryList);
+    addQuerytoList(&add_sensor_to_node, queryList);
+    addQuerytoList(&remove_sensor_from_node, queryList);
 }
 
