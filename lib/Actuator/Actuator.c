@@ -138,8 +138,23 @@ DBQuery delete_actuator = {
     1
 };
 
+DBQuery create_table_node_actuator = {
+    NULL,
+    "create_table_node_actuator",
+    "CREATE TABLE IF NOT EXISTS sinf.node_actuator("
+    "node_actuator_id SERIAL NOT NULL PRIMARY KEY,"
+    "node_id INTEGER NOT NULL,"
+    "actuator_id INTEGER NOT NULL,"
+    "start_date TIMESTAMP NOT NULL DEFAULT NOW(),"
+    "end_date TIMESTAMP,"
+    "FOREIGN KEY (node_id) REFERENCES sinf.node(node_id) ON UPDATE CASCADE ON DELETE CASCADE,"
+    "FOREIGN KEY (actuator_id) REFERENCES sinf.actuator(actuator_id) ON UPDATE CASCADE ON DELETE CASCADE);",
+    0
+};
+
 void preparePriorityActuatorQueries (list* queryList) {
     addQuerytoList(&create_table_actuator, queryList);
+    addQuerytoList(&create_table_node_actuator, queryList);
 }
 
 void prepareActuatorQueries (list* queryList) {

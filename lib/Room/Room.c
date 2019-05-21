@@ -158,6 +158,7 @@ DBQuery create_table_node_room = {
     NULL,
     "create_table_node_room",
     "CREATE TABLE IF NOT EXISTS sinf.node_room("
+    "node_room_id SERIAL NOT NULL PRIMARY KEY,"
     "node_id INTEGER NOT NULL,"
     "room_id INTEGER NOT NULL,"
     "start_date TIMESTAMP NOT NULL DEFAULT NOW(),"
