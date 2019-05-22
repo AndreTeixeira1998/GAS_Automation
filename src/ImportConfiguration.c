@@ -239,9 +239,9 @@ bool parseRule (Datastore* datastore, Rule* parentRule, cJSON* json_rule) {
     }
     cJSON_ArrayForEach(json_sensor_entry, json_sensor_array) {
         if (cJSON_IsNumber(json_sensor_entry)) {
-            uint16_t id = (uint16_t)json_sensor_entry->valueint;
+            uint16_t sensor_id = (uint16_t)json_sensor_entry->valueint;
             
-            Sensor* sensor = findSensorByID(datastore, id);
+            Sensor* sensor = findSensorByID(datastore, sensor_id);
             if (!sensor) {
                 return true;
             }
@@ -259,14 +259,34 @@ bool parseRule (Datastore* datastore, Rule* parentRule, cJSON* json_rule) {
     }
     cJSON_ArrayForEach(json_actuator_entry, json_actuator_array) {
         if (cJSON_IsNumber(json_actuator_entry)) {
-            uint16_t id = (uint16_t)json_actuator_entry->valueint;
+            uint16_t actuator_id = (uint16_t)json_actuator_entry->valueint;
 
-            Actuator* actuator = findActuatorByID(datastore, id);
+            Actuator* actuator = findActuatorByID(datastore, actuator_id);
             if (!actuator) {
                 return true;
             }
 
             if (addActuatorToRule(rule, actuator)) {
+                return true;
+            }
+        }
+    }
+
+    cJSON* json_profile_array = cJSON_GetObjectItem(json_rule, "profiles"),
+        *json_profile_entry = NULL;
+    if (!cJSON_IsArray(json_profile_array)) {
+        return true;
+    }
+    cJSON_ArrayForEach(json_profile_entry, json_profile_array) {
+        if (cJSON_IsNumber(json_profile_entry)) {
+            uint16_t profile_id = (uint16_t)json_profile_entry->valueint;
+
+            Profile* profile = findProfileByID(datastore, profile_id);
+            if (!profile) {
+                return true;
+            }
+
+            if (addProfileToRule(rule, profile)) {
                 return true;
             }
         }
