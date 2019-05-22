@@ -141,8 +141,8 @@ DBQuery* findQueryByName (list* queryList, char* query_name) {
     return query;
 }
 
-void __DB_exec (list* queryList, DBQuery* query, char* paramValues[]) {
-    if (!queryList || !query) {
+void __DB_exec (DBQuery* query, char* paramValues[]) {
+    if (!query) {
         return;
     }
 
@@ -177,7 +177,7 @@ void DB_exec (list* queryList, char* query_name, char* paramValues[]) {
 
     DBQuery* query = findQueryByName(queryList, query_name);
 
-    __DB_exec(queryList, query, paramValues);
+    __DB_exec(query, paramValues);
 
     return;
 }
@@ -203,7 +203,7 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
         sprintf(params[0], "%d", pixel->pos->x);
         sprintf(params[1], "%d", pixel->pos->y);
 
-        __DB_exec(queryList,
+        __DB_exec(
             query,
             params
         );
@@ -227,7 +227,7 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
         char* params[query->nParams];
         params[0] = room->name;
 
-        __DB_exec(queryList,
+        __DB_exec(
             query,
             params
         );
@@ -251,7 +251,7 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
                 return;
             }
 
-            __DB_exec(queryList,
+            __DB_exec(
                 query,
                 NULL
             );
@@ -271,7 +271,7 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
             sprintf(params[0], "%d", node->id);
             sprintf(params[1], "%d", node->parentRoom->id);
 
-            __DB_exec(queryList,
+            __DB_exec(
                 query,
                 params
             );
@@ -297,7 +297,7 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
                 
                 sprintf(params[0], "%d", sensor->type);
 
-                __DB_exec(queryList,
+                __DB_exec(
                     query,
                     params
                 );
@@ -323,7 +323,7 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
                 
                 sprintf(params[0], "%d", actuator->type);
 
-                __DB_exec(queryList,
+                __DB_exec(
                     query,
                     params
                 );
@@ -363,7 +363,7 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
             sprintf(params[2], "%d", rule->parentRule->id);
         }
 
-        __DB_exec(queryList,
+        __DB_exec(
             query,
             params
         );
@@ -388,7 +388,7 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
             sprintf(params[0], "%d", sensor->id);
             sprintf(params[1], "%d", rule->id);
 
-            __DB_exec(queryList,
+            __DB_exec(
                 query,
                 params
             );
@@ -414,7 +414,7 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
             sprintf(params[0], "%d", actuator->id);
             sprintf(params[1], "%d", rule->id);
 
-            __DB_exec(queryList,
+            __DB_exec(
                 query,
                 params
             );
