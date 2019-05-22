@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <pthread.h>
+#include <libpq-fe.h>
 
 #include "DBLink.h"
 #include "Datastore.h"
@@ -183,6 +184,42 @@ void* thread_writeOutput (void* arg) {
     pthread_exit(ret);
 }
 
+void recicleDBSchema (PGconn* conn) {
+    if (!conn) {
+        return;
+    }
+
+    PGresult* stmt = PQexec(
+        conn,
+        "DROP SCHEMA sinf CASCADE;"
+    );
+
+    fprintf(stderr, "%s", PQresultErrorMessage(stmt));
+
+    stmt = PQexec(
+        conn,
+        "CREATE SCHEMA sinf;"
+    );
+
+    fprintf(stderr, "%s", PQresultErrorMessage(stmt));
+}
+
+void createAllDBTables (list* queryList) {
+    DB_exec(queryList, "create_table_profile", NULL);
+    DB_exec(queryList, "create_table_pixel", NULL);
+    DB_exec(queryList, "create_table_sensor", NULL);
+    DB_exec(queryList, "create_table_actuator", NULL);
+    DB_exec(queryList, "create_table_node", NULL);
+    DB_exec(queryList, "create_table_room", NULL);
+    DB_exec(queryList, "create_table_rule", NULL);
+    DB_exec(queryList, "create_table_actuator_rule", NULL);
+    DB_exec(queryList, "create_table_sensor_rule", NULL);
+    DB_exec(queryList, "create_table_room_node", NULL);
+    DB_exec(queryList, "create_table_node_sensor", NULL);
+    DB_exec(queryList, "create_table_node_actuator", NULL);
+    DB_exec(queryList, "create_table_actuator_state", NULL);
+    DB_exec(queryList, "create_table_sensor_state", NULL);
+}
 
 int main(int argc, char const *argv[]) {
     if (argc < 5) {
@@ -203,23 +240,11 @@ int main(int argc, char const *argv[]) {
     }
     free(connStr);
 
-    list* queryList = newList();
+    list* queryList = newList(); // Should be a hash table, but time is the rarest of commodities...
 
+    recicleDBSchema(conn);
     DB_preparePriorityQueries(conn, queryList);
-    DB_exec(queryList, "create_table_profile", NULL);
-    DB_exec(queryList, "create_table_pixel", NULL);
-    DB_exec(queryList, "create_table_sensor", NULL);
-    DB_exec(queryList, "create_table_actuator", NULL);
-    DB_exec(queryList, "create_table_node", NULL);
-    DB_exec(queryList, "create_table_room", NULL);
-    DB_exec(queryList, "create_table_rule", NULL);
-    DB_exec(queryList, "create_table_actuator_rule", NULL);
-    DB_exec(queryList, "create_table_sensor_rule", NULL);
-    DB_exec(queryList, "create_table_room_node", NULL);
-    DB_exec(queryList, "create_table_node_sensor", NULL);
-    DB_exec(queryList, "create_table_node_actuator", NULL);
-    DB_exec(queryList, "create_table_actuator_state", NULL);
-    DB_exec(queryList, "create_table_sensor_state", NULL);
+    createAllDBTables(queryList);
     DB_prepareRegularQueries(conn, queryList);
 
     /*Datastore* datastore = importConfiguration(argv[1]);
