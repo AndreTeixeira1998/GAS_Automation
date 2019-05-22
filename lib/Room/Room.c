@@ -154,11 +154,11 @@ DBQuery delete_room = {
     1
 };
 
-DBQuery create_table_node_room = {
+DBQuery create_table_room_node = {
     NULL,
-    "create_table_node_room",
-    "CREATE TABLE IF NOT EXISTS sinf.node_room("
-    "node_room_id SERIAL NOT NULL PRIMARY KEY,"
+    "create_table_room_node",
+    "CREATE TABLE IF NOT EXISTS sinf.room_node("
+    "room_node_id SERIAL NOT NULL PRIMARY KEY,"
     "node_id INTEGER NOT NULL,"
     "room_id INTEGER NOT NULL,"
     "start_date TIMESTAMP NOT NULL DEFAULT NOW(),"
@@ -171,18 +171,28 @@ DBQuery create_table_node_room = {
 DBQuery add_node_to_room = {
     NULL,
     "add_node_to_room",
-    "INSERT INTO sinf.node_room(node_id, room_id) "
+    "INSERT INTO sinf.room_node(room_id, node_id) "
     "VALUES($1, $2);",
+    2
+};
+
+DBQuery remove_node_from_room = {
+    NULL,
+    "remove_node_from_room",
+    "UPDATE sinf.room_node "
+    "SET end_date = NOW() "
+    "WHERE room_id = $1 AND node_id = $2 AND end_date = NULL;",
     2
 };
 
 void preparePriorityRoomQueries (list* queryList) {
     addQuerytoList(&create_table_room, queryList);
-    addQuerytoList(&create_table_node_room, queryList);
+    addQuerytoList(&create_table_room_node, queryList);
 }
 
 void prepareRoomQueries (list* queryList) {
     addQuerytoList(&create_room, queryList);
     addQuerytoList(&delete_room, queryList);
     addQuerytoList(&add_node_to_room, queryList);
+    addQuerytoList(&remove_node_from_room, queryList);
 }
