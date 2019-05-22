@@ -247,15 +247,15 @@ int main(int argc, char const *argv[]) {
     createAllDBTables(queryList);
     DB_prepareRegularQueries(conn, queryList);
 
-    /*Datastore* datastore = importConfiguration(argv[1]);
+    Datastore* datastore = importConfiguration(argv[1]);
     if (!datastore) {
         printf("Error in config file.\n");
         return 1;
     }
     
-    DB_uploadConfiguration(datastore, queryList);
+    //DB_uploadConfiguration(datastore, queryList);
     
-    FILE* inputStream = fopen(argv[3], "r");
+    /*FILE* inputStream = fopen(argv[3], "r");
     FILE* outputStream = fopen(argv[4], "w");
     //FILE* inputStream = stdin;
     //FILE* outputStream = stdout;

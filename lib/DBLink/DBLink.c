@@ -429,7 +429,7 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
 }
 
 Datastore* DB_importConfiguration (PGconn* conn, list* queryList) {
-    if (!conn || PQstatus(conn) != CONNECTION_OK) {
+    if (!conn || PQstatus(conn) != CONNECTION_OK || !queryList) {
         return NULL;
     }
 

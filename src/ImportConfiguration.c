@@ -391,6 +391,48 @@ bool parseExtraPixel (Datastore* datastore, cJSON* json_pixel) {
     return false;
 }
 
+bool parseProfile (Datastore* datastore, cJSON* json_profile) {
+    if (!datastore || !json_profile) {
+        return true;
+    }
+
+    // Read the id of the profile from the parsed json
+    uint16_t id = 0;
+    cJSON* json_id = cJSON_GetObjectItem(json_profile, "id");
+    if (cJSON_IsNumber(json_id)) {
+        id = (uint16_t)json_id->valueint;
+    }
+    else {
+        return true;
+    }
+
+    // Read the timeframe of the profile from the parsed json
+    char *name,
+        *start,
+        *end;
+    cJSON* json_name = cJSON_GetObjectItem(json_profile, "name");
+    cJSON* json_start = cJSON_GetObjectItem(json_profile, "start");
+    cJSON* json_end = cJSON_GetObjectItem(json_profile, "end");
+    if ((cJSON_IsString(json_name) && (json_name->valuestring != NULL)) &&
+        (cJSON_IsString(json_start) && (json_start->valuestring != NULL)) &&
+        (cJSON_IsString(json_end) && (json_end->valuestring != NULL))) {
+        
+        name = json_name->valuestring;
+        start = json_start->valuestring;
+        end = json_end->valuestring;
+    }
+    else {
+        return true;
+    }
+
+    Profile* profile = createProfile(datastore, id, name, start, end);
+    if (!profile) {
+        return true;
+    }
+    
+    return false;
+}
+
 Datastore* importConfiguration(const char* filename) {
     
     char* jsonString = getMinifiedJSONStringFromFile(filename);
@@ -461,6 +503,25 @@ Datastore* importConfiguration(const char* filename) {
     cJSON_ArrayForEach(pixel, pixels) {
         if(parseExtraPixel(datastore, pixel)) {
             // Error parsing extra Pixel
+            deleteDatastore(datastore);
+            cJSON_Delete(json);
+            free(jsonString);
+            return NULL;
+        }
+    }
+
+    // Parse the profile's data from the configuration file
+    cJSON *profiles = cJSON_GetObjectItem(json, "profiles"),
+        *profile = NULL;
+    if (!cJSON_IsArray(profiles)) {
+        deleteDatastore(datastore);
+        cJSON_Delete(json);
+        free(jsonString);
+        return NULL;
+    }
+    cJSON_ArrayForEach(profile, profiles) {
+        if(parseProfile(datastore, profile)) {
+            // Error parsing Profile
             deleteDatastore(datastore);
             cJSON_Delete(json);
             free(jsonString);

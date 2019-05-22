@@ -307,6 +307,7 @@
             "value": 1200,
             "sensors": [3],
             "actuators": [2,3],
+            "profiles": [],
             "childs": []
         },
         {
@@ -315,6 +316,7 @@
             "value": 400,
             "sensors": [1],
             "actuators": [1],
+            "profiles": [],
             "childs": []
         },
         {
@@ -323,6 +325,7 @@
             "value": 30,
             "sensors": [2],
             "actuators": [1],
+            "profiles": [],
             "childs": []
         },
         {
@@ -331,6 +334,7 @@
             "value": 0,
             "sensors": [4],
             "actuators": [4],
+            "profiles": [],
             "childs": [
                 {
                     "id": 5,
@@ -338,6 +342,7 @@
                     "value": 800,
                     "sensors": [5],
                     "actuators": [4],
+                    "profiles": [],
                     "childs": []
                 }
             ]
@@ -348,6 +353,7 @@
             "value": 1200,
             "sensors": [5],
             "actuators": [4],
+            "profiles": [],
             "childs": []
         },
         {
@@ -356,6 +362,7 @@
             "value": 0,
             "sensors": [6],
             "actuators": [5],
+            "profiles": [],
             "childs": [
                 {
                     "id": 8,
@@ -363,6 +370,7 @@
                     "value": 800,
                     "sensors": [7],
                     "actuators": [5],
+                    "profiles": [],
                     "childs": []
                 }
             ]
@@ -373,6 +381,7 @@
             "value": 1200,
             "sensors": [7],
             "actuators": [5],
+            "profiles": [],
             "childs": []
         },
         {
@@ -381,6 +390,7 @@
             "value": 60,
             "sensors": [9],
             "actuators": [6],
+            "profiles": [],
             "childs": []
         },
         {
@@ -389,6 +399,7 @@
             "value": 0,
             "sensors": [8],
             "actuators": [7,8],
+            "profiles": [],
             "childs": []
         },
         {
@@ -397,6 +408,7 @@
             "value": 0,
             "sensors": [12],
             "actuators": [10],
+            "profiles": [],
             "childs": [
                 {
                     "id": 13,
@@ -404,6 +416,7 @@
                     "value": 800,
                     "sensors": [13],
                     "actuators": [10],
+                    "profiles": [],
                     "childs": []
                 }
             ]
@@ -414,6 +427,7 @@
             "value": 300,
             "sensors": [14],
             "actuators": [11],
+            "profiles": [],
             "childs": []
         },
         {
@@ -422,6 +436,7 @@
             "value": 800,
             "sensors": [14],
             "actuators": [11],
+            "profiles": [],
             "childs": []
         },
         {
@@ -430,6 +445,7 @@
             "value": 0,
             "sensors": [15],
             "actuators": [12],
+            "profiles": [],
             "childs": [
                 {
                     "id": 17,
@@ -437,6 +453,7 @@
                     "value": 800,
                     "sensors": [16],
                     "actuators": [12],
+                    "profiles": [],
                     "childs": []
                 }
             ]
@@ -447,6 +464,7 @@
             "value": 300,
             "sensors": [17],
             "actuators": [13],
+            "profiles": [],
             "childs": []
         },
         {
@@ -455,6 +473,7 @@
             "value": 800,
             "sensors": [17],
             "actuators": [13],
+            "profiles": [],
             "childs": []
         }
     ],
@@ -1564,6 +1583,20 @@
             "r": 165,
             "g": 42,
             "b": 42
+        }
+    ],
+    "profiles": [
+        {
+            "id": 1,
+            "name": "Profile 1",
+            "start": "08:00",
+            "end": "20:00"
+        },
+        {
+            "id": 2,
+            "name": "Profile 2",
+            "start": "09:00",
+            "end": "12:00"
         }
     ]
 }
