@@ -1,12 +1,17 @@
 #include "Profile.h"
 
-Profile* createProfile (Datastore* datastore, uint16_t id) {
+Profile* createProfile (Datastore* datastore, uint16_t id, const char* name, const char* start, const char* end) {
     if (!datastore) {
         return NULL;
     }
 
     if (findProfileByID(datastore, id)) {
         // There's already a profile with the specified ID
+        return NULL;
+    }
+
+    if (name && findProfileByName(datastore, name)) {
+        // There's already a profile with the specified name
         return NULL;
     }
 
@@ -18,6 +23,12 @@ Profile* createProfile (Datastore* datastore, uint16_t id) {
 
     // Fill Profile data
     profile->id = id;
+    profile->parentDatastore = datastore;
+    profile->name = NULL;
+    if (name) {
+        profile->name = (char*)realloc(profile->name, strlen(name)+1);
+        strcpy(profile->name, name);
+    }
 
     // Insert profile in the datastore
     list_element* elem = listInsert(datastore->profiles, profile, NULL);
@@ -69,6 +80,24 @@ Profile* findProfileByID (Datastore* datastore, uint16_t id) {
     LL_iterator(datastore->profiles, profile_elem) {
         Profile* profile = (Profile*)profile_elem->ptr;
         if (profile->id == id) {
+            return profile;
+        }
+    }
+
+    return NULL;
+}
+
+Profile* findProfileByName (Datastore* datastore, const char* name) {
+    if (!datastore || !name) {
+        return NULL;
+    }
+
+    LL_iterator(datastore->profiles, profile_elem) {
+        Profile* profile = (Profile*)profile_elem->ptr;
+        if (!profile->name) {
+            continue;
+        }
+        if (!strcmp(profile->name, name)) {
             return profile;
         }
     }

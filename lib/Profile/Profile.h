@@ -19,6 +19,7 @@ struct _profile {
     Datastore* parentDatastore;
     list_element* listPtr;
     uint16_t id;
+    char* name;
 };
 
 
@@ -27,9 +28,12 @@ struct _profile {
  * 
  * @param datastore Datastore to add the profile to
  * @param id ID of the Profile. Must be globaly unique
+ * @param name Name of the Profile. Must be globaly unique
+ * @param start Time at which the profile becomes active
+ * @param end Time at which the profile becomes inactive
  * @return Profile* Pointer to the Profile object
  */
-Profile* createProfile (Datastore* datastore, uint16_t id);
+Profile* createProfile (Datastore* datastore, uint16_t id, const char* name, const char* start, const char* end);
 
 /**
  * @brief Delete a Profile object and remove it from all rules it is aplied to
@@ -48,6 +52,15 @@ bool deleteProfile (Profile* profile);
  * @return Profile* Pointer to the Profile object
  */
 Profile* findProfileByID (Datastore* datastore, uint16_t id);
+
+/**
+ * @brief Find a Profile with the given name
+ * 
+ * @param datastore Pointer to Datastore object for where to search for the Profile
+ * @param name Name of the Profile to search for
+ * @return Profile* Pointer to the Profile object
+ */
+Profile* findProfileByName (Datastore* datastore, const char* name);
 
 void prepareProfileQueries (list* queryList);
 void preparePriorityProfileQueries (list* queryList);
