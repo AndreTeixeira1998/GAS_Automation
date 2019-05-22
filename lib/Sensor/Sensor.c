@@ -321,9 +321,31 @@ DBQuery remove_sensor_from_node = {
     2
 };
 
+DBQuery create_table_sensor_state = {
+    NULL,
+    "create_table_sensor_state",
+    "CREATE TABLE IF NOT EXISTS sinf.sensor_state("
+    "sensor_state_id SERIAL NOT NULL PRIMARY KEY,"
+    "sensor_id INTEGER NOT NULL,"
+    "value INTEGER NOT NULL,"
+    "timestamp TIMESTAMP NOT NULL DEFAULT NOW(),"
+    "FOREIGN KEY (sensor_id) REFERENCES sinf.sensor(sensor_id) ON UPDATE CASCADE ON DELETE CASCADE"
+    ");",
+    0
+};
+
+DBQuery create_sensor_state = {
+    NULL,
+    "create_sensor_state",
+    "INSERT INTO sinf.sensor(sensor_id) "
+    "VALUES($1);",
+    1
+};
+
 void preparePrioritySensorQueries (list* queryList) {
     addQuerytoList(&create_table_sensor, queryList);
     addQuerytoList(&create_table_node_sensor, queryList);
+    addQuerytoList(&create_table_sensor_state, queryList);
 }
 
 void prepareSensorQueries (list* queryList) {
@@ -331,5 +353,6 @@ void prepareSensorQueries (list* queryList) {
     addQuerytoList(&delete_sensor, queryList);
     addQuerytoList(&add_sensor_to_node, queryList);
     addQuerytoList(&remove_sensor_from_node, queryList);
+    addQuerytoList(&create_sensor_state, queryList);
 }
 
