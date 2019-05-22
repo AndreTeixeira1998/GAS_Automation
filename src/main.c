@@ -218,6 +218,7 @@ int main(int argc, char const *argv[]) {
     DB_exec(queryList, "create_table_room_node", NULL);
     DB_exec(queryList, "create_table_node_sensor", NULL);
     DB_exec(queryList, "create_table_node_actuator", NULL);
+    DB_exec(queryList, "create_table_actuator_state", NULL);
     // TODO: actuator_state
     // TODO: sensor_state
     DB_prepareRegularQueries(conn, queryList);
