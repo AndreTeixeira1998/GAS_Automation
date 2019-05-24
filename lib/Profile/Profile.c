@@ -66,7 +66,9 @@ bool deleteProfile (Profile* profile) {
         return true;
     }
 
-
+    if (profile->name) {
+        free(profile->name);
+    }
     free(profile);
 
     return false;
