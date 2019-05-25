@@ -141,9 +141,9 @@ DBQuery* findQueryByName (list* queryList, char* query_name) {
     return query;
 }
 
-void __DB_exec (DBQuery* query, char* paramValues[]) {
+PGresult* __DB_exec (DBQuery* query, char* paramValues[]) {
     if (!query) {
-        return;
+        return NULL;
     }
 
     int paramLengths[query->nParams];
@@ -154,7 +154,7 @@ void __DB_exec (DBQuery* query, char* paramValues[]) {
     }
 
     if (!query->conn) {
-        return;
+        return NULL;
     }
 
     PGresult* stmt = PQexecPrepared(
@@ -168,18 +168,18 @@ void __DB_exec (DBQuery* query, char* paramValues[]) {
     );
 
     fprintf(stderr, "%s", PQresultErrorMessage(stmt));
+
+    return stmt;
 }
 
-void DB_exec (list* queryList, char* query_name, char* paramValues[]) {
+PGresult* DB_exec (list* queryList, char* query_name, char* paramValues[]) {
     if (!queryList) {
-        return;
+        return NULL;
     }
 
     DBQuery* query = findQueryByName(queryList, query_name);
 
-    __DB_exec(query, paramValues);
-
-    return;
+    return __DB_exec(query, paramValues);
 }
 
 void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
@@ -203,10 +203,19 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
         sprintf(params[0], "%d", pixel->pos->x);
         sprintf(params[1], "%d", pixel->pos->y);
 
-        __DB_exec(
+        PGresult* stmt = __DB_exec(
             query,
             params
         );
+
+        int tuples = PQntuples(stmt);
+        if (tuples != 1) {
+            fprintf(stderr, "Error uploading configuration to DB.\n");
+            return;
+        }
+        char* remote_id_str = PQgetvalue(stmt, 0, 0);
+        uint16_t remote_id = strtol(remote_id_str, (char **)NULL, 10);
+        pixel->remote_id = remote_id;
 
         for (int i = 0; i < query->nParams; i++) {
             free(params[i]);
@@ -225,39 +234,25 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
         }
 
         char* params[query->nParams];
-        params[0] = room->name;
+        params[0] = malloc(12*sizeof(char));
+        sprintf(params[0], "%d", room->id);
+        params[1] = room->name;
 
         __DB_exec(
             query,
             params
         );
 
-        /*for (int i = 0; i < query->nParams; i++) { // DO NOT FREE THE ROOM NAME AS IT IS NOT A COPY
-            free(params[i]);
-        }*/
-    }
-
-
-    // NODES, SENSORS & ACTUATORS
-    LL_iterator(datastore->rooms, room_elem) {
-        Room* room = (Room*)room_elem->ptr;
+        // DO NOT FREE THE ROOM NAME AS IT IS NOT A COPY
+        free(params[0]); // free id
+    
+        
+        // NODES, SENSORS & ACTUATORS
         LL_iterator(room->nodes, node_elem) {
             Node* node = (Node*)node_elem->ptr;
 
             // add node
             DBQuery* query = findQueryByName(queryList, "create_node");
-            if (!query) {
-                fprintf(stderr, "Error uploading configuration to DB.\n");
-                return;
-            }
-
-            __DB_exec(
-                query,
-                NULL
-            );
-
-            // Add node to room
-            query = findQueryByName(queryList, "add_node_to_room");
             if (!query) {
                 fprintf(stderr, "Error uploading configuration to DB.\n");
                 return;
@@ -269,7 +264,6 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
             }
             
             sprintf(params[0], "%d", node->id);
-            sprintf(params[1], "%d", node->parentRoom->id);
 
             __DB_exec(
                 query,
@@ -278,6 +272,30 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
 
             for (int i = 0; i < query->nParams; i++) {
                 free(params[i]);
+            }
+
+            // Add node to room
+            query = findQueryByName(queryList, "add_node_to_room");
+            if (!query) {
+                fprintf(stderr, "Error uploading configuration to DB.\n");
+                return;
+            }
+
+            char* params1[query->nParams];
+            for (int i = 0; i < query->nParams; i++) {
+                params1[i] = malloc(12*sizeof(char));
+            }
+            
+            sprintf(params1[0], "%d", room->id);
+            sprintf(params1[1], "%d", node->id);
+
+            __DB_exec(
+                query,
+                params1
+            );
+
+            for (int i = 0; i < query->nParams; i++) {
+                free(params1[i]);
             }
 
 
@@ -295,7 +313,9 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
                     params[i] = malloc(12*sizeof(char));
                 }
                 
-                sprintf(params[0], "%d", sensor->type);
+                sprintf(params[0], "%d", sensor->id);
+                sprintf(params[1], "%d", sensor->type);
+                sprintf(params[2], "%d", sensor->pixel->remote_id);
 
                 __DB_exec(
                     query,
@@ -304,6 +324,29 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
 
                 for (int i = 0; i < query->nParams; i++) {
                     free(params[i]);
+                }
+
+                query = findQueryByName(queryList, "add_sensor_to_node");
+                if (!query) {
+                    fprintf(stderr, "Error uploading configuration to DB.\n");
+                    return;
+                }
+
+                char* params1[query->nParams];
+                for (int i = 0; i < query->nParams; i++) {
+                    params1[i] = malloc(12*sizeof(char));
+                }
+                
+                sprintf(params1[0], "%d", node->id);
+                sprintf(params1[1], "%d", sensor->id);
+
+                __DB_exec(
+                    query,
+                    params1
+                );
+
+                for (int i = 0; i < query->nParams; i++) {
+                    free(params1[i]);
                 }
             }
 
@@ -321,7 +364,9 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
                     params[i] = malloc(12*sizeof(char));
                 }
                 
-                sprintf(params[0], "%d", actuator->type);
+                sprintf(params[0], "%d", actuator->id);
+                sprintf(params[1], "%d", actuator->type);
+                sprintf(params[2], "%d", actuator->pixel->remote_id);
 
                 __DB_exec(
                     query,
@@ -330,6 +375,29 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
 
                 for (int i = 0; i < query->nParams; i++) {
                     free(params[i]);
+                }
+
+                query = findQueryByName(queryList, "add_actuator_to_node");
+                if (!query) {
+                    fprintf(stderr, "Error uploading configuration to DB.\n");
+                    return;
+                }
+
+                char* params1[query->nParams];
+                for (int i = 0; i < query->nParams; i++) {
+                    params1[i] = malloc(12*sizeof(char));
+                }
+                
+                sprintf(params1[0], "%d", node->id);
+                sprintf(params1[1], "%d", actuator->id);
+
+                __DB_exec(
+                    query,
+                    params1
+                );
+
+                for (int i = 0; i < query->nParams; i++) {
+                    free(params1[i]);
                 }
             }
         }
@@ -357,10 +425,11 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
             params[i] = malloc(12*sizeof(char));
         }
         
-        sprintf(params[0], "%d", rule->operation);
-        sprintf(params[1], "%d", rule->value);
+        sprintf(params[0], "%d", rule->id);
+        sprintf(params[1], "%d", rule->operation);
+        sprintf(params[2], "%d", rule->value);
         if (rule->parentRule) {
-            sprintf(params[2], "%d", rule->parentRule->id);
+            sprintf(params[3], "%d", rule->parentRule->id);
         }
 
         __DB_exec(
