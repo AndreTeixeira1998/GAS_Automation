@@ -132,7 +132,7 @@ DBQuery create_profile = {
 
 DBQuery create_named_profile = {
     NULL,
-    "create_profile",
+    "create_named_profile",
     "INSERT INTO sinf.profile(profile_id, start_date, end_date, name) "
     "VALUES($1, $2, $3, $4);",
     4
