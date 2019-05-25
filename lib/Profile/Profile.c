@@ -116,6 +116,7 @@ DBQuery create_table_profile = {
     "create_table_profile",
     "CREATE TABLE IF NOT EXISTS sinf.profile("
     "profile_id INTEGER NOT NULL PRIMARY KEY,"
+    "name CHAR(30) UNIQUE,"
     "start_date TIME,"
     "end_date TIME);",
     0
@@ -127,6 +128,14 @@ DBQuery create_profile = {
     "INSERT INTO sinf.profile(profile_id, start_date, end_date) "
     "VALUES($1, $2, $3);",
     3
+};
+
+DBQuery create_named_profile = {
+    NULL,
+    "create_profile",
+    "INSERT INTO sinf.profile(profile_id, start_date, end_date, name) "
+    "VALUES($1, $2, $3, $4);",
+    4
 };
 
 DBQuery delete_profile = {
@@ -142,5 +151,6 @@ void preparePriorityProfileQueries (list* queryList) {
 
 void prepareProfileQueries (list* queryList) {
     addQuerytoList(&create_profile, queryList);
+    addQuerytoList(&create_named_profile, queryList);
     addQuerytoList(&delete_profile, queryList);
 }
