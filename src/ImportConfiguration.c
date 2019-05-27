@@ -492,6 +492,25 @@ Datastore* importConfiguration(const char* filename) {
         }
     }
 
+    // Parse the profile's data from the configuration file
+    cJSON *profiles = cJSON_GetObjectItem(json, "profiles"),
+        *profile = NULL;
+    if (!cJSON_IsArray(profiles)) {
+        deleteDatastore(datastore);
+        cJSON_Delete(json);
+        free(jsonString);
+        return NULL;
+    }
+    cJSON_ArrayForEach(profile, profiles) {
+        if(parseProfile(datastore, profile)) {
+            // Error parsing Profile
+            deleteDatastore(datastore);
+            cJSON_Delete(json);
+            free(jsonString);
+            return NULL;
+        }
+    }
+
     // Parse the rule's data from the configuration file
     cJSON *rules = cJSON_GetObjectItem(json, "rules"),
         *rule = NULL;
@@ -523,25 +542,6 @@ Datastore* importConfiguration(const char* filename) {
     cJSON_ArrayForEach(pixel, pixels) {
         if(parseExtraPixel(datastore, pixel)) {
             // Error parsing extra Pixel
-            deleteDatastore(datastore);
-            cJSON_Delete(json);
-            free(jsonString);
-            return NULL;
-        }
-    }
-
-    // Parse the profile's data from the configuration file
-    cJSON *profiles = cJSON_GetObjectItem(json, "profiles"),
-        *profile = NULL;
-    if (!cJSON_IsArray(profiles)) {
-        deleteDatastore(datastore);
-        cJSON_Delete(json);
-        free(jsonString);
-        return NULL;
-    }
-    cJSON_ArrayForEach(profile, profiles) {
-        if(parseProfile(datastore, profile)) {
-            // Error parsing Profile
             deleteDatastore(datastore);
             cJSON_Delete(json);
             free(jsonString);

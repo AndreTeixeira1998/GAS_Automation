@@ -198,8 +198,9 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
         }
 
         char* params[query->nParams];
-        params[0] = malloc(12*sizeof(char));
-        params[1] = malloc(12*sizeof(char));
+        for (int i = 0; i < query->nParams; i++) {
+            params[i] = malloc(12*sizeof(char));
+        }
         sprintf(params[0], "%d", pixel->pos->x);
         sprintf(params[1], "%d", pixel->pos->y);
 
@@ -222,6 +223,44 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
         }
     }
 
+    // PROFILES
+    LL_iterator(datastore->profiles, profile_elem) {
+        Profile* profile = (Profile*)profile_elem->ptr;
+
+        DBQuery* query = NULL;
+        if (profile->name) {
+            query = findQueryByName(queryList, "create_named_profile");
+        }
+        else {
+            query = findQueryByName(queryList, "create_profile");
+        }
+
+        if (!query) {
+            fprintf(stderr, "Error uploading configuration to DB.\n");
+            return;
+        }
+
+        char* params[query->nParams];
+        params[0] = malloc(12*sizeof(char));
+        params[1] = malloc(12*sizeof(char));
+        params[2] = malloc(12*sizeof(char));
+        sprintf(params[0], "%d", profile->id);
+        strftime(params[1], 12, "%H:%M", &(profile->start));
+        strftime(params[2], 12, "%H:%M", &(profile->end));
+        if (profile->name) {
+            params[3] = profile->name;
+        }
+
+
+        __DB_exec(
+            query,
+            params
+        );
+
+        free(params[0]);
+        free(params[1]);
+        free(params[2]);
+    }
 
     // ROOMS
     LL_iterator(datastore->rooms, room_elem) {
@@ -481,6 +520,32 @@ void DB_uploadConfiguration (Datastore* datastore, list* queryList) {
             }
             
             sprintf(params[0], "%d", actuator->id);
+            sprintf(params[1], "%d", rule->id);
+
+            __DB_exec(
+                query,
+                params
+            );
+
+            for (int i = 0; i < query->nParams; i++) {
+                free(params[i]);
+            }
+        }
+
+        LL_iterator(rule->profiles, profile_elem) {
+            Profile* profile = (Profile*)profile_elem->ptr;
+            query = findQueryByName(queryList, "add_profile_to_rule");
+            if (!query) {
+                fprintf(stderr, "Error uploading configuration to DB.\n");
+                return;
+            }
+
+            char* params[query->nParams];
+            for (int i = 0; i < query->nParams; i++) {
+                params[i] = malloc(12*sizeof(char));
+            }
+            
+            sprintf(params[0], "%d", profile->id);
             sprintf(params[1], "%d", rule->id);
 
             __DB_exec(

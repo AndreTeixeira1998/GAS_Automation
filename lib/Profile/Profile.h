@@ -20,6 +20,8 @@ struct _profile {
     list_element* listPtr;
     uint16_t id;
     char* name;
+    struct tm start;
+    struct tm end;
 };
 
 

@@ -307,7 +307,7 @@
             "value": 1200,
             "sensors": [3],
             "actuators": [2,3],
-            "profiles": [],
+            "profiles": [1,2],
             "childs": []
         },
         {
@@ -316,7 +316,7 @@
             "value": 400,
             "sensors": [1],
             "actuators": [1],
-            "profiles": [],
+            "profiles": [2],
             "childs": []
         },
         {
@@ -325,7 +325,7 @@
             "value": 30,
             "sensors": [2],
             "actuators": [1],
-            "profiles": [],
+            "profiles": [1],
             "childs": []
         },
         {

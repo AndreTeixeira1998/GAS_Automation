@@ -219,6 +219,7 @@ void createAllDBTables (list* queryList) {
     DB_exec(queryList, "create_table_node_actuator", NULL);
     DB_exec(queryList, "create_table_actuator_state", NULL);
     DB_exec(queryList, "create_table_sensor_state", NULL);
+    DB_exec(queryList, "create_table_profile_rule", NULL);
 }
 
 int main(int argc, char const *argv[]) {

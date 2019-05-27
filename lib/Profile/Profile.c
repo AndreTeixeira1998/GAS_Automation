@@ -30,6 +30,21 @@ Profile* createProfile (Datastore* datastore, uint16_t id, const char* name, con
         strcpy(profile->name, name);
     }
 
+    if (start) {
+        char* hours = strtok(start, ":");
+        char* minutes = strtok(NULL, ":");
+
+        profile->start.tm_hour = strtol(hours, (char **)NULL, 10);
+        profile->start.tm_min = strtol(minutes, (char **)NULL, 10);
+    }
+    if (end) {
+        char* hours = strtok(end, ":");
+        char* minutes = strtok(NULL, ":");
+
+        profile->end.tm_hour = strtol(hours, (char **)NULL, 10);
+        profile->end.tm_min = strtol(minutes, (char **)NULL, 10);
+    }
+
     // Insert profile in the datastore
     list_element* elem = listInsert(datastore->profiles, profile, NULL);
 
@@ -126,7 +141,7 @@ DBQuery create_profile = {
     NULL,
     "create_profile",
     "INSERT INTO sinf.profile(profile_id, start_date, end_date) "
-    "VALUES($1, $2, $3);",
+    "VALUES($1, to_timestamp($2, 'HH24:MI'), to_timestamp($3, 'HH24:MI'));",
     3
 };
 
@@ -134,7 +149,7 @@ DBQuery create_named_profile = {
     NULL,
     "create_named_profile",
     "INSERT INTO sinf.profile(profile_id, start_date, end_date, name) "
-    "VALUES($1, $2, $3, $4);",
+    "VALUES($1, to_timestamp($2, 'HH24:MI'), to_timestamp($3, 'HH24:MI'), $4);",
     4
 };
 
@@ -145,12 +160,43 @@ DBQuery delete_profile = {
     1
 };
 
+DBQuery create_table_profile_rule = {
+    NULL,
+    "create_table_profile_rule",
+    "CREATE TABLE IF NOT EXISTS sinf.profile_rule("
+    "profile_id INTEGER NOT NULL,"
+    "rule_id INTEGER NOT NULL,"
+    "FOREIGN KEY (profile_id) REFERENCES sinf.profile(profile_id) ON UPDATE CASCADE ON DELETE CASCADE,"
+    "FOREIGN KEY (rule_id) REFERENCES sinf.rule(rule_id) ON UPDATE CASCADE ON DELETE CASCADE,"
+    "UNIQUE (profile_id, rule_id)"
+    ");",
+    0
+};
+
+DBQuery add_profile_to_rule = {
+    NULL,
+    "add_profile_to_rule",
+    "INSERT INTO sinf.profile_rule(profile_id, rule_id) "
+    "VALUES($1, $2);",
+    2
+};
+
+DBQuery remove_profile_from_rule = {
+    NULL,
+    "remove_profile_from_rule",
+    "DELETE FROM sinf.profile_rule WHERE profile_id=$1 AND rule_id=$2;",
+    2
+};
+
 void preparePriorityProfileQueries (list* queryList) {
     addQuerytoList(&create_table_profile, queryList);
+    addQuerytoList(&create_table_profile_rule, queryList);
 }
 
 void prepareProfileQueries (list* queryList) {
     addQuerytoList(&create_profile, queryList);
     addQuerytoList(&create_named_profile, queryList);
     addQuerytoList(&delete_profile, queryList);
+    addQuerytoList(&add_profile_to_rule, queryList);
+    addQuerytoList(&remove_profile_from_rule, queryList);
 }
