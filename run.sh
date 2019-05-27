@@ -23,7 +23,7 @@ sleep 3
 
 if getopts v: option
 then
-    bash -c "valgrind ./GAS.out GASconfig.json connString.conf /dev/pts/$firstout /dev/pts/$secondin"
+    bash -c "valgrind --leak-check=full ./GAS.out GASconfig.json connString.conf /dev/pts/$firstout /dev/pts/$secondin"
 else
     bash -c "./GAS.out GASconfig.json connString.conf /dev/pts/$firstout /dev/pts/$secondin"
 fi
