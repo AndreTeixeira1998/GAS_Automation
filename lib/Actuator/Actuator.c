@@ -185,9 +185,9 @@ DBQuery create_table_actuator_state = {
 DBQuery create_actuator_state = {
     NULL,
     "create_actuator_state",
-    "INSERT INTO sinf.actuator(actuator_id) "
-    "VALUES($1);",
-    1
+    "INSERT INTO sinf.actuator_state(actuator_id, value) "
+    "VALUES($1, $2);",
+    2
 };
 
 void preparePriorityActuatorQueries (list* queryList) {
