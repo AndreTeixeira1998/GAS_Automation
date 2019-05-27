@@ -575,3 +575,55 @@ Datastore* DB_importConfiguration (PGconn* conn, list* queryList) {
 
     return datastore;
 }
+
+void uploadSensorValue (Sensor* sensor, float val, list* queryList) {
+    DBQuery* query = findQueryByName(queryList, "create_sensor_state");
+    if (!query) {
+        fprintf(stderr, "Error uploading sensor value to DB.\n");
+    }
+    else {
+        // query has been found
+        char* params[query->nParams];
+        for (int i = 0; i < query->nParams; i++) {
+            params[i] = malloc(12*sizeof(char));
+        }
+        
+        sprintf(params[0], "%d", sensor->id);
+        snprintf(params[1], 12, "%f", val);
+
+        __DB_exec(
+            query,
+            params
+        );
+
+        for (int i = 0; i < query->nParams; i++) {
+            free(params[i]);
+        }
+    }
+}
+
+void uploadActuatorValue (Actuator* actuator, bool val, list* queryList) {
+    DBQuery* query = findQueryByName(queryList, "create_actuator_state");
+    if (!query) {
+        fprintf(stderr, "Error uploading actuator value to DB.\n");
+    }
+    else {
+        // query has been found
+        char* params[query->nParams];
+        for (int i = 0; i < query->nParams; i++) {
+            params[i] = malloc(12*sizeof(char));
+        }
+        
+        sprintf(params[0], "%d", actuator->id);
+        sprintf(params[1], "%d", val);
+
+        __DB_exec(
+            query,
+            params
+        );
+
+        for (int i = 0; i < query->nParams; i++) {
+            free(params[i]);
+        }
+    }
+}

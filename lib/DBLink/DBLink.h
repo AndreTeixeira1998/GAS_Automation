@@ -9,6 +9,7 @@ typedef struct _dbquery DBQuery;
 #include "Datastore.h"
 #include "Profile.h"
 #include "Pixel.h"
+#include "Actuator.h"
 
 struct _dbquery {
     PGconn* conn;
@@ -25,6 +26,8 @@ PGresult* __DB_exec (DBQuery* query, char* paramValues[]);
 PGresult* DB_exec (list* queryList, char* query_name, char* paramValues[]);
 void DB_uploadConfiguration (Datastore* datastore, list* queryList);
 Datastore* DB_importConfiguration (PGconn* conn, list* queryList);
+void uploadSensorValue (Sensor* sensor, float val, list* queryList);
+void uploadActuatorValue (Actuator* actuator, bool val, list* queryList);
 
 void addQuerytoList (DBQuery* query, list* queryList);
 
