@@ -327,7 +327,7 @@ DBQuery create_table_sensor_state = {
     "CREATE TABLE IF NOT EXISTS sinf.sensor_state("
     "sensor_state_id SERIAL NOT NULL PRIMARY KEY,"
     "sensor_id INTEGER NOT NULL,"
-    "value INTEGER NOT NULL,"
+    "value REAL NOT NULL,"
     "timestamp TIMESTAMP NOT NULL DEFAULT NOW(),"
     "FOREIGN KEY (sensor_id) REFERENCES sinf.sensor(sensor_id) ON UPDATE CASCADE ON DELETE CASCADE"
     ");",
@@ -337,9 +337,9 @@ DBQuery create_table_sensor_state = {
 DBQuery create_sensor_state = {
     NULL,
     "create_sensor_state",
-    "INSERT INTO sinf.sensor(sensor_id) "
-    "VALUES($1);",
-    1
+    "INSERT INTO sinf.sensor_state(sensor_id, value) "
+    "VALUES($1, $2);",
+    2
 };
 
 void preparePrioritySensorQueries (list* queryList) {
