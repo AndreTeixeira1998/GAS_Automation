@@ -77,7 +77,7 @@ bool deleteDatastore (Datastore* datastore) {
     }
     deleteList(datastore->pixels);
 
-    // Delete all room's profiles
+    // Delete all datastore's profiles
     aux = listStart(datastore->profiles);
     while (aux != NULL) {
         if (deleteProfile(aux->ptr)) {
@@ -88,7 +88,7 @@ bool deleteDatastore (Datastore* datastore) {
     }
     deleteList(datastore->profiles);
 
-    // Delete all room's rules
+    // Delete all datastore's rules
     aux = listStart(datastore->rules);
     while (aux != NULL) {
         if (deleteRule(aux->ptr)) {

@@ -302,6 +302,13 @@ bool addProfileToRule (Rule* rule, Profile* profile) {
         return true;
     }
 
+    LL_iterator(rule->profiles, rule_profile_elem) {
+        Profile* rule_profile = (Profile*)rule_profile_elem->ptr;
+        if (rule_profile->id == profile->id) {
+            return true;
+        }
+    }
+
     list_element* elem = listInsert(rule->profiles, profile, NULL);
     if (!elem) {
         // Error while inserting
@@ -320,9 +327,12 @@ bool removeProfileFromRule (Rule* rule, Profile* profile) {
         Profile* rule_profile = (Profile*)rule_profile_elem->ptr;
         if (rule_profile == profile) {
             list_element* res = listRemove(rule->profiles, rule_profile_elem);
-            if (res == NULL && listSize(profile->parentDatastore->profiles)) {
+            if (res == NULL && listSize(rule->profiles)) {
                 // TODO check this for logic error
                 return true;
+            }
+            else {
+                return false;
             }
         }
     }
