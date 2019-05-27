@@ -50,6 +50,7 @@ typedef struct {
     Datastore* datastore;
     FILE* stream;
     bool active;
+    list* queryList;
 }ThreadArgs;
 
 void* thread_readInput (void* arg) {
@@ -125,11 +126,12 @@ void* thread_readInput (void* arg) {
 void* thread_executeRules (void* arg) {
     ThreadArgs* args = arg;
     Datastore* datastore = args->datastore;
+    list* queryList = args->queryList;
     //FILE* stream = args->stream;
     int* ret = calloc(1, sizeof(int));
     
     while (args->active) {
-        executeRules(datastore);
+        executeRules(datastore, true, queryList);
 
         LL_iterator(datastore->rooms, room_elem) {
             Room* room = room_elem->ptr;
@@ -256,7 +258,7 @@ int main(int argc, char const *argv[]) {
     
     DB_uploadConfiguration(datastore, queryList);
     
-    /*FILE* inputStream = fopen(argv[3], "r");
+    FILE* inputStream = fopen(argv[3], "r");
     FILE* outputStream = fopen(argv[4], "w");
     //FILE* inputStream = stdin;
     //FILE* outputStream = stdout;
@@ -274,14 +276,17 @@ int main(int argc, char const *argv[]) {
     thread_args[THREAD_READINPUT].datastore = datastore;
     thread_args[THREAD_READINPUT].stream = inputStream;
     thread_args[THREAD_READINPUT].active = true;
+    thread_args[THREAD_READINPUT].queryList = queryList;
 
     thread_args[THREAD_EXECUTERULES].datastore = datastore;
     thread_args[THREAD_EXECUTERULES].stream = NULL;
     thread_args[THREAD_EXECUTERULES].active = true;
+    thread_args[THREAD_EXECUTERULES].queryList = queryList;
 
     thread_args[THREAD_WRITEOUTPUT].datastore = datastore;
     thread_args[THREAD_WRITEOUTPUT].stream = outputStream;
     thread_args[THREAD_WRITEOUTPUT].active = true;
+    thread_args[THREAD_WRITEOUTPUT].queryList = queryList;
 
     
     // Create the threads
@@ -320,7 +325,7 @@ int main(int argc, char const *argv[]) {
     fclose(outputStream);
     PQfinish(conn);
     deleteList(queryList);
-    deleteDatastore(datastore);*/
+    deleteDatastore(datastore);
 
 
     printf("Done\n\n");

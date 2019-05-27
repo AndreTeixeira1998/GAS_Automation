@@ -85,7 +85,7 @@ bool addActuatorToRule (Rule* rule, Actuator* actuator);
  * @return true Error
  * @return false All Good
  */
-bool executeRules (Datastore* datastore);
+bool executeRules (Datastore* datastore, bool uploadValues, list* queryList);
 
 /**
  * @brief Search the datastore for a Rule with the specified ID

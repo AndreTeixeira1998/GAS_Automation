@@ -1,4 +1,5 @@
 #include "Rule.h"
+#include "DBLink.h"
 
 Rule* createRule (Datastore* datastore, Rule* parentRule, uint16_t id, uint16_t type, uint16_t value) {
     if (!datastore) {
@@ -167,7 +168,7 @@ bool addActuatorToRule (Rule* rule, Actuator* actuator) {
     return false;
 }
 
-bool evaluateRule (Rule* rule) {
+bool evaluateRule (Rule* rule, bool uploadValues, list* queryList) {
     if (!rule) {
         return false;
     }
@@ -175,7 +176,7 @@ bool evaluateRule (Rule* rule) {
     // Test all childs
     LL_iterator(rule->childs, child_elem) {
         Rule* child = child_elem->ptr;
-        if (evaluateRule(child)) {
+        if (evaluateRule(child, uploadValues, queryList)) {
             // One Child is verified
             break;
         }
@@ -185,29 +186,32 @@ bool evaluateRule (Rule* rule) {
     // Test sensor values against rule value given the rule operation
     LL_iterator(rule->sensors, sensor_elem) {
         Sensor* sensor = sensor_elem->ptr;
-        float val = 0;
+        float val = getSensorValue(sensor);
+
+        if (uploadValues) {
+            uploadSensorValue(sensor, val, queryList);
+        }
         
         switch(rule->operation) {
             case TYPE_RULE_LESS_THEN:
-                if ( !(getSensorValue(sensor) < rule->value) ) {
+                if ( !(val < rule->value) ) {
                     return false;
                 }
                 break;
 
             case TYPE_RULE_GREATER_THEN:
-                if ( !(getSensorValue(sensor) > rule->value) ) {
+                if ( !(val > rule->value) ) {
                     return false;
                 }
                 break;
 
             case TYPE_RULE_EQUAL_TO:
-                if ( !(getSensorValue(sensor) == rule->value) ) {
+                if ( !(val == rule->value) ) {
                     return false;
                 }
                 break;
 
             case TYPE_RULE_WITHIN_MARGIN:
-                val = getSensorValue(sensor);
                 if ( !((val > ((float)(rule->value))*(0.95)) &&
                     (val < ((float)(rule->value))*(1.05)) )) {
                     return false;
@@ -224,7 +228,7 @@ bool evaluateRule (Rule* rule) {
     return true;
 }
 
-bool executeRules (Datastore* datastore) {
+bool executeRules (Datastore* datastore, bool uploadValues, list* queryList) {
     if (!datastore) {
         return true;
     }
@@ -244,11 +248,16 @@ bool executeRules (Datastore* datastore) {
 
     LL_iterator(datastore->rules, rule_elem) {
         Rule* rule = rule_elem->ptr;
-        bool active = evaluateRule(rule);
+        bool active = evaluateRule(rule, uploadValues, queryList);
 
         // Rule is active
         LL_iterator(rule->actuators, actuator_elem) {
             Actuator* actuator = actuator_elem->ptr;
+
+            if (uploadValues) {
+                uploadActuatorValue(actuator, active, queryList);
+            }
+
             Pixel* pixel = getActuatorPixel(actuator);
             if (setPixelColor(pixel, active ? &colorActive : &colorInactive)) {
                 return true;
