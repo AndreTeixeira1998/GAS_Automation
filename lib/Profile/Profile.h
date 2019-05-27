@@ -64,6 +64,8 @@ Profile* findProfileByID (Datastore* datastore, uint16_t id);
  */
 Profile* findProfileByName (Datastore* datastore, const char* name);
 
+bool isProfileActive (Profile* profile);
+
 void prepareProfileQueries (list* queryList);
 void preparePriorityProfileQueries (list* queryList);
 
