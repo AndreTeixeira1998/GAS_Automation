@@ -165,7 +165,7 @@ DBQuery remove_actuator_from_node = {
     "remove_actuator_from_node",
     "UPDATE sinf.node_actuator "
     "SET end_date = NOW() "
-    "WHERE node_id = $1 AND actuator_id = $2 AND end_date = NULL;",
+    "WHERE node_id = $1 AND actuator_id = $2 AND end_date IS NULL;",
     2
 };
 

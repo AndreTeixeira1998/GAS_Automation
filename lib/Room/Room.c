@@ -181,7 +181,7 @@ DBQuery remove_node_from_room = {
     "remove_node_from_room",
     "UPDATE sinf.room_node "
     "SET end_date = NOW() "
-    "WHERE room_id = $1 AND node_id = $2 AND end_date = NULL;",
+    "WHERE room_id = $1 AND node_id = $2 AND end_date IS NULL;",
     2
 };
 

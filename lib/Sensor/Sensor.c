@@ -317,7 +317,7 @@ DBQuery remove_sensor_from_node = {
     "remove_sensor_from_node",
     "UPDATE sinf.node_sensor "
     "SET end_date = NOW() "
-    "WHERE node_id = $1 AND sensor_id = $2 AND end_date = NULL;",
+    "WHERE node_id = $1 AND sensor_id = $2 AND end_date IS NULL;",
     2
 };
 
