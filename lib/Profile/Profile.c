@@ -134,22 +134,18 @@ bool isProfileActive (Profile* profile) {
 
     int startTimeInMinutes = ((profile->start).tm_hour)*60 + (profile->start).tm_min,
         endTimeInMinutes = ((profile->end).tm_hour)*60 + (profile->end).tm_min,
-        currentTimeInMinutes = (currentTime->tm_hour)*60 + (currentTime->tm_min),
-        timeWindow = 0;
+        currentTimeInMinutes = (currentTime->tm_hour)*60 + (currentTime->tm_min);
 
-    if (profile->end.tm_hour > profile->start.tm_hour) {
-        timeWindow = endTimeInMinutes - startTimeInMinutes;
-    }
-    else {
-        timeWindow = (24*60) - startTimeInMinutes + endTimeInMinutes;
-    }
+    if (endTimeInMinutes > startTimeInMinutes) {
+        int timeWindow = endTimeInMinutes - startTimeInMinutes;
 
-    if ((currentTimeInMinutes > startTimeInMinutes) &&
-        ((currentTimeInMinutes-startTimeInMinutes) < timeWindow)) {
-        
-        return true;
+        if ((currentTimeInMinutes >= startTimeInMinutes) &&
+            ((currentTimeInMinutes-startTimeInMinutes) < timeWindow)) {
+            
+            return true;
+        }
     }
-    else if (((24*60) - startTimeInMinutes + currentTimeInMinutes) < timeWindow) {
+    else if (currentTimeInMinutes < endTimeInMinutes) {
         return true;
     }
 
