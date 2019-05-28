@@ -173,6 +173,23 @@ bool evaluateRule (Rule* rule, bool uploadValues, list* queryList) {
         return false;
     }
 
+    bool profileActive = true; // Rule is active by default if no profile is applied
+    // Test all applied profiles
+    if (listSize(rule->profiles)) {
+        profileActive = false;
+        LL_iterator(rule->profiles, profile_elem) {
+            Profile* profile = (Profile*)profile_elem->ptr;
+            if (isProfileActive(profile)) {
+                profileActive = true;
+                break;
+            }
+        }
+    }
+
+    if (!profileActive) {
+        return false;
+    }
+
     // Test all childs
     LL_iterator(rule->childs, child_elem) {
         Rule* child = child_elem->ptr;
