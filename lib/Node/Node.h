@@ -64,6 +64,8 @@ bool setNodeID (Node* node, uint16_t id);
  */
 Node* findNodeByID (Datastore* datastore, uint16_t nodeID);
 
+bool moveNodeToRoom (Node* node, Room* room, list* queryList);
+
 void prepareNodeQueries (list* queryList);
 void preparePriorityNodeQueries (list* queryList);
 

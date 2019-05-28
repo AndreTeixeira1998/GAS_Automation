@@ -121,6 +121,74 @@ Node* findNodeByID (Datastore* datastore, uint16_t nodeID) {
     return NULL;
 }
 
+bool moveNodeToRoom (Node* node, Room* room, list* queryList) {
+    if (!node || !room) {
+        return true;
+    }
+
+    // REMOVE NODE FROM CURRENT ROOM
+    DBQuery* query = findQueryByName(queryList, "remove_node_from_room");
+    if (!query) {
+        fprintf(stderr, "Error moving node.\n");
+    }
+    else {
+        // query has been found
+        char* params[query->nParams];
+        for (int i = 0; i < query->nParams; i++) {
+            params[i] = malloc(12*sizeof(char));
+        }
+        
+        sprintf(params[0], "%d", node->parentRoom->id);
+        sprintf(params[1], "%d", node->id);
+
+        __DB_exec(
+            query,
+            params
+        );
+
+        for (int i = 0; i < query->nParams; i++) {
+            free(params[i]);
+        }
+    }
+
+    list_element* res = listRemove(node->parentRoom->nodes, node->listPtr);
+    if (res == NULL && listSize(node->parentRoom->nodes)) {
+        return true;
+    }
+    node->listPtr = NULL;
+
+    // ADD NODE TO NEW ROOM
+    query = findQueryByName(queryList, "add_node_to_room");
+    if (!query) {
+        fprintf(stderr, "Error moving node.\n");
+    }
+    else {
+        // query has been found
+        char* params[query->nParams];
+        for (int i = 0; i < query->nParams; i++) {
+            params[i] = malloc(12*sizeof(char));
+        }
+        
+        sprintf(params[0], "%d" ,room->id);
+        sprintf(params[1], "%d", node->id);
+
+        __DB_exec(
+            query,
+            params
+        );
+
+        for (int i = 0; i < query->nParams; i++) {
+            free(params[i]);
+        }
+    }
+
+    list_element* elem = listInsert(room->nodes, node, NULL);
+    node->listPtr = elem;
+    node->parentRoom = room;
+
+    return false;
+}
+
 /**********************************/
 /*        DATABASE QUERIES        */
 /**********************************/
