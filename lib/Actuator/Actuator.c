@@ -107,6 +107,74 @@ Actuator* findActuatorByID (Datastore* datastore, uint16_t actuatorID) {
     return NULL;
 }
 
+bool moveActuatorToNode (Actuator* actuator, Node* node, list* queryList) {
+    if (!actuator || !node) {
+        return true;
+    }
+
+    // REMOVE NODE FROM CURRENT ROOM
+    DBQuery* query = findQueryByName(queryList, "remove_actuator_from_node");
+    if (!query) {
+        fprintf(stderr, "Error moving actuator.\n");
+    }
+    else {
+        // query has been found
+        char* params[query->nParams];
+        for (int i = 0; i < query->nParams; i++) {
+            params[i] = malloc(12*sizeof(char));
+        }
+        
+        sprintf(params[0], "%d", actuator->parentNode->id);
+        sprintf(params[1], "%d", actuator->id);
+
+        __DB_exec(
+            query,
+            params
+        );
+
+        for (int i = 0; i < query->nParams; i++) {
+            free(params[i]);
+        }
+    }
+
+    list_element* res = listRemove(actuator->parentNode->actuators, actuator->listPtr);
+    if (res == NULL && listSize(actuator->parentNode->actuators)) {
+        return true;
+    }
+    actuator->listPtr = NULL;
+
+    // ADD NODE TO NEW ROOM
+    query = findQueryByName(queryList, "add_actuator_to_node");
+    if (!query) {
+        fprintf(stderr, "Error moving actuator.\n");
+    }
+    else {
+        // query has been found
+        char* params[query->nParams];
+        for (int i = 0; i < query->nParams; i++) {
+            params[i] = malloc(12*sizeof(char));
+        }
+        
+        sprintf(params[0], "%d", node->id);
+        sprintf(params[1], "%d", actuator->id);
+
+        __DB_exec(
+            query,
+            params
+        );
+
+        for (int i = 0; i < query->nParams; i++) {
+            free(params[i]);
+        }
+    }
+
+    list_element* elem = listInsert(node->actuators, actuator, NULL);
+    actuator->listPtr = elem;
+    actuator->parentNode = node;
+
+    return false;
+}
+
 /**********************************/
 /*        DATABASE QUERIES        */
 /**********************************/
