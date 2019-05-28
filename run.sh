@@ -26,12 +26,12 @@ else
     sleep 3
 
     bash -c "./GAS.out GASconfig.json connString.conf /dev/pts/$firstout /dev/pts/$secondin"
+    
+    #python sims/write_matrix.py > /dev/pts/$secondin
+    P5=$!
+
+    kill $P4
+    kill $P3
+    kill $P2
+    kill $P1
 fi
-
-#python sims/write_matrix.py > /dev/pts/$secondin
-P5=$!
-
-kill $P4
-kill $P3
-kill $P2
-kill $P1
