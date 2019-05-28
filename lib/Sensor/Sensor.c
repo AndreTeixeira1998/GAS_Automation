@@ -259,6 +259,74 @@ bool updateSensorPixel (Sensor* sensor) {
     return false;
 }
 
+bool moveSensorToNode (Sensor* sensor, Node* node, list* queryList) {
+    if (!sensor || !node) {
+        return true;
+    }
+
+    // REMOVE NODE FROM CURRENT ROOM
+    DBQuery* query = findQueryByName(queryList, "remove_sensor_from_node");
+    if (!query) {
+        fprintf(stderr, "Error moving sensor.\n");
+    }
+    else {
+        // query has been found
+        char* params[query->nParams];
+        for (int i = 0; i < query->nParams; i++) {
+            params[i] = malloc(12*sizeof(char));
+        }
+        
+        sprintf(params[0], "%d", sensor->parentNode->id);
+        sprintf(params[1], "%d", sensor->id);
+
+        __DB_exec(
+            query,
+            params
+        );
+
+        for (int i = 0; i < query->nParams; i++) {
+            free(params[i]);
+        }
+    }
+
+    list_element* res = listRemove(sensor->parentNode->sensors, sensor->listPtr);
+    if (res == NULL && listSize(sensor->parentNode->sensors)) {
+        return true;
+    }
+    sensor->listPtr = NULL;
+
+    // ADD NODE TO NEW ROOM
+    query = findQueryByName(queryList, "add_sensor_to_node");
+    if (!query) {
+        fprintf(stderr, "Error moving sensor.\n");
+    }
+    else {
+        // query has been found
+        char* params[query->nParams];
+        for (int i = 0; i < query->nParams; i++) {
+            params[i] = malloc(12*sizeof(char));
+        }
+        
+        sprintf(params[0], "%d", node->id);
+        sprintf(params[1], "%d", sensor->id);
+
+        __DB_exec(
+            query,
+            params
+        );
+
+        for (int i = 0; i < query->nParams; i++) {
+            free(params[i]);
+        }
+    }
+
+    list_element* elem = listInsert(node->sensors, sensor, NULL);
+    sensor->listPtr = elem;
+    sensor->parentNode = node;
+
+    return false;
+}
+
 /**********************************/
 /*        DATABASE QUERIES        */
 /**********************************/

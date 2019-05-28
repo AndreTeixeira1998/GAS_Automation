@@ -178,6 +178,8 @@ Sensor* findSensorByID (Datastore* datastore, uint16_t id);
  */
 bool updateSensorPixel (Sensor* sensor);
 
+bool moveSensorToNode (Sensor* sensor, Node* node, list* queryList);
+
 void prepareSensorQueries (list* queryList);
 void preparePrioritySensorQueries (list* queryList);
 

@@ -169,7 +169,7 @@ bool moveNodeToRoom (Node* node, Room* room, list* queryList) {
             params[i] = malloc(12*sizeof(char));
         }
         
-        sprintf(params[0], "%d" ,room->id);
+        sprintf(params[0], "%d", room->id);
         sprintf(params[1], "%d", node->id);
 
         __DB_exec(
