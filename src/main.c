@@ -255,7 +255,7 @@ int main(int argc, char const *argv[]) {
         printf("Error in config file.\n");
         return 1;
     }
-    
+
     DB_uploadConfiguration(datastore, queryList);
     
     FILE* inputStream = fopen(argv[3], "r");
@@ -288,7 +288,7 @@ int main(int argc, char const *argv[]) {
     thread_args[THREAD_WRITEOUTPUT].active = true;
     thread_args[THREAD_WRITEOUTPUT].queryList = queryList;
 
-    
+
     // Create the threads
     thread_IDs[THREAD_READINPUT] = pthread_create(&threads[THREAD_READINPUT], NULL, &thread_readInput, &thread_args[THREAD_READINPUT]);
     thread_IDs[THREAD_EXECUTERULES] = pthread_create(&threads[THREAD_EXECUTERULES], NULL, &thread_executeRules, &thread_args[THREAD_EXECUTERULES]);
@@ -297,6 +297,10 @@ int main(int argc, char const *argv[]) {
     // Run until asked to quit
     printf("\n\nPress ENTER to exit...");
     getchar();
+
+    moveNodeToRoom(findNodeByID(datastore, 1), findRoomByID(datastore, 2), queryList);
+    moveSensorToNode(findSensorByID(datastore, 1), findNodeByID(datastore, 2), queryList);
+    moveActuatorToNode(findActuatorByID(datastore, 1), findNodeByID(datastore, 2), queryList);
 
     // Signal threads to die
     thread_args[THREAD_READINPUT].active = false;
